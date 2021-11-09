@@ -1,0 +1,33 @@
+@startuml Permissions
+class PermissionsDoc {
+}
+
+class Permission {
+  name: string
+  note : string
+  alsoRequires : string
+}
+PermissionsDoc "1" *-- "*" Permission : permissions
+
+class Scheme { 
+    requiresAdminConsent : bool
+    description
+    consentDescription
+}
+Scheme --> SchemeType : type
+class SchemeType {
+    name: string
+}
+Permission "1" *-- "*" Scheme : schemes
+
+class PathSet  {
+    methods: string[]
+    
+}
+class Path {
+    excludeProperties: string[]
+}
+PathSet "1" *-- "*" Path : paths
+Permission "1" *-- "*" PathSet : pathSets
+PathSet "*" --> "*" SchemeType : schemes
+@enduml
