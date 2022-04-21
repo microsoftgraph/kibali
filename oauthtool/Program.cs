@@ -174,13 +174,17 @@ namespace OAuthTool
                 // add scheme of schemeType, set descriptions
                 var newScheme = new Scheme
                 {
+                    Type = schemeType,
                     RequiresAdminConsent = scheme.GetProperty("Grant").GetString() == "admin",
                     Description = scheme.GetProperty("Description").GetString(),
-                    ConsentDescription = scheme.GetProperty("CosentDescription").GetString()
+                    ConsentDescription = scheme.GetProperty("ConsentDescription").GetString()
                 };
-                if (!perm.Schemes.ContainsKey(schemeType)) {
+                if (!perm.Schemes.ContainsKey(schemeType))
+                {
                     perm.Schemes.Add(schemeType, newScheme);
-                } else {
+                }
+                else
+                {
                     Console.WriteLine($"Duplicate entry for {name} in scheme {schemeType}");
                 }
             }
