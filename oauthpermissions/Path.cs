@@ -2,26 +2,42 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace OAuthPermissions
+namespace ApiPermissions
 {
-    public class Path
+    public class PathConstraints
     {
-        public List<String> ExcludeProperties { get; set; } = new List<String>();
+        private List<string> leastPrivilegedPermission;
+
+        public List<string> LeastPrivilegedPermission
+        {
+            get
+            {
+                if (leastPrivilegedPermission == null)
+                {
+                    leastPrivilegedPermission = new List<string>();
+                }
+                return leastPrivilegedPermission;
+            }
+            set => leastPrivilegedPermission = value;
+        }
+
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            if (ExcludeProperties.Count > 0)
+
+            if (LeastPrivilegedPermission.Count > 0)
             {
-                writer.WritePropertyName("excludeProperties");
+                writer.WritePropertyName("leastPrivilegedPermission");
                 writer.WriteStartArray();
-                foreach (var prop in ExcludeProperties)
+                foreach (var perm in LeastPrivilegedPermission)
                 {
-                    writer.WriteStringValue(prop);
+                    writer.WriteStringValue(perm);
                 }
                 writer.WriteEndArray();
             }
             writer.WriteEndObject();
         }
+
     }
 
 }

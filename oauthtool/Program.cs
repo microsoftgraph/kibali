@@ -1,8 +1,13 @@
-﻿using OAuthPermissions;
+﻿using Azure.Core;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
+using ApiPermissions;
+using ApiPermissions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -16,10 +21,92 @@ namespace OAuthTool
         {
             var doc = new PermissionsDocument();
 
-         //   ParseFromMerillCSV(doc, "../../../../permissions.csv");
+            //   ParseFromMerillCSV(doc, "../../../../permissions.csv");
             await ParseFromGEPermissions(doc, "../../../../permissions-beta.json");
 
             await WriteDocuments(doc, "./output");
+        }
+
+        private static async Task TestGraphAPI(PermissionsDocument permissionDocument)
+        {
+            var stream = new MemoryStream();
+            var result = await new OpenApiStreamReader().ReadAsync(stream);
+            var openApiDoc = result.OpenApiDocument;
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(permissionDocument);
+
+            //Create Application
+
+            //Create credentials to use for testing delegated permissions
+            TokenCredential delegatedCredential = null;
+            //Create credentials to use for testing application-only permissions
+            TokenCredential appOnlyCredential = null;
+
+            
+            foreach (var (name,permission) in permissionDocument.Permissions)
+            {
+                // Consent app to the permission
+                
+                TestPaths(openApiDoc, (string url) => AccessRequestResult.Success == authZChecker.CanAccess(url, "GET", "DelegatedWork", new string[] { name } ), delegatedCredential);
+                TestPaths(openApiDoc, (string url) => AccessRequestResult.Success == authZChecker.CanAccess(url, "GET", "Application", new string[] { name }), appOnlyCredential);
+
+                // Remove consent from the app
+            } 
+
+            // Delete the application
+        }
+
+        private static void TestPaths(OpenApiDocument openApiDoc, Func<string,bool> canAccess, TokenCredential credential)
+        {
+            foreach (var (url, pathItem) in openApiDoc.Paths)
+            {
+                foreach (var (method, operation) in pathItem.Operations)
+                {
+                    List<string> allowedUrls = null;
+                    HttpStatusCode status = HttpStatusCode.OK;
+                    switch (method)
+                    {
+                        case Microsoft.OpenApi.Models.OperationType.Get:
+                            status = TestGetOperation(operation);
+                            break;
+                        case Microsoft.OpenApi.Models.OperationType.Put:
+                            break;
+                        case Microsoft.OpenApi.Models.OperationType.Post:
+                            break;
+                        case Microsoft.OpenApi.Models.OperationType.Delete:
+                            break;
+                        case Microsoft.OpenApi.Models.OperationType.Patch:
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (canAccess(url) )
+                    {
+                        if (status == HttpStatusCode.Forbidden)
+                        {
+                            // This is a problem
+                        }
+                    } else
+                    {
+                        if (status != HttpStatusCode.Forbidden)
+                        {
+                            // This is a problem
+                        }
+                    }
+
+                    if (!allowedUrls.Contains(url) && status != HttpStatusCode.Forbidden)
+                    {
+                        // Danger will
+                    }
+
+                }
+            }
+        }
+
+        private static HttpStatusCode TestGetOperation(OpenApiOperation operation)
+        {
+            throw new NotImplementedException();
         }
 
         private static void ParseFromMerillCSV(PermissionsDocument doc, string inputfile)
@@ -79,7 +166,7 @@ namespace OAuthTool
                         schemes.Add(entry.Scheme);
                     }
                     var pathSet = GetOrCreatePathSet(perm, methods, schemes);
-                    pathSet.Paths.Add(pathDetails.Key, new OAuthPermissions.Path());
+                    pathSet.Paths.Add(pathDetails.Key, new ApiPermissions.PathConstraints());
                 }
             }
 
@@ -174,10 +261,9 @@ namespace OAuthTool
                 // add scheme of schemeType, set descriptions
                 var newScheme = new Scheme
                 {
-                    Type = schemeType,
                     RequiresAdminConsent = scheme.GetProperty("Grant").GetString() == "admin",
-                    Description = scheme.GetProperty("Description").GetString(),
-                    ConsentDescription = scheme.GetProperty("ConsentDescription").GetString()
+                    UserDescription = scheme.GetProperty("Description").GetString(),
+                    AdminDescription = scheme.GetProperty("ConsentDescription").GetString()
                 };
                 if (!perm.Schemes.ContainsKey(schemeType))
                 {
@@ -212,7 +298,7 @@ namespace OAuthTool
 
                 if (!perm.Schemes.ContainsKey(type))
                 {
-                    perm.Schemes.Add(type, new Scheme() { Type = type });
+                    perm.Schemes.Add(type, new Scheme() );
                 }
                 PathSet pathSet;
                 if (perm.PathSets.Count == 0)
@@ -225,7 +311,7 @@ namespace OAuthTool
                 }
 
                 pathSet.Methods.Add(method);
-                pathSet.Paths.TryAdd(path, new OAuthPermissions.Path());
+                pathSet.Paths.TryAdd(path, new ApiPermissions.PathConstraints());
             }
             else
             {

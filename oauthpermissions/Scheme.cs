@@ -1,35 +1,25 @@
 ﻿using System;
 using System.Text.Json;
 
-namespace OAuthPermissions
+namespace ApiPermissions
 {
     public class Scheme
     {
-        public SchemeType Type { get; set; }
-        public string Description { get; set; }
-        public string ConsentDescription { get; set; }
+        public string AdminDisplayName { get; set; }
+        public string AdminDescription { get; set; }
+        public string UserDisplayName { get; set; }
+        public string UserDescription { get; set; }
         public bool RequiresAdminConsent { get; set; }
 
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
 
-            writer.WriteString("type", Type.ToString());
-
-            if (RequiresAdminConsent)
-            {
-                writer.WriteBoolean("admin", RequiresAdminConsent);
-            }
-
-            if (!String.IsNullOrEmpty(Description))
-            {
-                writer.WriteString("description", Description);
-            }
-
-            if (!String.IsNullOrEmpty(ConsentDescription))
-            {
-                writer.WriteString("consentDescription", ConsentDescription);
-            }
+            if (!String.IsNullOrEmpty(AdminDisplayName)) writer.WriteString("adminDisplayName", AdminDisplayName);
+            if (!String.IsNullOrEmpty(AdminDescription)) writer.WriteString("adminDescription", AdminDescription);
+            if (!String.IsNullOrEmpty(UserDisplayName)) writer.WriteString("userDisplayName", UserDisplayName);
+            if (!String.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
+            if (RequiresAdminConsent == true) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
 
             writer.WriteEndObject();
         }

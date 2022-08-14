@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace OAuthPermissions
+namespace ApiPermissions
 {
     public class Permission
     {
-        public string AlsoRequires { get; set; }
+        public string Note { get; set; }
+        public bool Implicit { get; set; } = false;
+        public bool IsHidden { get; set; } = false;
+        public string OwnerEmail { get; set; }
+        public string PrivilegeLevel { get; set; }
+        public List<string> RequiredEnvironments { get; set; } = new List<string>();
+
         public Dictionary<SchemeType, Scheme> Schemes { get; set; } = new Dictionary<SchemeType, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
 
@@ -14,10 +20,10 @@ namespace OAuthPermissions
         {
             writer.WriteStartObject();
 
-            if (!String.IsNullOrEmpty(AlsoRequires))
-            {
-                writer.WriteString("alsoRequires", AlsoRequires);
-            }
+            if (!String.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
+            if (Implicit == true) writer.WriteBoolean("implicit", Implicit);
+            if (IsHidden == true) writer.WriteBoolean("isHidden", IsHidden);
+            if (!String.IsNullOrWhiteSpace(OwnerEmail)) writer.WriteString("ownerEmail", OwnerEmail);
 
             writer.WritePropertyName("schemes");
             writer.WriteStartObject();

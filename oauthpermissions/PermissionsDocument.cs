@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OAuthPermissions
+namespace ApiPermissions
 {
     public class PermissionsDocument
     {
