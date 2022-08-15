@@ -23,6 +23,22 @@ namespace ApiPermissions
 
             writer.WriteEndObject();
         }
+
+        public static Scheme Load(JsonElement value)
+        {
+            var scheme = new Scheme();
+            ParsingHelpers.ParseMap(value, scheme, handlers);
+            return scheme;
+        }
+
+        private static readonly FixedFieldMap<Scheme> handlers = new()
+        {
+            { "adminDisplayName", (o,v) => {o.AdminDisplayName = v.GetString();  } },
+            { "adminDescription", (o,v) => {o.AdminDescription = v.GetString();  } },
+            { "userDisplayName", (o,v) => {o.UserDisplayName = v.GetString();  } },
+            { "userDescription", (o,v) => {o.UserDescription = v.GetString();  } },
+            { "requiresAdminConsent", (o,v) => {o.RequiresAdminConsent = v.GetBoolean();  } },
+        };
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security;
 using System.Text.Json;
 
 namespace ApiPermissions
@@ -9,9 +10,9 @@ namespace ApiPermissions
         public HashSet<string> Schemes { get; set; } = new HashSet<string>();
         public HashSet<string> Methods { get; set; } = new HashSet<string>();
         public string AlsoRequires { get; set; }
-        public List<String> ExcludedProperties { get; set; } = new List<String>();
-        public List<String> IncludedProperties { get; set; } = new List<String>();
-
+        public List<string> ExcludedProperties { get; set; } = new List<string>();
+        public List<string> IncludedProperties { get; set; } = new List<string>();
+        
 
         public Dictionary<string, PathConstraints> Paths
         {
@@ -90,6 +91,22 @@ namespace ApiPermissions
             writer.WriteEndObject();
         }
 
+        public static PathSet Load(JsonElement value)
+        {
+            var pathSet = new PathSet();
+            ParsingHelpers.ParseMap(value, pathSet, handlers);
+            return pathSet;
+        }
+
+        private static FixedFieldMap<PathSet> handlers = new()
+        {
+            { "alsoRequires", (o,v) => {o.AlsoRequires = v.GetString();  } },
+            { "methods", (o,v) => {o.Methods = ParsingHelpers.GetHashSetOfString(v);  } },
+            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetHashSetOfString(v);  } },
+            { "paths", (o,v) => {o.Paths = ParsingHelpers.GetMap(v, PathConstraints.Load);  } },
+            { "includedProperties", (o,v) => {o.IncludedProperties = ParsingHelpers.GetListOfString(v);  } },
+            { "excludedProperties", (o,v) => {o.ExcludedProperties = ParsingHelpers.GetListOfString(v);  } },
+        };
     }
 
 }

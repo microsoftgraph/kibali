@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace ApiPermissions
@@ -124,7 +125,26 @@ namespace ApiPermissions
                     }
                     supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires));
                 }
-                this.SupportedMethods.Add(supportedMethod, supportedSchemes);
+                if (!this.SupportedMethods.ContainsKey(supportedMethod))
+                {
+                    this.SupportedMethods.Add(supportedMethod, supportedSchemes);
+                } else
+                {
+                    Update(this.SupportedMethods[supportedMethod], supportedSchemes);
+                };
+                
+            }
+        }
+
+        private void Update(Dictionary<string, List<AcceptableClaim>> existingClaims, Dictionary<string, List<AcceptableClaim>> newClaims)
+        {
+            foreach(var newClaim in newClaims)
+            {
+                
+                if (existingClaims.TryGetValue(newClaim.Key, out var existingClaim))
+                {
+                    existingClaim.AddRange(newClaim.Value);
+                }
             }
         }
     }

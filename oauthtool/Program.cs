@@ -10,6 +10,8 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using oauthpermissions;
+using System.Net.Http;
 
 namespace OAuthTool
 {
@@ -22,7 +24,9 @@ namespace OAuthTool
             var doc = new PermissionsDocument();
 
             //   ParseFromMerillCSV(doc, "../../../../permissions.csv");
-            await ParseFromGEPermissions(doc, "../../../../permissions-beta.json");
+            await ParseFromGEPermissions(doc, "https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-beta.json");
+
+            CsdlExporter.Export("csdl.xml", doc);
 
             await WriteDocuments(doc, "./output");
         }
@@ -41,7 +45,6 @@ namespace OAuthTool
             TokenCredential delegatedCredential = null;
             //Create credentials to use for testing application-only permissions
             TokenCredential appOnlyCredential = null;
-
             
             foreach (var (name,permission) in permissionDocument.Permissions)
             {
@@ -127,8 +130,17 @@ namespace OAuthTool
 
         private static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputfile)
         {
+            Stream input = null;
+            if (inputfile.StartsWith("http"))
+            {
+                var client = new HttpClient();
+                input = await client.GetStreamAsync(inputfile);
+            } else
+            {
+                input = new FileStream(inputfile, FileMode.Open);
+            }
 
-            var jsonDoc = await JsonDocument.ParseAsync(new FileStream(inputfile, FileMode.Open));
+            var jsonDoc = await JsonDocument.ParseAsync(input);
 
             var rootObject = jsonDoc.RootElement;
 
@@ -136,11 +148,11 @@ namespace OAuthTool
 
             var permissionSchemes = rootObject.GetProperty("PermissionSchemes");
 
-            ProcessPermissionsSchemes(SchemeType.DelegatedPersonal,
+            ProcessPermissionsSchemes("DelegatedPersonal",
                                         permissionSchemes.GetProperty("DelegatedPersonal"), doc);
-            ProcessPermissionsSchemes(SchemeType.DelegatedWork,
+            ProcessPermissionsSchemes("DelegatedWork",
                                         permissionSchemes.GetProperty("DelegatedWork"), doc);
-            ProcessPermissionsSchemes(SchemeType.Application,
+            ProcessPermissionsSchemes("Application",
                                         permissionSchemes.GetProperty("Application"), doc);
             var entries = CreatePermissionsEntries(apiPermissions);
 
@@ -208,7 +220,8 @@ namespace OAuthTool
                     if (tempDoc != null)
                     {
                         Console.WriteLine("Outputing " + currentResource);
-                        using (var outStream = new FileStream($"{outputPath}/{currentResource}.json", FileMode.Create))
+                        var filename = currentResource.Replace("/", "-");
+                        using (var outStream = new FileStream($"{outputPath}/{filename}.json", FileMode.Create))
                         {
                             await tempDoc.WriteAsync(outStream);
                         }
@@ -245,7 +258,7 @@ namespace OAuthTool
             return entries;
         }
 
-        private static void ProcessPermissionsSchemes(SchemeType schemeType, JsonElement schemes, PermissionsDocument doc)
+        private static void ProcessPermissionsSchemes(string schemeType, JsonElement schemes, PermissionsDocument doc)
         {
             foreach( var scheme in schemes.EnumerateArray())
             {
@@ -276,22 +289,23 @@ namespace OAuthTool
             }
         }
 
-        private static SchemeType GetSchemeType(bool isApplication, bool isDelegatedWork)
+        private static string GetSchemeType(bool isApplication, bool isDelegatedWork)
         {
             if (isApplication)
             {
                 // Add ApplicationPermission
-                return SchemeType.Application;
+                return "Application";
             }
             if (isDelegatedWork)
             {
                 // Add DelegatePermission
-             return SchemeType.DelegatedWork;
+             return "DelegatedWork";
+
             }
-            return SchemeType.DelegatedPersonal;
+            return "DelegatedPersonal";
         }
 
-        private static void CreatePath(PermissionsDocument doc, string name, string path, string method, SchemeType type)
+        private static void CreatePath(PermissionsDocument doc, string name, string path, string method, string type)
         {
             if (doc.Permissions.TryGetValue(name, out Permission perm))
             {

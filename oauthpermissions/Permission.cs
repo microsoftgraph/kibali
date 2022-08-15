@@ -13,7 +13,7 @@ namespace ApiPermissions
         public string PrivilegeLevel { get; set; }
         public List<string> RequiredEnvironments { get; set; } = new List<string>();
 
-        public Dictionary<SchemeType, Scheme> Schemes { get; set; } = new Dictionary<SchemeType, Scheme>();
+        public Dictionary<string, Scheme> Schemes { get; set; } = new Dictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
 
         public void Write(Utf8JsonWriter writer)
@@ -43,6 +43,25 @@ namespace ApiPermissions
             writer.WriteEndArray();
             writer.WriteEndObject();
         }
+
+        internal static Permission Load(JsonElement value)
+        {
+            var permission = new Permission();
+            ParsingHelpers.ParseMap(value, permission, handlers);
+            return permission;
+        }
+
+        private static FixedFieldMap<Permission> handlers = new()
+        {
+            { "note", (o,v) => {o.Note = v.GetString();  } },
+            { "privilegeLevel", (o,v) => {o.PrivilegeLevel= v.GetString();  } },
+            { "ownerEmail", (o,v) => {o.OwnerEmail= v.GetString();  } },
+            { "requiredEnvironments", (o,v) => {o.RequiredEnvironments= ParsingHelpers.GetListOfString(v); } },
+            { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
+            { "isHidden", (o,v) => {o.IsHidden = v.GetBoolean();  } },
+            { "pathsets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
+            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetMap(v, Scheme.Load);  } },
+        };
     }
 
 }

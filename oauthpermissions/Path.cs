@@ -38,6 +38,22 @@ namespace ApiPermissions
             writer.WriteEndObject();
         }
 
+        public static PathConstraints Load(JsonElement value)
+        {
+            if (value.ValueKind == JsonValueKind.Null)
+            {
+                return null;
+            }
+            var pathConstraints = new PathConstraints();
+            ParsingHelpers.ParseMap(value, pathConstraints, handlers);
+            return pathConstraints;
+        }
+
+        private static FixedFieldMap<PathConstraints> handlers = new()
+        {
+            { "leastPrivilegedPermission", (o,v) => {o.LeastPrivilegedPermission = ParsingHelpers.GetListOfString(v);  } },
+        };
+
     }
 
 }

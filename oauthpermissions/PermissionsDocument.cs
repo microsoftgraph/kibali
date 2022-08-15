@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace ApiPermissions
 {
     public class PermissionsDocument
     {
-        private Dictionary<string,Permission> permissions = new Dictionary<string,Permission>();
-
-        public Dictionary<string,Permission> Permissions { get => permissions; }
+        private Dictionary<string, Permission> permissions = new Dictionary<string, Permission>();
+        
+        public Dictionary<string, Permission> Permissions { get => permissions; set => permissions = value;  }
 
         public async Task WriteAsync(FileStream outStream)
         {
@@ -22,18 +23,50 @@ namespace ApiPermissions
         private void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-                writer.WriteString("$schema", "../../../../permissionsSchema.json");
-                writer.WritePropertyName("permissions");
-                writer.WriteStartObject();
-                    foreach (var permissionPair in this.permissions)
-                    {
-                        writer.WritePropertyName(permissionPair.Key);
-                        permissionPair.Value.Write(writer);
-                    }
-                writer.WriteEndObject();
+            writer.WriteString("$schema", "../../../../permissionsSchema.json");
+            writer.WritePropertyName("permissions");
+            writer.WriteStartObject();
+            foreach (var permissionPair in this.permissions)
+            {
+                writer.WritePropertyName(permissionPair.Key);
+                permissionPair.Value.Write(writer);
+            }
+            writer.WriteEndObject();
             writer.WriteEndObject();
         }
+
+
+        public PermissionsDocument Load(string document) 
+        {
+            return Load(JsonDocument.Parse(document));
+        }
+
+        public static PermissionsDocument Load(MemoryStream documentStream)
+        {
+            return Load(JsonDocument.Parse(documentStream));
+        }
+        public static PermissionsDocument Load(JsonDocument doc)
+        {
+            return Load(doc.RootElement);
+        }
+
+        public static PermissionsDocument Load(JsonElement value)
+        {
+            var permissionsDocument = new PermissionsDocument();
+
+            ParsingHelpers.ParseMap(value, permissionsDocument, handlers);
+
+            return permissionsDocument;
+        }
+
+        private static readonly FixedFieldMap<PermissionsDocument> handlers = new()
+        {
+            { "permissions", (d,v) => { d.Permissions = ParsingHelpers.GetMap(v,Permission.Load);  } }
+        };
+        
     }
+
+        
 
     public enum SchemeType
     {
