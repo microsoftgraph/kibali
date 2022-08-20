@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Microsoft.OpenApi;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Interfaces;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Services;
+using Microsoft.OpenApi.Writers;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,12 +16,12 @@ namespace ApiPermissions
     {
         private readonly List<PermissionsDocument> permissionsDocuments = new List<PermissionsDocument>();
         private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
-
+        private OpenApiUrlTreeNode urlTree;
 
         public Dictionary<string, ProtectedResource> Resources { get
             {
                 return resources;
-            } 
+            }
         }
         public void Load(PermissionsDocument permissionsDocument)
         {
@@ -22,28 +29,32 @@ namespace ApiPermissions
             InvertPermissionsDocument(permissionsDocument);
         }
 
-        private void InvertPermissionsDocument(PermissionsDocument permissionsDocument)
+        public ProtectedResource FindResource(string url)
         {
-            // Walk permissions, find each pathSet and add path to dictionary
-            foreach(var permission in permissionsDocument.Permissions )
+            var parsedUrl = new Uri(new Uri("https://example.org/"), url, true);
+            var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
+
+            return Find(UrlTree, segments);
+        }
+
+        public IEnumerable<AcceptableClaim> GetRequiredPermissions(string url, string method, string scheme)
+        {
+            var resource = FindResource(url);
+            if (resource == null)
             {
-                foreach(var pathSet in permission.Value.PathSets) {
-                    foreach( var path in pathSet.Paths )
-                    {
-                        ProtectedResource resource;
-                        if (resources.ContainsKey(path.Key))
-                        {
-                            resource = resources[path.Key];
-                            
-                        } else
-                        {
-                            resource = new ProtectedResource(path.Key);
-                            resources.Add(path.Key, resource);
-                        }
-                        resource.AddRequiredClaims(permission.Key,pathSet);
-                    }
-                }
+                return new List<AcceptableClaim>();
             }
+            if (!resource.SupportedMethods.TryGetValue(method, out var supportedSchemes))
+            {
+                return new List<AcceptableClaim>();
+            }
+
+            if (!supportedSchemes.TryGetValue(scheme, out var acceptableClaims))
+            {
+                return new List<AcceptableClaim>();
+            }
+
+            return acceptableClaims;
         }
 
         public AccessRequestResult CanAccess(string url, string method, string scheme, string[] providedPermissions)
@@ -51,9 +62,9 @@ namespace ApiPermissions
             var resource = FindResource(url);
             if (resource == null)
             {
-                return AccessRequestResult.MissingResource; 
+                return AccessRequestResult.MissingResource;
             }
-            if (!resource.SupportedMethods.TryGetValue(method,out var supportedSchemes)) {
+            if (!resource.SupportedMethods.TryGetValue(method, out var supportedSchemes)) {
                 return AccessRequestResult.UnsupportedMethod;
             }
 
@@ -71,13 +82,112 @@ namespace ApiPermissions
             return AccessRequestResult.InsufficientPermissions;
         }
 
-
-        private ProtectedResource FindResource(string url)
+        private void InvertPermissionsDocument(PermissionsDocument permissionsDocument)
         {
-            this.resources.TryGetValue(url, out var protectedResource);  // Todo: replace with template matching.
-            return protectedResource;
+            // Walk permissions, find each pathSet and add path to dictionary
+            foreach (var permission in permissionsDocument.Permissions)
+            {
+                foreach (var pathSet in permission.Value.PathSets)
+                {
+                    foreach (var path in pathSet.Paths)
+                    {
+                        ProtectedResource resource;
+                        if (resources.ContainsKey(path.Key))
+                        {
+                            resource = resources[path.Key];
+
+                        }
+                        else
+                        {
+                            resource = new ProtectedResource(path.Key);
+                            resources.Add(path.Key, resource);
+                        }
+                        resource.AddRequiredClaims(permission.Key, pathSet);
+                    }
+                }
+            }
+        }
+
+        private ProtectedResource Find(OpenApiUrlTreeNode urlTree, IEnumerable<string> segments)
+        {
+            
+            var segment = segments.FirstOrDefault();
+            if (string.IsNullOrEmpty(segment))
+            {
+                return (urlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
+            }
+
+            if (urlTree.Children.ContainsKey(segment))
+            {
+                return Find(urlTree.Children[segment], segments: segments.Skip(1));
+            }
+            else
+            {
+                var parameterSegment = urlTree.Children.Where(k => k.Key.StartsWith("{")).FirstOrDefault();
+                if (parameterSegment.Key == null) return null;
+                return Find(parameterSegment.Value, segments: segments.Skip(1));
+            }
+        }
+
+        private OpenApiUrlTreeNode UrlTree
+        {
+            get
+            {
+                if (urlTree == null)
+                {
+                    urlTree = CreateUrlTree(this.resources);
+                }
+                return urlTree;
+            }
+        }
+
+        private OpenApiUrlTreeNode CreateUrlTree(Dictionary<string, ProtectedResource> resources)
+        {
+            var tree = OpenApiUrlTreeNode.Create();
+
+            foreach (var resource in resources)
+            {
+                var pathItem = new OpenApiPathItem();
+
+                var openApiResource = new OpenApiProtectedResource(resource.Value);
+                pathItem.AddExtension("x-permissions", openApiResource);
+                
+                //foreach (var method in resource.Value.SupportedMethods)
+                //{
+                //    var op = new OpenApiOperation();
+                //    var sr = new OpenApiSecurityRequirement();
+
+                //    foreach (var scheme in method.Value)
+                //    {
+                //        sr[new OpenApiSecurityScheme() { Name = scheme.Key }] = scheme.Value.Select(ac => ac.Permission).ToArray();
+
+                //    }
+                //    op.Security = new List<OpenApiSecurityRequirement>() { sr };
+
+                //    pathItem.Operations.Add(GetOperationTypeFromMethod(method.Key), new OpenApiOperation());
+                //}
+                tree.Attach(resource.Key, pathItem, "!");
+            }
+
+            return tree;
         }
     }
+
+    public class OpenApiProtectedResource : IOpenApiExtension, IOpenApiAny
+    {
+        public OpenApiProtectedResource(ProtectedResource resource)
+        {
+            Resource = resource;
+        }
+
+        public ProtectedResource Resource { get; }
+
+        public AnyType AnyType => AnyType.Object;
+
+        public void Write(IOpenApiWriter writer, OpenApiSpecVersion specVersion)
+        {
+        }
+    }                                           
 
     public enum AccessRequestResult
     {
@@ -86,82 +196,5 @@ namespace ApiPermissions
         UnsupportedMethod,
         UnsupportedScheme,
         InsufficientPermissions
-    }
-           
-
-    public class ProtectedResource
-    {
-        // Permission -> (Methods,Scheme) -> Path  (Darrel's format)
-        // (Schemes -> Permissions) -> restriction -> target  (Kanchan's format)
-        // target -> restrictions -> schemes -> Ordered Permissions (CSDL Format) 
-
-        // path -> Method -> Schemes -> Permissions  (Inverted format) 
-        
-        // (Path, Method) -> Schemes -> Permissions (Docs)
-        // (Path, Method) -> Scheme(delegated) -> Permissions (Graph Explorer Tab)
-        // Permissions(delegated) (Graph Explorer Permissions List)
-        // Schemas -> Permissions ( AAD Onboarding)
-
-
-
-        public string Url { get; set; }
-        public Dictionary<string, Dictionary<string,List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
-
-        public ProtectedResource(string url)
-        {
-            Url = url;
-        }
-
-        public void AddRequiredClaims(string permission, PathSet pathSet)
-        {
-            foreach (var supportedMethod in pathSet.Methods)
-            {
-                var supportedSchemes = new Dictionary<string, List<AcceptableClaim>>();
-                foreach (var supportedScheme in pathSet.Schemes)
-                {
-                    if (!supportedSchemes.ContainsKey(supportedScheme))
-                    {
-                        supportedSchemes.Add(supportedScheme, new List<AcceptableClaim>());
-                    }
-                    supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires));
-                }
-                if (!this.SupportedMethods.ContainsKey(supportedMethod))
-                {
-                    this.SupportedMethods.Add(supportedMethod, supportedSchemes);
-                } else
-                {
-                    Update(this.SupportedMethods[supportedMethod], supportedSchemes);
-                };
-                
-            }
-        }
-
-        private void Update(Dictionary<string, List<AcceptableClaim>> existingClaims, Dictionary<string, List<AcceptableClaim>> newClaims)
-        {
-            foreach(var newClaim in newClaims)
-            {
-                
-                if (existingClaims.TryGetValue(newClaim.Key, out var existingClaim))
-                {
-                    existingClaim.AddRange(newClaim.Value);
-                }
-            }
-        }
-    }
-
-    public class AcceptableClaim
-    {
-        public AcceptableClaim(string permission, string alsoRequires)
-        {
-            this.Permission = permission;
-            this.AlsoRequires = alsoRequires;
-        }
-        public string Permission { get; }
-        public string AlsoRequires { get;  }
-
-        internal bool IsAuthorized(string[] providedPermissions)
-        {
-            return providedPermissions.Contains(this.Permission);  //TODO: add support for alsoRequires
-        }
     }
 }

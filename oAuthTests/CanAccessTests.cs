@@ -1,10 +1,9 @@
 using ApiPermissions;
-using ApiPermissions;
 using Path = ApiPermissions.PathConstraints;
 
 namespace oAuthTests
 {
-    public class UnitTest1
+    public class CanAccessTests
     {
         [Fact]
         public void NegativePermissionMatchForMissingResource()
@@ -65,7 +64,6 @@ namespace oAuthTests
             };
             permissionsDocument.Permissions.Add("Foo.Read", fooRead);
             var authZChecker = new AuthZChecker();
-
             authZChecker.Load(permissionsDocument);
             var canAccess = authZChecker.CanAccess("/foo", "GET", "DelegatedPersonal", new string[] { "Foo.Read" });
 
@@ -97,7 +95,7 @@ namespace oAuthTests
                             Methods = {
                                 "GET"
                             },
-                            Schemes = {
+                            SchemeKeys = {
                                 "DelegatedPersonal"
                             },
                             Paths = {
@@ -122,7 +120,7 @@ namespace oAuthTests
                             Methods = {
                                 "GET"
                             },
-                            Schemes = {
+                            SchemeKeys = {
                                 "DelegatedPersonal"
                             },
                             Paths = {

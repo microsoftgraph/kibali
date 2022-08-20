@@ -2,7 +2,6 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using ApiPermissions;
-using ApiPermissions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,11 +23,13 @@ namespace OAuthTool
             var doc = new PermissionsDocument();
 
             //   ParseFromMerillCSV(doc, "../../../../permissions.csv");
-            await ParseFromGEPermissions(doc, "https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-beta.json");
+            await ParseFromGEPermissions(doc, "https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-beta.json", "https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-descriptions.json");
 
-            CsdlExporter.Export("csdl.xml", doc);
+            //CsdlExporter.Export("csdl.xml", doc);
 
-            await WriteDocuments(doc, "./output");
+            //   await WriteDocuments(doc, "./output");
+
+            await WriteSingleDocument(doc, "./output");
         }
 
         private static async Task TestGraphAPI(PermissionsDocument permissionDocument)
@@ -128,32 +129,41 @@ namespace OAuthTool
             }
         }
 
-        private static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputfile)
+        private static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputfile, string permissionsFile)
         {
             Stream input = null;
             if (inputfile.StartsWith("http"))
             {
                 var client = new HttpClient();
                 input = await client.GetStreamAsync(inputfile);
-            } else
+            }
+            else
             {
                 input = new FileStream(inputfile, FileMode.Open);
             }
 
             var jsonDoc = await JsonDocument.ParseAsync(input);
-
             var rootObject = jsonDoc.RootElement;
+
+
+            Stream permissionsInput = null;
+            if (permissionsFile.StartsWith("http"))
+            {
+                var client = new HttpClient();
+                permissionsInput = await client.GetStreamAsync(permissionsFile);
+            }
+            else
+            {
+                permissionsInput = new FileStream(permissionsFile, FileMode.Open);
+            }
+            var permissionsDoc = await JsonDocument.ParseAsync(permissionsInput);
+            var permissionsObject = permissionsDoc.RootElement;
 
             var apiPermissions = rootObject.GetProperty("ApiPermissions");
 
-            var permissionSchemes = rootObject.GetProperty("PermissionSchemes");
+            //CreatePermissions(doc, rootObject);
+            CreatePermissions2(doc, permissionsObject);
 
-            ProcessPermissionsSchemes("DelegatedPersonal",
-                                        permissionSchemes.GetProperty("DelegatedPersonal"), doc);
-            ProcessPermissionsSchemes("DelegatedWork",
-                                        permissionSchemes.GetProperty("DelegatedWork"), doc);
-            ProcessPermissionsSchemes("Application",
-                                        permissionSchemes.GetProperty("Application"), doc);
             var entries = CreatePermissionsEntries(apiPermissions);
 
             var permissionsInfoList = entries.GroupBy(pe => pe.Permission)
@@ -181,15 +191,79 @@ namespace OAuthTool
                     pathSet.Paths.Add(pathDetails.Key, new ApiPermissions.PathConstraints());
                 }
             }
+        }
+
+        private static void CreatePermissions2(PermissionsDocument doc, JsonElement permissionsObject)
+        {
+            var delegatedElement = permissionsObject.GetProperty("delegatedScopesList");
+            foreach (var entry in delegatedElement.EnumerateArray())
+            {
+                var name = entry.GetProperty("value").GetString();
+                if (!doc.Permissions.TryGetValue(name, out var permission))
+                {
+                    permission = new Permission();
+                }
+                permission.IsHidden = !entry.GetProperty("isEnabled").GetBoolean();
+
+                var scheme = new Scheme
+                {
+                    RequiresAdminConsent = entry.GetProperty("isAdmin").GetBoolean(),
+                    AdminDescription = entry.GetProperty("adminConsentDescription").GetString(),
+                    AdminDisplayName = entry.GetProperty("adminConsentDisplayName").GetString(),
+                    UserDescription = entry.GetProperty("consentDescription").GetString(),
+                    UserDisplayName = entry.GetProperty("consentDisplayName").GetString()
+                };
+
+                permission.Schemes["DelegatedWork"] = scheme;
+
+                doc.Permissions.Add(name, permission);
+            }
 
 
+            var applicationElement = permissionsObject.GetProperty("applicationScopesList");
+            foreach (var entry in applicationElement.EnumerateArray())
+            {
+                var name = entry.GetProperty("value").GetString();
+                if (!doc.Permissions.TryGetValue(name, out var permission))
+                {
+                    permission = new Permission();
+                    doc.Permissions.Add(name, permission);
+                }
+                permission.IsHidden = !entry.GetProperty("isEnabled").GetBoolean();
+
+                var scheme = new Scheme
+                {
+                    RequiresAdminConsent = entry.GetProperty("isAdmin").GetBoolean(),
+                    AdminDescription = entry.GetProperty("consentDescription").GetString(),
+                    AdminDisplayName = entry.GetProperty("consentDisplayName").GetString(),
+                };
+
+                permission.Schemes["Application"] = scheme;
+            }
+
+        }
+
+        private static void CreatePermissionObjects(PermissionsDocument doc, JsonElement delegatedElement, string schemeName)
+        {
+        }
+
+        private static void CreatePermissions(PermissionsDocument doc, JsonElement rootObject)
+        {
+            var permissionSchemes = rootObject.GetProperty("PermissionSchemes");
+
+            ProcessPermissionsSchemes("DelegatedPersonal",
+                                        permissionSchemes.GetProperty("DelegatedPersonal"), doc);
+            ProcessPermissionsSchemes("DelegatedWork",
+                                        permissionSchemes.GetProperty("DelegatedWork"), doc);
+            ProcessPermissionsSchemes("Application",
+                                        permissionSchemes.GetProperty("Application"), doc);
         }
 
         private static PathSet GetOrCreatePathSet(Permission perm, HashSet<string> methods, HashSet<string> schemes)
         {
             foreach (var pathSet in perm.PathSets)
             {
-                if (pathSet.Schemes.SetEquals(schemes) && pathSet.Methods.SetEquals(methods))
+                if (pathSet.SchemeKeys.SetEquals(schemes) && pathSet.Methods.SetEquals(methods))
                 {
                     return pathSet;
                 }
@@ -197,11 +271,23 @@ namespace OAuthTool
             var newPathSet = new PathSet()
             {
                 Methods = methods,
-                Schemes = schemes
+                SchemeKeys = schemes
             };
             perm.PathSets.Add(newPathSet);
             return newPathSet;
         }
+
+        private static async Task WriteSingleDocument(PermissionsDocument doc, string outputPath)
+        {
+            doc.Permissions = doc.Permissions.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+            Directory.CreateDirectory(outputPath);
+            var filename = "GraphPermissions";
+            using (var outStream = new FileStream($"{outputPath}/{filename}.json", FileMode.Create))
+            {
+                await doc.WriteAsync(outStream);
+            }
+        }
+
 
         private static async Task WriteDocuments(PermissionsDocument doc, string outputPath)
         {

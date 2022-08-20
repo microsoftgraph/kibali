@@ -7,7 +7,7 @@ namespace ApiPermissions
 {
     public class PathSet
     {
-        public HashSet<string> Schemes { get; set; } = new HashSet<string>();
+        public HashSet<string> SchemeKeys { get; set; } = new HashSet<string>();
         public HashSet<string> Methods { get; set; } = new HashSet<string>();
         public string AlsoRequires { get; set; }
         public List<string> ExcludedProperties { get; set; } = new List<string>();
@@ -61,9 +61,9 @@ namespace ApiPermissions
 
 
 
-            writer.WritePropertyName("schemes");
+            writer.WritePropertyName("schemeKeys");
             writer.WriteStartArray();
-            foreach (var scheme in Schemes)
+            foreach (var scheme in SchemeKeys)
             {
                 writer.WriteStringValue(scheme);
             }
@@ -102,7 +102,7 @@ namespace ApiPermissions
         {
             { "alsoRequires", (o,v) => {o.AlsoRequires = v.GetString();  } },
             { "methods", (o,v) => {o.Methods = ParsingHelpers.GetHashSetOfString(v);  } },
-            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetHashSetOfString(v);  } },
+            { "schemeKeys", (o,v) => {o.SchemeKeys = ParsingHelpers.GetHashSetOfString(v);  } },
             { "paths", (o,v) => {o.Paths = ParsingHelpers.GetMap(v, PathConstraints.Load);  } },
             { "includedProperties", (o,v) => {o.IncludedProperties = ParsingHelpers.GetListOfString(v);  } },
             { "excludedProperties", (o,v) => {o.ExcludedProperties = ParsingHelpers.GetListOfString(v);  } },

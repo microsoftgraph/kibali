@@ -25,4 +25,13 @@
     <ProjectReference Include="..\oauthpermissions\oauthpermissions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="GraphPermissions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="UserAuthenticationMethod.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

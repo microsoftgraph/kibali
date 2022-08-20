@@ -59,7 +59,7 @@ namespace ApiPermissions
             { "requiredEnvironments", (o,v) => {o.RequiredEnvironments= ParsingHelpers.GetListOfString(v); } },
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
             { "isHidden", (o,v) => {o.IsHidden = v.GetBoolean();  } },
-            { "pathsets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
+            { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
             { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetMap(v, Scheme.Load);  } },
         };
     }

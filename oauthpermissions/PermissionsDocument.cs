@@ -23,7 +23,7 @@ namespace ApiPermissions
         private void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteString("$schema", "../../../../permissionsSchema.json");
+            writer.WriteString("$schema", "https://microsoftgraph.github.io/msgraph-metadata/graph-permissions-schema.json");
             writer.WritePropertyName("permissions");
             writer.WriteStartObject();
             foreach (var permissionPair in this.permissions)
@@ -36,12 +36,12 @@ namespace ApiPermissions
         }
 
 
-        public PermissionsDocument Load(string document) 
+        public static PermissionsDocument Load(string document) 
         {
             return Load(JsonDocument.Parse(document));
         }
 
-        public static PermissionsDocument Load(MemoryStream documentStream)
+        public static PermissionsDocument Load(Stream documentStream)
         {
             return Load(JsonDocument.Parse(documentStream));
         }
@@ -61,7 +61,8 @@ namespace ApiPermissions
 
         private static readonly FixedFieldMap<PermissionsDocument> handlers = new()
         {
-            { "permissions", (d,v) => { d.Permissions = ParsingHelpers.GetMap(v,Permission.Load);  } }
+            { "permissions", (d,v) => { d.Permissions = ParsingHelpers.GetMap(v,Permission.Load);  } },
+            { "$schema", (d,v) => {  } }
         };
         
     }

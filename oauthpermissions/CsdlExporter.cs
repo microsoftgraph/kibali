@@ -36,19 +36,23 @@ namespace oauthpermissions
 
             xmlWriter.WriteStartElement("Schema");
 
-                xmlWriter.WriteStartElement("Annotations");
-                    xmlWriter.WriteAttributeString("Target", "microsoft.graph.GraphService");
-                    // Write out all permissions info...
-                    foreach (var permission in permissionsDocument.Permissions)
-                    {
-                        WritePermissionAnnotations(xmlWriter, permission);
-                    }
-                xmlWriter.WriteEndElement();
+            xmlWriter.WriteStartElement("Annotations");
+            xmlWriter.WriteAttributeString("Target", "microsoft.graph.GraphService");
+            xmlWriter.WriteStartElement("Annotation");
+            xmlWriter.WriteAttributeString("Term", "Org.OData.Authorization.V1.Authorizations");
+            xmlWriter.WriteStartElement("Collection");
+
+            CreateSchemePermissions(permissionsDocument, xmlWriter, "DelegatedWork");
+            CreateSchemePermissions(permissionsDocument, xmlWriter, "Application");
+
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
 
             var authZChecker = new AuthZChecker();
             authZChecker.Load(permissionsDocument);
 
-            
             // Write out all permissions info...
             foreach (var resource in authZChecker.Resources)
             {
@@ -61,10 +65,54 @@ namespace oauthpermissions
 
         }
 
+        private static void CreateSchemePermissions(PermissionsDocument permissionsDocument, XmlWriter xmlWriter, string scheme)
+        {
+            xmlWriter.WriteStartElement("Record");
+            xmlWriter.WriteAttributeString("Type", "Org.OData.Authorization.V1.Outh2Implicit");
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("Name", scheme);
+            xmlWriter.WriteEndElement();
+
+            // Write out all permissions info...
+            foreach (var permission in permissionsDocument.Permissions.Where(p => p.Value.Schemes.ContainsKey(scheme)))
+            {
+                WritePermissionAnnotations(xmlWriter, permission, scheme);
+            }
+
+            xmlWriter.WriteEndElement();
+        }
+
         private static void WriteResourceAnnotations(XmlWriter xmlWriter, KeyValuePair<string, ProtectedResource> resource)
         {
+            
             xmlWriter.WriteStartElement("Annotations");
             xmlWriter.WriteAttributeString("Target", UrlToTarget(resource.Value.Url));
+            //foreach (var method in resource.Value.)
+            //{
+
+            //}
+            xmlWriter.WriteStartElement("Annotation");
+            // ReadResrictions
+            // UpdateRestrictions
+            // InsertResrictions
+            // DeleteResrictions
+            // OperatationRestrictions
+            xmlWriter.WriteAttributeString("Term", "Org.OData.Capabilities.V1.OperationRestrictions");
+            xmlWriter.WriteStartElement("Record");
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("Property", "Permissions");
+            xmlWriter.WriteStartElement("Collection");
+
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("SchemeName", "Permissions");
+            xmlWriter.WriteEndElement();
+
+
+
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndElement();
             xmlWriter.WriteEndElement();
 
         }
@@ -76,9 +124,26 @@ namespace oauthpermissions
         }
         private static Regex urlToTarget = new Regex("/{[^/]*");
 
-        private static void WritePermissionAnnotations(XmlWriter xmlWriter, KeyValuePair<string, Permission> permission)
+        private static void WritePermissionAnnotations(XmlWriter xmlWriter, KeyValuePair<string, Permission> permission, string scheme)
         {
-            //Todo
+            xmlWriter.WriteStartElement("Record");
+
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("Property", "Scope");
+            xmlWriter.WriteAttributeString("String", permission.Key);
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("Property", "Description");
+            xmlWriter.WriteAttributeString("String", permission.Value.Schemes[scheme].UserDescription);
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("PropertyValue");
+            xmlWriter.WriteAttributeString("Property", "Grant");
+            xmlWriter.WriteAttributeString("String", permission.Value.Schemes[scheme].RequiresAdminConsent ? "admin":"user");
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
         }
     }
 }
