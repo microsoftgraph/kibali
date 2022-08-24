@@ -100,12 +100,12 @@ jobs:
       #     name: NuGet packages
       #     path: Artifacts/NuGet/
 
-  cd:
-    if: needs.ci.outputs.is_default_branch == 'true' && needs.ci.outputs.latest_version != ''
-    name: Continuous Deployment
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
+  # cd:
+  #   if: needs.ci.outputs.is_default_branch == 'true' && needs.ci.outputs.latest_version != ''
+  #   name: Continuous Deployment
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+  #   steps:
       # - name: Download and extract NuGet packages
       #   id: dl_packages_artifact
       #   uses: actions/download-artifact@v2
