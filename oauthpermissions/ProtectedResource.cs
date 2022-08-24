@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text.Json;
 
-namespace ApiPermissions
+namespace Kibali
 {
     public class ProtectedResource
     {
@@ -14,8 +17,6 @@ namespace ApiPermissions
         // (Path, Method) -> Scheme(delegated) -> Permissions (Graph Explorer Tab)
         // Permissions(delegated) (Graph Explorer Permissions List)
         // Schemas -> Permissions ( AAD Onboarding)
-
-
 
         public string Url { get; set; }
         public Dictionary<string, Dictionary<string,List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
@@ -62,6 +63,49 @@ namespace ApiPermissions
                     existingSchemes[newScheme.Key] = newScheme.Value;
                 }
             }
+        }
+
+        public void Write(Utf8JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("url");
+            writer.WriteStringValue(Url);
+            writer.WritePropertyName("methods");
+            WriteSupportedMethod(writer, this.SupportedMethods);
+            
+            writer.WriteEndObject();
+        }
+
+        private void WriteSupportedMethod(Utf8JsonWriter writer, Dictionary<string, Dictionary<string, List<AcceptableClaim>>> supportedMethods)
+        {
+            writer.WriteStartObject();
+            foreach (var item in supportedMethods)
+            {
+                writer.WritePropertyName(item.Key);
+                WriteSupportedSchemes(writer, item.Value);
+            }
+            writer.WriteEndObject();
+        }
+
+        public void WriteSupportedSchemes(Utf8JsonWriter writer, Dictionary<string, List<AcceptableClaim>> methodClaims)
+        {
+            writer.WriteStartObject();
+            foreach (var item in methodClaims)
+            {
+                writer.WritePropertyName(item.Key);
+                WriteAcceptableClaims(writer, item.Value);
+            }
+            writer.WriteEndObject();
+        }
+
+        public void WriteAcceptableClaims(Utf8JsonWriter writer, List<AcceptableClaim> schemes)
+        {
+            writer.WriteStartArray();
+            foreach (var item in schemes)
+            {
+                item.Write(writer);
+            }
+            writer.WriteEndArray();
         }
     }
 }

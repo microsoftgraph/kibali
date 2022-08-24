@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security;
 using System.Text.Json;
 
-namespace ApiPermissions
+namespace Kibali
 {
     public class PathSet
     {

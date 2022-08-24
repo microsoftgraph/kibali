@@ -1,4 +1,4 @@
-﻿using ApiPermissions;
+﻿using Kibali;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 
-namespace oAuthTests
+namespace KibaliTests
 {
     public class FindPermissionTests
     {

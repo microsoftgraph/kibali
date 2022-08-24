@@ -1,7 +1,6 @@
-using ApiPermissions;
-using Path = ApiPermissions.PathConstraints;
+using Kibali;
 
-namespace oAuthTests
+namespace KibaliTests
 {
     public class CanAccessTests
     {

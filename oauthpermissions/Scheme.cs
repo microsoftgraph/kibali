@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 
-namespace ApiPermissions
+namespace Kibali
 {
     public class Scheme
     {

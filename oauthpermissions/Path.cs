@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace ApiPermissions
+namespace Kibali
 {
     public class PathConstraints
     {
