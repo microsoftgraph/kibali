@@ -1,12 +1,8 @@
-﻿using Kibali;
-using System.Threading.Tasks;
-using KibaliTool;
+﻿using System.Threading.Tasks;
 using System.CommandLine;
-using Microsoft.Graph.Beta.Models.ExternalConnectors;
-using static Microsoft.Graph.Constants;
 using System.CommandLine.Binding;
 
-namespace OAuthTool
+namespace KibaliTool
 {
 
     class Program
@@ -62,7 +58,14 @@ namespace OAuthTool
         public static Option<string> PermissionFileOption = new (new[] { "--permissionFile", "--pf" }, "GE Permissions File");
         public static Option<string> OutFolderOption = new (new[] { "--outFolder", "--of" }, "Output folder");
         public static Option<bool> SingleFileOption = new (new[] { "--singleFile", "--sf" }, "Single file");
-        
+
+        public ImportCommandBinder()
+        {
+            PermissionDescriptionOption.SetDefaultValue(@"https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-descriptions.json");
+            PermissionFileOption.SetDefaultValue(@"https://raw.githubusercontent.com/microsoftgraph/microsoft-graph-devx-content/dev/permissions/permissions-beta.json");
+            OutFolderOption.SetDefaultValue(@"./output");
+            SingleFileOption.SetDefaultValue(true);
+        }
         protected override ImportCommandParameters GetBoundValue(BindingContext bindingContext)
         {
             return new ImportCommandParameters()

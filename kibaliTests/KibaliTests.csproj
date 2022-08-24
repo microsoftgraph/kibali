@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\oauthpermissions\Kibali.csproj" />
+    <ProjectReference Include="..\kibali\Kibali.csproj" />
   </ItemGroup>
 
   <ItemGroup>

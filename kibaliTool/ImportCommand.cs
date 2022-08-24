@@ -1,5 +1,5 @@
 ﻿using Kibali;
-using OAuthTool;
+using KibaliTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
