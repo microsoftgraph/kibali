@@ -32,9 +32,9 @@ jobs:
         shell: pwsh
         run: |
           $projectsArray = @(
-            '.\src\Kibali\Kibali.csproj',
-            '.\src\Kibali\KibaliTool.csproj',
-            '.\src\Kibali\KibaliTests.csproj'
+            '.\src\kibali\Kibali.csproj',
+            '.\src\kibaliTool\KibaliTool.csproj',
+            '.\test\kibaliTests\KibaliTests.csproj'
           )
 
           $projectsArray | ForEach-Object {
