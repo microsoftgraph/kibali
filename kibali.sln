@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KibaliTool", "kibaliTool\KibaliTool.csproj", "{FA1138F5-EAB4-4692-ABF5-D95F25650CB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KibaliTool", "src\kibaliTool\KibaliTool.csproj", "{FA1138F5-EAB4-4692-ABF5-D95F25650CB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kibali", "kibali\Kibali.csproj", "{06080307-D6AD-4904-95EE-80410394AD08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kibali", "src\kibali\Kibali.csproj", "{06080307-D6AD-4904-95EE-80410394AD08}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KibaliTests", "kibaliTests\KibaliTests.csproj", "{2FC02876-7BC4-4CE8-8799-C8ECDD821925}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KibaliTests", "test\kibaliTests\KibaliTests.csproj", "{2FC02876-7BC4-4CE8-8799-C8ECDD821925}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFF75A97-585E-451A-B687-6CE3E9954973}"
 	ProjectSection(SolutionItems) = preProject

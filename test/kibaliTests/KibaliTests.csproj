@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\kibali\Kibali.csproj" />
+    <ProjectReference Include="..\..\src\kibali\Kibali.csproj" />
   </ItemGroup>
 
   <ItemGroup>
