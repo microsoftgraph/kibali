@@ -65,7 +65,7 @@ jobs:
             '.\test\kibaliTest\KibaliTest.csproj'
           )
           $gitNewVersion = if ("${{ steps.tag_generator.outputs.new_version }}") {"${{ steps.tag_generator.outputs.new_version }}"} else {$null}
-          $projectCurrentVersion = ([xml](Get-Content .\src\kibali\kibali.csproj)).Project.PropertyGroup.Version
+          $projectCurrentVersion = ([xml](Get-Content .\src\kibali\Kibali.csproj)).Project.PropertyGroup.Version
           $projectNewVersion = $gitNewVersion ?? $projectCurrentVersion
 
           $projectsArray | ForEach-Object {
