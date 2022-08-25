@@ -62,7 +62,7 @@ jobs:
           $projectsArray = @(
             '.\src\kibali\Kibali.csproj',
             '.\src\kibali\KibaliTool.csproj',
-            '.\test\kibaliTest\KibaliTest.csproj'
+            '.\test\kibaliTest\KibaliTests.csproj'
           )
           $gitNewVersion = if ("${{ steps.tag_generator.outputs.new_version }}") {"${{ steps.tag_generator.outputs.new_version }}"} else {$null}
           $projectCurrentVersion = ([xml](Get-Content .\src\kibali\Kibali.csproj)).Project.PropertyGroup.Version
