@@ -60,9 +60,9 @@ jobs:
         shell: pwsh
         run: |
           $projectsArray = @(
-            '.\src\kibali\kibali.csproj',
-            '.\src\kibali\kibaliTool.csproj',
-            '.\test\kibaliTest\kibaliTest.csproj'
+            '.\src\kibali\Kibali.csproj',
+            '.\src\kibali\KibaliTool.csproj',
+            '.\test\kibaliTest\KibaliTest.csproj'
           )
           $gitNewVersion = if ("${{ steps.tag_generator.outputs.new_version }}") {"${{ steps.tag_generator.outputs.new_version }}"} else {$null}
           $projectCurrentVersion = ([xml](Get-Content .\src\kibali\kibali.csproj)).Project.PropertyGroup.Version
