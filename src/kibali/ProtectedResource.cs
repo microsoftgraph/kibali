@@ -53,21 +53,21 @@ namespace Kibali
             }
         }
 
-        public void ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, List<string> leastPrivilegedPermissions)
+        public void ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
         {
-            ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissions);
+            ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissionSchemes);
             ValidateDuplicatedScopes();
         }
 
-        private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, List<string> leastPrivilegedPermissions)
+        private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
         {
-            ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissions);
+            ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
             foreach (var supportedMethod in pathSet.Methods)
             {
                 var schemeLeastPrivilegeScopes = new Dictionary<string, HashSet<string>>();
                 foreach (var supportedScheme in pathSet.SchemeKeys)
                 {
-                    if (!leastPrivilegedPermissions.Contains(supportedScheme))
+                    if (!leastPrivilegedPermissionSchemes.Contains(supportedScheme))
                     {
                         continue;
                     }

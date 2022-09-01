@@ -58,6 +58,7 @@ namespace Kibali
                 var doc = Load(stream);
                 mergedDoc.Permissions = mergedDoc.Permissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
             }
+
             return mergedDoc;
         }
 
