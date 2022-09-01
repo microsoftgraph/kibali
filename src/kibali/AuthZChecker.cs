@@ -18,6 +18,10 @@ namespace Kibali
         private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
         private OpenApiUrlTreeNode urlTree;
 
+        public HashSet<PermissionsError> Errors = new HashSet<PermissionsError>();
+        
+        public bool ContainsErrors = false;
+
         public Dictionary<string, ProtectedResource> Resources { get
             {
                 return resources;
@@ -80,6 +84,34 @@ namespace Kibali
                 }
             }
             return AccessRequestResult.InsufficientPermissions;
+        }
+
+        public void Validate(PermissionsDocument permissionsDocument)
+        {
+            // Walk permissions, find each pathSet and add path to dictionary
+            foreach (var permission in permissionsDocument.Permissions)
+            {
+                foreach(var pathSet in permission.Value.PathSets)
+                {
+                    foreach (var path in pathSet.Paths)
+                    {
+                        ProtectedResource resource;
+                        if (resources.ContainsKey(path.Key))
+                        {
+                            resource = resources[path.Key];
+
+                        }
+                        else
+                        {
+                            resource = new ProtectedResource(path.Key);
+                            resources.Add(path.Key, resource);
+                        }
+                        resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value.LeastPrivilegedPermission);
+                        this.ContainsErrors |= resource.ContainsErrors;
+                        this.Errors.UnionWith(resource.PermissionsErrors);
+                    }
+                }
+            }
         }
 
         private void InvertPermissionsDocument(PermissionsDocument permissionsDocument)
@@ -196,5 +228,11 @@ namespace Kibali
         UnsupportedMethod,
         UnsupportedScheme,
         InsufficientPermissions
+    }
+
+    public enum PermissionsErrorCode
+    {
+        DuplicateLeastPrivilegeScopes,
+        InvalidLeastPrivilegeScheme,
     }
 }
