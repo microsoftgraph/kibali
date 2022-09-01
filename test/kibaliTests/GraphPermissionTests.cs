@@ -19,8 +19,10 @@ namespace KibaliTests
         public GraphPermissionTests(ITestOutputHelper output)
         {
             _output = output;
-            graphPermissions = PermissionsDocument.Load(new FileStream("GraphPermissions.json", FileMode.Open));
-            userAuthPermissions = PermissionsDocument.Load(new FileStream("UserAuthenticationMethod.json", FileMode.Open));
+            using var graphStream = new FileStream("GraphPermissions.json", FileMode.Open);
+            graphPermissions = PermissionsDocument.Load(graphStream);
+            using var authStream = new FileStream("UserAuthenticationMethod.json", FileMode.Open);
+            userAuthPermissions = PermissionsDocument.Load(authStream);
         }
 
         [Fact]

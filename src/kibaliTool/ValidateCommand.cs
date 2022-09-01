@@ -15,7 +15,7 @@ internal class ValidateCommand
 {
     public static async Task<int> Execute(ValidateCommandParameters validateCommandParameters)
     {
-        var doc = new PermissionsDocument();
+        PermissionsDocument doc;
         if (validateCommandParameters.SourcePermissionsFile != null)
         {
             using var stream = new FileStream(validateCommandParameters.SourcePermissionsFile, FileMode.Open);

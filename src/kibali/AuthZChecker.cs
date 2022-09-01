@@ -35,7 +35,7 @@ namespace Kibali
 
         public ProtectedResource FindResource(string url)
         {
-            var parsedUrl = new Uri(new Uri("https://example.org/"), url, true);
+            var parsedUrl = new Uri(new Uri("https://example.org/"), url);
             var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
 
             return Find(UrlTree, segments);

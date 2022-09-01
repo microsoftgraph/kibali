@@ -77,14 +77,14 @@ namespace Kibali
                     }
                     schemeLeastPrivilegeScopes[supportedScheme].Add(permission);
                 }
-                if (!this.leastPrivilegedPermissions.ContainsKey(supportedMethod))
+                if (!this.leastPrivilegedPermissions.TryGetValue(supportedMethod, out var methodLeastPrivilegeScopes))
                 {
                     this.leastPrivilegedPermissions.Add(supportedMethod, schemeLeastPrivilegeScopes);
                 }
                 else
                 {
-                    UpdatePrivilegedPermissions(this.leastPrivilegedPermissions[supportedMethod], schemeLeastPrivilegeScopes, supportedMethod);
-                };
+                    UpdatePrivilegedPermissions(methodLeastPrivilegeScopes, schemeLeastPrivilegeScopes, supportedMethod);
+                }   
             }
         }
 
@@ -112,9 +112,9 @@ namespace Kibali
             
         }
 
-        private void ValidateMismatchedSchemes(string permission, PathSet pathSet, List<string> leastPrivilegedPermissions)
+        private void ValidateMismatchedSchemes(string permission, PathSet pathSet, List<string> leastPrivilegePermissionSchemes)
         {
-            var mismatchedPrivilegeSchemes = leastPrivilegedPermissions.Except(pathSet.SchemeKeys);
+            var mismatchedPrivilegeSchemes = leastPrivilegePermissionSchemes.Except(pathSet.SchemeKeys);
             if (mismatchedPrivilegeSchemes.Any())
             {
                 var invalidSchemes = string.Join(", ", mismatchedPrivilegeSchemes);

@@ -14,7 +14,8 @@ public class ValidationTests
     public void ValidateSinglePermissionsFileIsValid()
     {
         // Arrange
-        var doc = PermissionsDocument.Load(new FileStream("ValidUser.json", FileMode.Open));
+        using var stream = new FileStream("ValidUser.json", FileMode.Open);
+        var doc = PermissionsDocument.Load(stream);
 
         // Act
         var authZChecker = new AuthZChecker();
@@ -27,7 +28,8 @@ public class ValidationTests
     public void ValidateSinglePermissionFileIsNotvalid()
     {
         // Arrange
-        var doc = PermissionsDocument.Load(new FileStream("InValidUser.json", FileMode.Open));
+        using var stream = new FileStream("InvalidUser.json", FileMode.Open);
+        var doc = PermissionsDocument.Load(stream);
         
         // Act
         var authZChecker = new AuthZChecker();

@@ -109,8 +109,8 @@ namespace KibaliTool
 
     internal class ValidateCommandBinder : BinderBase<ValidateCommandParameters>
     {
-        public static Option<string> PermissionFileOption = new(new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
-        public static Option<string> PermissionFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
+        public static readonly Option<string> PermissionFileOption = new(new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
+        public static readonly Option<string> PermissionFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
 
         protected override ValidateCommandParameters GetBoundValue(BindingContext bindingContext)
         {

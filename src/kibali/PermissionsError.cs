@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Kibali;
 
@@ -12,10 +13,15 @@ public class PermissionsError
 
     public override bool Equals(object obj)
     {
-        return obj is PermissionsError error &&
-               Message == error.Message &&
-               Path == error.Path &&
-               ErrorCode == error.ErrorCode;
+        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            PermissionsError error = (PermissionsError)obj;
+            return (Message == error.Message) && (Path == error.Path) && (ErrorCode == error.ErrorCode);
+        }
     }
 
     public override int GetHashCode()
