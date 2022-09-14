@@ -53,15 +53,16 @@ namespace Kibali
             }
         }
 
-        public void ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
+        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
         {
             ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissionSchemes);
-            ValidateDuplicatedScopes();
+            var mismatchedSchemes = ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
+            var duplicateErrors = ValidateDuplicatedScopes();
+            return mismatchedSchemes.Union(duplicateErrors);
         }
 
         private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
         {
-            ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
             foreach (var supportedMethod in pathSet.Methods)
             {
                 var schemeLeastPrivilegeScopes = new Dictionary<string, HashSet<string>>();
@@ -88,8 +89,9 @@ namespace Kibali
             }
         }
 
-        private void ValidateDuplicatedScopes()
+        private HashSet<PermissionsError> ValidateDuplicatedScopes()
         {
+            var errors = new HashSet<PermissionsError>();
             foreach (var methodScopes in this.leastPrivilegedPermissions)
             {
                 var method = methodScopes.Key;
@@ -99,34 +101,34 @@ namespace Kibali
                     var scheme = schemeScope.Key;
                     if (scopes.Count > 1)
                     {
-                        this.PermissionsErrors.Add(new PermissionsError
+                        errors.Add(new PermissionsError
                         {
                             Path = this.Url,
                             ErrorCode = PermissionsErrorCode.DuplicateLeastPrivilegeScopes,
                             Message = string.Format(StringConstants.DuplicateLeastPrivilegeSchemeErrorMessage, string.Join(", ", scopes), scheme, method),
                         });
-                        this.ContainsErrors = true;
                     }
                 }
             }
-            
+            return errors;
         }
 
-        private void ValidateMismatchedSchemes(string permission, PathSet pathSet, List<string> leastPrivilegePermissionSchemes)
+        private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, List<string> leastPrivilegePermissionSchemes)
         {
             var mismatchedPrivilegeSchemes = leastPrivilegePermissionSchemes.Except(pathSet.SchemeKeys);
+            var errors = new HashSet<PermissionsError>();
             if (mismatchedPrivilegeSchemes.Any())
             {
                 var invalidSchemes = string.Join(", ", mismatchedPrivilegeSchemes);
                 var expectedSchemes = string.Join(", ", pathSet.SchemeKeys);
-                this.PermissionsErrors.Add(new PermissionsError
+                errors.Add(new PermissionsError
                 {
                     Path = this.Url,
                     ErrorCode = PermissionsErrorCode.InvalidLeastPrivilegeScheme,
                     Message = string.Format(StringConstants.UnexpectedLeastPrivilegeSchemeErrorMessage, invalidSchemes, permission, expectedSchemes),
                 });
-                this.ContainsErrors = true;
             }
+            return errors;
         }
 
         private void UpdatePrivilegedPermissions(Dictionary<string, HashSet<string>> existingPermissions, Dictionary<string, HashSet<string>> newPermissions, string method)

@@ -18,10 +18,6 @@ namespace Kibali
         private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
         private OpenApiUrlTreeNode urlTree;
 
-        public HashSet<PermissionsError> Errors = new HashSet<PermissionsError>();
-        
-        public bool ContainsErrors = false;
-
         public Dictionary<string, ProtectedResource> Resources { get
             {
                 return resources;
@@ -35,7 +31,7 @@ namespace Kibali
 
         public ProtectedResource FindResource(string url)
         {
-            var parsedUrl = new Uri(new Uri("https://example.org/"), url);
+            var parsedUrl = new Uri(new Uri("https://example.org/"), url, true);
             var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
 
             return Find(UrlTree, segments);
@@ -86,37 +82,15 @@ namespace Kibali
             return AccessRequestResult.InsufficientPermissions;
         }
 
-        public void Validate(PermissionsDocument permissionsDocument)
+        public HashSet<PermissionsError> Validate(PermissionsDocument permissionsDocument)
         {
-            // Walk permissions, find each pathSet and add path to dictionary
-            foreach (var permission in permissionsDocument.Permissions)
-            {
-                foreach(var pathSet in permission.Value.PathSets)
-                {
-                    foreach (var path in pathSet.Paths)
-                    {
-                        ProtectedResource resource;
-                        if (resources.ContainsKey(path.Key))
-                        {
-                            resource = resources[path.Key];
-
-                        }
-                        else
-                        {
-                            resource = new ProtectedResource(path.Key);
-                            resources.Add(path.Key, resource);
-                        }
-                        resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value.LeastPrivilegedPermission);
-                        this.ContainsErrors |= resource.ContainsErrors;
-                        this.Errors.UnionWith(resource.PermissionsErrors);
-                    }
-                }
-            }
+            return InvertPermissionsDocument(permissionsDocument, validate: true);
         }
 
-        private void InvertPermissionsDocument(PermissionsDocument permissionsDocument)
+        private HashSet<PermissionsError> InvertPermissionsDocument(PermissionsDocument permissionsDocument, bool validate = false)
         {
             // Walk permissions, find each pathSet and add path to dictionary
+            var errors = new HashSet<PermissionsError>();
             foreach (var permission in permissionsDocument.Permissions)
             {
                 foreach (var pathSet in permission.Value.PathSets)
@@ -135,9 +109,14 @@ namespace Kibali
                             resources.Add(path.Key, resource);
                         }
                         resource.AddRequiredClaims(permission.Key, pathSet);
+                        if (validate)
+                        {
+                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value.LeastPrivilegedPermission));
+                        }
                     }
                 }
             }
+            return errors;
         }
 
         private ProtectedResource Find(OpenApiUrlTreeNode urlTree, IEnumerable<string> segments)

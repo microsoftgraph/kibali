@@ -23,7 +23,7 @@ internal class ValidateCommand
         }
         else if (validateCommandParameters.SourcePermissionsFolder != null)
         {
-            doc = PermissionsDocument.LoadAndMerge(validateCommandParameters.SourcePermissionsFolder);
+            doc = PermissionsDocument.LoadFromFolder(validateCommandParameters.SourcePermissionsFolder);
         }
         else
         {
@@ -31,7 +31,7 @@ internal class ValidateCommand
         }
 
         var authZChecker = new AuthZChecker();
-        authZChecker.Validate(doc);
+        var errors = authZChecker.Validate(doc);
 
         return 0;
     }

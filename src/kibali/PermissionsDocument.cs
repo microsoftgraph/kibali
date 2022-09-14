@@ -49,7 +49,7 @@ namespace Kibali
             return Load(doc.RootElement);
         }
 
-        public static PermissionsDocument LoadAndMerge(string documentPath)
+        public static PermissionsDocument LoadFromFolder(string documentPath)
         {
             var mergedDoc = new PermissionsDocument();
             foreach(var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))

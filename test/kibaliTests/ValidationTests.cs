@@ -19,10 +19,10 @@ public class ValidationTests
 
         // Act
         var authZChecker = new AuthZChecker();
-        authZChecker.Validate(doc);
+        var errors = authZChecker.Validate(doc);
         
         // Assert
-        Assert.False(authZChecker.ContainsErrors);
+        Assert.False(errors.Any());
     }
     [Fact]
     public void ValidateSinglePermissionFileIsNotvalid()
@@ -33,48 +33,46 @@ public class ValidationTests
         
         // Act
         var authZChecker = new AuthZChecker();
-        authZChecker.Validate(doc);
+        var errors = authZChecker.Validate(doc);
 
         // Assert
-        Assert.True(authZChecker.ContainsErrors);
-        var actualErrors = authZChecker.Errors;
-        Assert.True(actualErrors.Count == 2);
-        Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, actualErrors.Select(e => e.ErrorCode));
-        Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, actualErrors.Select(e => e.ErrorCode));
-        Assert.Contains("/me", actualErrors.Select(e => e.Path));
-        Assert.Contains("/me/createdobjects", actualErrors.Select(e => e.Path)); 
+        Assert.True(errors.Any());
+        Assert.True(errors.Count == 2);
+        Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
+        Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
+        Assert.Contains("/me", errors.Select(e => e.Path));
+        Assert.Contains("/me/createdobjects", errors.Select(e => e.Path)); 
     }
     [Fact]
     public void ValidateFolderIsValid()
     {
         // Arrange
-        var doc = PermissionsDocument.LoadAndMerge("ValidPermissions");
+        var doc = PermissionsDocument.LoadFromFolder("ValidPermissions");
 
         // Act
         var authZChecker = new AuthZChecker();
-        authZChecker.Validate(doc);
+        var errors = authZChecker.Validate(doc);
 
         // Assert
-        Assert.False(authZChecker.ContainsErrors);
+        Assert.False(errors.Any());
     }
     [Fact]
     public void ValidateFolderIsNotValid()
     {
         // Arrange
-        var doc = PermissionsDocument.LoadAndMerge("InvalidPermissions");
+        var doc = PermissionsDocument.LoadFromFolder("InvalidPermissions");
 
         // Act
         var authZChecker = new AuthZChecker();
-        authZChecker.Validate(doc);
+        var errors = authZChecker.Validate(doc);
 
         // Assert
-        Assert.True(authZChecker.ContainsErrors);
-        var actualErrors = authZChecker.Errors;
-        Assert.True(actualErrors.Count == 3);
-        Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, actualErrors.Select(e => e.ErrorCode));
-        Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, actualErrors.Select(e => e.ErrorCode));
-        Assert.Contains("/me", actualErrors.Select(e => e.Path));
-        Assert.Contains("/users/{id}/licensedetails", actualErrors.Select(e => e.Path));
+        Assert.True(errors.Any());
+        Assert.True(errors.Count == 3);
+        Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
+        Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
+        Assert.Contains("/me", errors.Select(e => e.Path));
+        Assert.Contains("/users/{id}/licensedetails", errors.Select(e => e.Path));
     }
    
 }
