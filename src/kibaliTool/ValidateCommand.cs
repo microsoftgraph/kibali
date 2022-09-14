@@ -37,7 +37,7 @@ internal class ValidateCommand
         {
             foreach (var error in errors)
             {
-                Console.WriteLine(error.ToString());
+                Console.WriteLine(error);
             }
             return 1;
         }
