@@ -1,6 +1,7 @@
 ﻿using Kibali;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KibaliTool;
@@ -32,7 +33,19 @@ internal class ValidateCommand
 
         var authZChecker = new AuthZChecker();
         var errors = authZChecker.Validate(doc);
+        if (errors.Any())
+        {
+            foreach (var error in errors)
+            {
+                Console.WriteLine(error.ToString());
+            }
+            return 1;
+        }
+        else
+        {
+            Console.WriteLine("No errors found");
+            return 0;
+        }
 
-        return 0;
     }
 }
