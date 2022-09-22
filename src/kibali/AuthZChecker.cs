@@ -82,9 +82,15 @@ namespace Kibali
             return AccessRequestResult.InsufficientPermissions;
         }
 
-        private void InvertPermissionsDocument(PermissionsDocument permissionsDocument)
+        public HashSet<PermissionsError> Validate(PermissionsDocument permissionsDocument)
+        {
+            return InvertPermissionsDocument(permissionsDocument, validate: true);
+        }
+
+        private HashSet<PermissionsError> InvertPermissionsDocument(PermissionsDocument permissionsDocument, bool validate = false)
         {
             // Walk permissions, find each pathSet and add path to dictionary
+            var errors = new HashSet<PermissionsError>();
             foreach (var permission in permissionsDocument.Permissions)
             {
                 foreach (var pathSet in permission.Value.PathSets)
@@ -103,9 +109,14 @@ namespace Kibali
                             resources.Add(path.Key, resource);
                         }
                         resource.AddRequiredClaims(permission.Key, pathSet);
+                        if (validate)
+                        {
+                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value.LeastPrivilegedPermission));
+                        }
                     }
                 }
             }
+            return errors;
         }
 
         private ProtectedResource Find(OpenApiUrlTreeNode urlTree, IEnumerable<string> segments)
@@ -196,5 +207,11 @@ namespace Kibali
         UnsupportedMethod,
         UnsupportedScheme,
         InsufficientPermissions
+    }
+
+    public enum PermissionsErrorCode
+    {
+        DuplicateLeastPrivilegeScopes,
+        InvalidLeastPrivilegeScheme,
     }
 }
