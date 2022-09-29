@@ -16,6 +16,8 @@ namespace Kibali
         public Dictionary<string, Scheme> Schemes { get; set; } = new Dictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
 
+        public ProvisioningInfo ProvisioningInfo { get; set; } = new();
+
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
@@ -41,6 +43,10 @@ namespace Kibali
                 pathSet.Write(writer);
             }
             writer.WriteEndArray();
+
+            writer.WritePropertyName("provisioningInfo");
+            ProvisioningInfo.Write(writer);
+
             writer.WriteEndObject();
         }
 

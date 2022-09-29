@@ -21,10 +21,6 @@ namespace Kibali
         public string Url { get; set; }
         public Dictionary<string, Dictionary<string, List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
 
-        public bool ContainsErrors = false;
-
-        public HashSet<PermissionsError> PermissionsErrors { get; set; } = new ();
-
         public ProtectedResource(string url)
         {
             Url = url;
