@@ -178,8 +178,7 @@
             }
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "Directory.Read.All": {
       "schemes": {
@@ -699,8 +698,7 @@
             "/privilegedroleassignmentrequests/my": {}
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "Directory.ReadWrite.All": {
       "schemes": {
@@ -1417,8 +1415,7 @@
             }
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     }
   }
 }
