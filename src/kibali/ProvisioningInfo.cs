@@ -22,7 +22,7 @@ namespace Kibali
         {
             writer.WriteStartObject();
             
-            if (IsHidden == true) writer.WriteBoolean("isHidden", IsHidden);
+            if (IsHidden) writer.WriteBoolean("isHidden", IsHidden);
 
             if (RequiredEnvironments.Any())
             {
