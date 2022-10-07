@@ -51,7 +51,10 @@
             }
           }
         }
-      ]
+      ],
+      "provisioningInfo": {
+        "ownerSecurityGroup":  ""
+      }
     },
     "User.Invite.All": {
       "schemes": {

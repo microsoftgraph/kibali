@@ -57,6 +57,7 @@ namespace Kibali
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
             { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
             { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetMap(v, Scheme.Load);  } },
+            { "provisioningInfo", (o,v) => {o.ProvisioningInfo = ProvisioningInfo.Load(v);  } },
         };
     }
 
