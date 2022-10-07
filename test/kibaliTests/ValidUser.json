@@ -52,7 +52,9 @@
           }
         }
       ],
-      "ownerEmail": ""
+      "provisioningInfo": {
+        "ownerSecurityGroup":  ""
+      }
     },
     "User.Invite.All": {
       "schemes": {
@@ -87,8 +89,7 @@
             }
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.ManageIdentities.All": {
       "schemes": {
@@ -118,8 +119,7 @@
             "/users/{id}": {}
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.Read": {
       "schemes": {
@@ -625,8 +625,7 @@
             "/users/{id}/translateexchangeids": {}
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.Read.All": {
       "schemes": {
@@ -1130,8 +1129,7 @@
             "/users/{id}/profile/names": {}
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.ReadBasic.All": {
       "schemes": {
@@ -1567,8 +1565,7 @@
             }
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.ReadWrite": {
       "schemes": {
@@ -2160,8 +2157,7 @@
             "/users/{id}/translateexchangeids": {}
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     },
     "User.ReadWrite.All": {
       "schemes": {
@@ -2786,8 +2782,7 @@
             }
           }
         }
-      ],
-      "ownerEmail": ""
+      ]
     }
   }
 }
