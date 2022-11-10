@@ -98,7 +98,7 @@ namespace KibaliTool
                         schemes.Add(entry.Scheme);
                     }
                     var pathSet = GetOrCreatePathSet(perm, methods, schemes);
-                    pathSet.Paths.Add(pathDetails.Key, new Kibali.PathConstraints());
+                    pathSet.Paths.Add(pathDetails.Key, string.Empty);
                 }
             }
         }
