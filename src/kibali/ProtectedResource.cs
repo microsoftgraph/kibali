@@ -98,7 +98,7 @@ namespace Kibali
                 {
                     var scopes = schemeScope.Value;
                     var scheme = schemeScope.Key;
-                    if (scopes.Count > 1)
+                    if (scopes.Count > 1 && !IsFalsePositiveDuplicate(method, scopes))
                     {
                         errors.Add(new PermissionsError
                         {
@@ -110,6 +110,27 @@ namespace Kibali
                 }
             }
             return errors;
+        }
+
+        /// <summary>
+        /// Check if the duplicate is a false positive.
+        /// </summary>
+        /// <param name="method">HTTP Method.</param>
+        /// <param name="scopes">Duplicated permission scopes.</param>
+        /// <returns>True if the duplicate is a false positive (invalid).</returns>
+        private bool IsFalsePositiveDuplicate(string method, HashSet<string> scopes)
+        {
+            // GET operations can be done by ReadWrite permissions but we should only have one Read permission
+            // which is the least privileged for Read operations.
+            if (method == "GET")
+            {
+                var groupedOperations = scopes.GroupBy(x => x.Split('.')[1]).ToDictionary(g => g.Key, g => g.Count());
+                groupedOperations.TryGetValue("Read", out int readCount);
+                groupedOperations.TryGetValue("ReadBasic", out int readBasicCount);
+                readCount += readBasicCount;
+                return readCount == 1;
+            }
+            return false;
         }
 
         private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegePermissionSchemes)
