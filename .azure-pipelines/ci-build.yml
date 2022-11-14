@@ -207,7 +207,7 @@ stages:
         inputs:
           command: 'publish'
           arguments: -c Release --runtime win-x64 /p:PublishSingleFile=true --self-contained --output $(Build.ArtifactStagingDirectory)/Microsoft.Graph.KibaliTool-v$(kibaliToolversion) -p:PublishTrimmed=true
-          projects: 'src/kibali/KibaliTool.csproj'
+          projects: 'src/kibali/KibaliTool/KibaliTool.csproj'
           publishWebProjects: False
           zipAfterPublish: false 
 
