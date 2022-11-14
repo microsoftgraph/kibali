@@ -8,13 +8,10 @@ namespace Kibali
     {
         public string Note { get; set; }
         public bool Implicit { get; set; } = false;
-        public bool IsHidden { get; set; } = false;
-        public string OwnerEmail { get; set; }
         public string PrivilegeLevel { get; set; }
-        public List<string> RequiredEnvironments { get; set; } = new List<string>();
-
         public Dictionary<string, Scheme> Schemes { get; set; } = new Dictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
+        public ProvisioningInfo ProvisioningInfo { get; set; } = new();
 
         public void Write(Utf8JsonWriter writer)
         {
@@ -22,8 +19,6 @@ namespace Kibali
 
             if (!String.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
             if (Implicit == true) writer.WriteBoolean("implicit", Implicit);
-            if (IsHidden == true) writer.WriteBoolean("isHidden", IsHidden);
-            if (!String.IsNullOrWhiteSpace(OwnerEmail)) writer.WriteString("ownerEmail", OwnerEmail);
 
             writer.WritePropertyName("schemes");
             writer.WriteStartObject();
@@ -41,6 +36,10 @@ namespace Kibali
                 pathSet.Write(writer);
             }
             writer.WriteEndArray();
+
+            writer.WritePropertyName("provisioningInfo");
+            ProvisioningInfo.Write(writer);
+
             writer.WriteEndObject();
         }
 
@@ -55,12 +54,10 @@ namespace Kibali
         {
             { "note", (o,v) => {o.Note = v.GetString();  } },
             { "privilegeLevel", (o,v) => {o.PrivilegeLevel= v.GetString();  } },
-            { "ownerEmail", (o,v) => {o.OwnerEmail= v.GetString();  } },
-            { "requiredEnvironments", (o,v) => {o.RequiredEnvironments= ParsingHelpers.GetListOfString(v); } },
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
-            { "isHidden", (o,v) => {o.IsHidden = v.GetBoolean();  } },
             { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
             { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetMap(v, Scheme.Load);  } },
+            { "provisioningInfo", (o,v) => {o.ProvisioningInfo = ProvisioningInfo.Load(v);  } },
         };
     }
 

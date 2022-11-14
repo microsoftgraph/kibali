@@ -25,6 +25,12 @@ namespace KibaliTool
 
             var resource = authZChecker.FindResource(queryCommandParameters.Url);
 
+            if(resource == null)
+            {
+                Console.WriteLine($"Resource {queryCommandParameters.Url} not found in the input file.");
+                return 0;
+            }
+
             var writer = new Utf8JsonWriter(Console.OpenStandardOutput(), new JsonWriterOptions() { Indented= true });
 
             if (!String.IsNullOrEmpty(queryCommandParameters.Scheme))
