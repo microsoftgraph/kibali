@@ -14,19 +14,19 @@ namespace Kibali
         public List<string> IncludedProperties { get; set; } = new List<string>();
         
 
-        public Dictionary<string, PathConstraints> Paths
+        public Dictionary<string, string> Paths
         {
             get
             {
                 if (paths == null)
                 {
-                    paths = new Dictionary<string, PathConstraints>();
+                    paths = new Dictionary<string, string>();
                 };
                 return paths;
             }
             set { paths = value; }
         }
-        private Dictionary<string, PathConstraints> paths;
+        private Dictionary<string, string> paths;
 
         public void Write(Utf8JsonWriter writer)
         {
@@ -83,7 +83,7 @@ namespace Kibali
             foreach (var path in Paths)
             {
                 writer.WritePropertyName(path.Key);
-                path.Value.Write(writer);
+                writer.WriteStringValue(path.Value);
             }
             writer.WriteEndObject();
 
@@ -103,7 +103,7 @@ namespace Kibali
             { "alsoRequires", (o,v) => {o.AlsoRequires = v.GetString();  } },
             { "methods", (o,v) => {o.Methods = ParsingHelpers.GetHashSetOfString(v);  } },
             { "schemeKeys", (o,v) => {o.SchemeKeys = ParsingHelpers.GetHashSetOfString(v);  } },
-            { "paths", (o,v) => {o.Paths = ParsingHelpers.GetMap(v, PathConstraints.Load);  } },
+            { "paths", (o,v) => {o.Paths = ParsingHelpers.GetMap(v, x => x.ToString()); } },
             { "includedProperties", (o,v) => {o.IncludedProperties = ParsingHelpers.GetListOfString(v);  } },
             { "excludedProperties", (o,v) => {o.ExcludedProperties = ParsingHelpers.GetListOfString(v);  } },
         };

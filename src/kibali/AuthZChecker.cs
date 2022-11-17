@@ -111,7 +111,7 @@ namespace Kibali
                         resource.AddRequiredClaims(permission.Key, pathSet);
                         if (validate)
                         {
-                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value.LeastPrivilegedPermission));
+                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value));
                         }
                     }
                 }

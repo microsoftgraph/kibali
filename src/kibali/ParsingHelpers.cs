@@ -58,6 +58,47 @@ namespace Kibali
             return hashSet;
         }
 
+        /// <summary>
+        /// Parse properties.
+        /// </summary>
+        /// <param name="context">Name-value pair separated by ';'.</param>
+        internal static Dictionary<string,string> ParseProperties(string context)
+        {
+            var properties = new Dictionary<string, string>();
+            foreach (var pair in ParseKey(context))
+            {
+                properties.Add(pair.Key, pair.Value);
+            }
+
+            return properties;
+        }
+
+        /// <summary>
+        /// Enumerate the key value pairs for the configuration key.
+        /// </summary>
+        /// <param name="key">Configuration key supplied in the setting.</param>
+        /// *<returns>Key value pairs.</returns>
+        internal static IEnumerable<KeyValuePair<string, string>> ParseKey(string key)
+        {
+            foreach (var pair in key.Split(';'))
+            {
+                if (string.IsNullOrEmpty(pair))
+                {
+                    continue;
+                }
+
+                var index = pair.IndexOf('=');
+                if (index == -1)
+                {
+                    throw new InvalidOperationException($"Unable to parse: {key}. Format is name1=value1;name2=value2;...");
+                }
+
+                var keyValue = new KeyValuePair<string, string>(pair.Substring(0, index), pair.Substring(index + 1));
+                yield return keyValue;
+            }
+        }
+
+
 
     }
     public class FixedFieldMap<T> : Dictionary<string, Action<T, JsonElement>>

@@ -49,15 +49,18 @@ namespace Kibali
             }
         }
 
-        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
+        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, string pathValue)
         {
+            var parsedPathValue = ParsingHelpers.ParseProperties(pathValue);
+            parsedPathValue.TryGetValue("least", out string privilegeString);
+            var leastPrivilegedPermissionSchemes = privilegeString != null ? privilegeString.Split(",") : new string[0];
             ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissionSchemes);
             var mismatchedSchemes = ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
             var duplicateErrors = ValidateDuplicatedScopes();
             return mismatchedSchemes.Union(duplicateErrors);
         }
 
-        private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, List<string> leastPrivilegedPermissionSchemes)
+        private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegedPermissionSchemes)
         {
             foreach (var supportedMethod in pathSet.Methods)
             {
@@ -95,7 +98,7 @@ namespace Kibali
                 {
                     var scopes = schemeScope.Value;
                     var scheme = schemeScope.Key;
-                    if (scopes.Count > 1)
+                    if (scopes.Count > 1 && !IsFalsePositiveDuplicate(method, scopes))
                     {
                         errors.Add(new PermissionsError
                         {
@@ -109,7 +112,28 @@ namespace Kibali
             return errors;
         }
 
-        private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, List<string> leastPrivilegePermissionSchemes)
+        /// <summary>
+        /// Check if the duplicate is a false positive.
+        /// </summary>
+        /// <param name="method">HTTP Method.</param>
+        /// <param name="scopes">Duplicated permission scopes.</param>
+        /// <returns>True if the duplicate is a false positive (invalid).</returns>
+        private bool IsFalsePositiveDuplicate(string method, HashSet<string> scopes)
+        {
+            // GET operations can be done by ReadWrite permissions but we should only have one Read permission
+            // which is the least privileged for Read operations.
+            if (method == "GET")
+            {
+                var groupedOperations = scopes.GroupBy(x => x.Split('.')[1]).ToDictionary(g => g.Key, g => g.Count());
+                groupedOperations.TryGetValue("Read", out int readCount);
+                groupedOperations.TryGetValue("ReadBasic", out int readBasicCount);
+                readCount += readBasicCount;
+                return readCount == 1;
+            }
+            return false;
+        }
+
+        private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegePermissionSchemes)
         {
             var mismatchedPrivilegeSchemes = leastPrivilegePermissionSchemes.Except(pathSet.SchemeKeys);
             var errors = new HashSet<PermissionsError>();
