@@ -1,0 +1,9 @@
+{
+  "tool": "Credential Scanner",
+  "suppressions": [
+    {
+      "placeholder": "/users/validatepassword",
+      "_justification": "False Positive. This is a property value to show the paths supported by a permission. /users/validatepassword not an actual password e.g. /users/validatepassword : least=DelegatedWork"
+    }
+  ]
+}
