@@ -2,23 +2,23 @@
   "tool": "Credential Scanner",
   "suppressions": [
     {
-      "file": "test\\kibaliTests\\InvalidUser.json",
+      "file": "test/kibaliTests/InvalidUser.json",
       "_justification": "False Positive on property /users/validatepassword . Property not an actual password e.g. /users/validatepassword : least=DelegatedWork"
     },
     {
-      "file": "test\\kibaliTests\\ValidUser.json",
+      "file": "test/kibaliTests/ValidUser.json",
       "_justification": "False Positive on property /users/validatepassword . Property not an actual password e.g. /users/validatepassword : least=DelegatedWork"
     },
     {
-      "file": "test\\kibaliTests\\GraphPermissions.json",
+      "file": "test/kibaliTests/GraphPermissions.json",
       "_justification": "False Positive on property /users/validatepassword . Property not an actual password e.g. /users/validatepassword : least=DelegatedWork"
     },
     {
-      "file": "test\\kibaliTests\\InvalidPermissions\\User.json",
+      "file": "test/kibaliTests/InvalidPermissions/User.json",
       "_justification": "False Positive on property /users/validatepassword . Property not an actual password e.g. /users/validatepassword : least=DelegatedWork"
     },
     {
-      "file": "test\\kibaliTests\\ValidPermissions\\User.json",
+      "file": "test/kibaliTests/ValidPermissions/User.json",
       "_justification": "False Positive on property /users/validatepassword . Property not an actual password e.g. /users/validatepassword : least=DelegatedWork"
     }
   ]
