@@ -108,7 +108,7 @@ stages:
         displayName: 'Post Analysis'
         inputs:
           BinSkim: true
-          CredScan: true
+          CredScan: false
           PoliCheck: true
 
       - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
