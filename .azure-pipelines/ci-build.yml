@@ -108,7 +108,7 @@ stages:
         displayName: 'Post Analysis'
         inputs:
           BinSkim: true
-          CredScan: true
+          CredScan: false
           PoliCheck: true
 
       - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
@@ -231,7 +231,7 @@ stages:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/Microsoft.Graph.Kibali-v$(kibaliToolversion)'
 
 - stage: deploy
-  condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
+  condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
   dependsOn: build
   jobs:
     - deployment: deploy_kibaliTool
