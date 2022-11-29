@@ -267,7 +267,7 @@ stages:
                 command: push
                 packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali*.nupkg'
                 nuGetFeedType: external
-                publishFeedCredentials: 'OpenAPI Nuget Connection'
+                publishFeedCredentials: 'microsoftgraph NuGet connection'
             - task: GitHubRelease@1
               displayName: 'GitHub release (edit)'
               condition: succeededOrFailed()
@@ -309,6 +309,6 @@ stages:
                 command: push
                 packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
                 nuGetFeedType: external
-                publishFeedCredentials: 'OpenAPI Nuget Connection'
+                publishFeedCredentials: 'microsoftgraph NuGet connection'
 
  
