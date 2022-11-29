@@ -10,14 +10,14 @@ public class DocumentationTests
         var permissionsDocument = CreatePermissionsDocument();
 
         var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET");
-        var table = generator.GenerateTable().Replace("\r\n", string.Empty);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
 |Permission type|Permissions (from least to most privileged)|
 |:---|:---|
 |Delegated (work or school account)|Foo.Read, Foo.ReadWrite|
 |Delegated (personal Microsoft account)|**TODO: Provide applicable permissions.**|
-|Application|Foo.ReadWrite|".Replace("\r\n", string.Empty);
+|Application|Foo.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
 
