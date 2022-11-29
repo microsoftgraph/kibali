@@ -232,13 +232,13 @@ namespace Kibali
             var markdownBuilder = new MarkDownBuilder();
             markdownBuilder.StartTable("Permission type", "Permissions (from least to most privileged)");
 
-            var delegatedWorkScopes = methodClaims.ContainsKey("DelegatedWork") ? methodClaims["DelegatedWork"].OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            var delegatedWorkScopes = methodClaims.TryGetValue("DelegatedWork", out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
             markdownBuilder.AddTableRow("Delegated (work or school account)", string.Join(", ", delegatedWorkScopes));
 
-            var delegatedPersonalScopes = methodClaims.ContainsKey("DelegatedPersonal") ? methodClaims["DelegatedPersonal"].OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            var delegatedPersonalScopes = methodClaims.TryGetValue("DelegatedPersonal", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
             markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", string.Join(", ", delegatedPersonalScopes));
 
-            var appOnlyScopes = methodClaims.ContainsKey("Application") ? methodClaims["Application"].OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            var appOnlyScopes = methodClaims.TryGetValue("Application", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
             markdownBuilder.AddTableRow("Application", string.Join(", ", appOnlyScopes));
             markdownBuilder.EndTable();
             return markdownBuilder.ToString();
