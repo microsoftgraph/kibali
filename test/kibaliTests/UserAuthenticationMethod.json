@@ -20,47 +20,47 @@
             "GET"
           ],
           "paths": {
-            "/me/authentication/microsoftauthenticatormethods/{id}": {},
-            "/me/authentication/phonemethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods/{id}": {},
-            "/me/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/emailmethods/{id}": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/phonemethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods/{id}": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/me/authentication/emailmethods": {},
-            "/me/authentication/emailmethods/{id}": {},
-            "/me/authentication/fido2methods": {},
-            "/me/authentication/fido2methods/{id}": {},
-            "/me/authentication/methods": {},
-            "/me/authentication/microsoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/me/authentication/passwordmethods": {},
-            "/me/authentication/passwordmethods/{id}": {},
-            "/me/authentication/phonemethods": {},
-            "/me/authentication/softwareoathmethods": {},
-            "/me/authentication/softwareoathmethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods": {},
-            "/me/authentication/windowshelloforbusinessmethods": {},
-            "/users/{id}/authentication/emailmethods": {},
-            "/users/{id}/authentication/fido2methods": {},
-            "/users/{id}/authentication/fido2methods/{id}": {},
-            "/users/{id}/authentication/methods": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods": {},
-            "/users/{id}/authentication/operations/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordmethods": {},
-            "/users/{id}/authentication/passwordmethods/{id}": {},
-            "/users/{id}/authentication/phonemethods": {},
-            "/users/{id}/authentication/softwareoathmethods": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods": {},
-            "/me/authentication/methods/{id}": {},
-            "/users/{id}/authentication/methods/{id}": {}
+            "/me/authentication/microsoftauthenticatormethods/{id}": "",
+            "/me/authentication/phonemethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods/{id}": "",
+            "/me/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/emailmethods/{id}": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/phonemethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods/{id}": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/me/authentication/emailmethods": "",
+            "/me/authentication/emailmethods/{id}": "",
+            "/me/authentication/fido2methods": "",
+            "/me/authentication/fido2methods/{id}": "",
+            "/me/authentication/methods": "",
+            "/me/authentication/microsoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/me/authentication/passwordmethods": "",
+            "/me/authentication/passwordmethods/{id}": "",
+            "/me/authentication/phonemethods": "",
+            "/me/authentication/softwareoathmethods": "",
+            "/me/authentication/softwareoathmethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods": "",
+            "/me/authentication/windowshelloforbusinessmethods": "",
+            "/users/{id}/authentication/emailmethods": "",
+            "/users/{id}/authentication/fido2methods": "",
+            "/users/{id}/authentication/fido2methods/{id}": "",
+            "/users/{id}/authentication/methods": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods": "",
+            "/users/{id}/authentication/operations/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordmethods": "",
+            "/users/{id}/authentication/passwordmethods/{id}": "",
+            "/users/{id}/authentication/phonemethods": "",
+            "/users/{id}/authentication/softwareoathmethods": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods": "",
+            "/me/authentication/methods/{id}": "",
+            "/users/{id}/authentication/methods/{id}": ""
           }
         }
       ]
@@ -89,48 +89,48 @@
             "GET"
           ],
           "paths": {
-            "/reports/authenticationmethods/userregistrationdetails": {},
-            "/reports/authenticationmethods/userregistrationdetails/{id}": {},
-            "/me/authentication/microsoftauthenticatormethods/{id}": {},
-            "/me/authentication/phonemethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods/{id}": {},
-            "/me/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/emailmethods/{id}": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/phonemethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods/{id}": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/me/authentication/emailmethods": {},
-            "/me/authentication/emailmethods/{id}": {},
-            "/me/authentication/fido2methods": {},
-            "/me/authentication/fido2methods/{id}": {},
-            "/me/authentication/methods": {},
-            "/me/authentication/microsoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/me/authentication/passwordmethods": {},
-            "/me/authentication/passwordmethods/{id}": {},
-            "/me/authentication/phonemethods": {},
-            "/me/authentication/softwareoathmethods": {},
-            "/me/authentication/softwareoathmethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods": {},
-            "/me/authentication/windowshelloforbusinessmethods": {},
-            "/users/{id}/authentication/emailmethods": {},
-            "/users/{id}/authentication/fido2methods": {},
-            "/users/{id}/authentication/fido2methods/{id}": {},
-            "/users/{id}/authentication/methods": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordmethods": {},
-            "/users/{id}/authentication/passwordmethods/{id}": {},
-            "/users/{id}/authentication/phonemethods": {},
-            "/users/{id}/authentication/softwareoathmethods": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods": {},
-            "/me/authentication/methods/{id}": {},
-            "/users/{id}/authentication/methods/{id}": {}
+            "/reports/authenticationmethods/userregistrationdetails": "",
+            "/reports/authenticationmethods/userregistrationdetails/{id}": "",
+            "/me/authentication/microsoftauthenticatormethods/{id}": "",
+            "/me/authentication/phonemethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods/{id}": "",
+            "/me/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/emailmethods/{id}": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/phonemethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods/{id}": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/me/authentication/emailmethods": "",
+            "/me/authentication/emailmethods/{id}": "",
+            "/me/authentication/fido2methods": "",
+            "/me/authentication/fido2methods/{id}": "",
+            "/me/authentication/methods": "",
+            "/me/authentication/microsoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/me/authentication/passwordmethods": "",
+            "/me/authentication/passwordmethods/{id}": "",
+            "/me/authentication/phonemethods": "",
+            "/me/authentication/softwareoathmethods": "",
+            "/me/authentication/softwareoathmethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods": "",
+            "/me/authentication/windowshelloforbusinessmethods": "",
+            "/users/{id}/authentication/emailmethods": "",
+            "/users/{id}/authentication/fido2methods": "",
+            "/users/{id}/authentication/fido2methods/{id}": "",
+            "/users/{id}/authentication/methods": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordmethods": "",
+            "/users/{id}/authentication/passwordmethods/{id}": "",
+            "/users/{id}/authentication/phonemethods": "",
+            "/users/{id}/authentication/softwareoathmethods": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods": "",
+            "/me/authentication/methods/{id}": "",
+            "/users/{id}/authentication/methods/{id}": ""
           }
         },
         {
@@ -141,7 +141,7 @@
             "GET"
           ],
           "paths": {
-            "/users/{id}/authentication/operations/{id}": {}
+            "/users/{id}/authentication/operations/{id}": ""
           }
         }
       ]
@@ -166,15 +166,15 @@
             "GET"
           ],
           "paths": {
-            "/me/authentication/microsoftauthenticatormethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods/{id}": {},
-            "/me/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods/{id}": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/fido2methods/{id}": {}
+            "/me/authentication/microsoftauthenticatormethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods/{id}": "",
+            "/me/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods/{id}": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/fido2methods/{id}": ""
           }
         },
         {
@@ -187,9 +187,9 @@
             "PUT"
           ],
           "paths": {
-            "/me/authentication/phonemethods/{id}": {},
-            "/users/{id}/authentication/emailmethods/{id}": {},
-            "/users/{id}/authentication/phonemethods/{id}": {}
+            "/me/authentication/phonemethods/{id}": "",
+            "/users/{id}/authentication/emailmethods/{id}": "",
+            "/users/{id}/authentication/phonemethods/{id}": ""
           }
         },
         {
@@ -200,32 +200,32 @@
             "GET"
           ],
           "paths": {
-            "/me/authentication/emailmethods": {},
-            "/me/authentication/emailmethods/{id}": {},
-            "/me/authentication/fido2methods": {},
-            "/me/authentication/fido2methods/{id}": {},
-            "/me/authentication/methods": {},
-            "/me/authentication/microsoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/me/authentication/passwordmethods": {},
-            "/me/authentication/passwordmethods/{id}": {},
-            "/me/authentication/softwareoathmethods": {},
-            "/me/authentication/softwareoathmethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods": {},
-            "/me/authentication/windowshelloforbusinessmethods": {},
-            "/users/{id}/authentication/fido2methods": {},
-            "/users/{id}/authentication/methods": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods": {},
-            "/users/{id}/authentication/operations/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordmethods": {},
-            "/users/{id}/authentication/passwordmethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods": {},
-            "/me/authentication/methods/{id}": {},
-            "/users/{id}/authentication/methods/{id}": {}
+            "/me/authentication/emailmethods": "",
+            "/me/authentication/emailmethods/{id}": "",
+            "/me/authentication/fido2methods": "",
+            "/me/authentication/fido2methods/{id}": "",
+            "/me/authentication/methods": "",
+            "/me/authentication/microsoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/me/authentication/passwordmethods": "",
+            "/me/authentication/passwordmethods/{id}": "",
+            "/me/authentication/softwareoathmethods": "",
+            "/me/authentication/softwareoathmethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods": "",
+            "/me/authentication/windowshelloforbusinessmethods": "",
+            "/users/{id}/authentication/fido2methods": "",
+            "/users/{id}/authentication/methods": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods": "",
+            "/users/{id}/authentication/operations/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordmethods": "",
+            "/users/{id}/authentication/passwordmethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods": "",
+            "/me/authentication/methods/{id}": "",
+            "/users/{id}/authentication/methods/{id}": ""
           }
         },
         {
@@ -237,9 +237,9 @@
             "POST"
           ],
           "paths": {
-            "/me/authentication/phonemethods": {},
-            "/users/{id}/authentication/emailmethods": {},
-            "/users/{id}/authentication/phonemethods": {}
+            "/me/authentication/phonemethods": "",
+            "/users/{id}/authentication/emailmethods": "",
+            "/users/{id}/authentication/phonemethods": ""
           }
         },
         {
@@ -250,10 +250,10 @@
             "POST"
           ],
           "paths": {
-            "/me/authentication/phonemethods/{id}/disablesmssignin": {},
-            "/me/authentication/phonemethods/{id}/enablesmssignin": {},
-            "/users/{id}/authentication/phonemethods/{id}/disablesmssignin": {},
-            "/users/{id}/authentication/phonemethods/{id}/enablesmssignin": {}
+            "/me/authentication/phonemethods/{id}/disablesmssignin": "",
+            "/me/authentication/phonemethods/{id}/enablesmssignin": "",
+            "/users/{id}/authentication/phonemethods/{id}/disablesmssignin": "",
+            "/users/{id}/authentication/phonemethods/{id}/enablesmssignin": ""
           }
         }
       ]
@@ -283,15 +283,15 @@
             "GET"
           ],
           "paths": {
-            "/me/authentication/microsoftauthenticatormethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods/{id}": {},
-            "/me/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods/{id}": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": {},
-            "/users/{id}/authentication/fido2methods/{id}": {}
+            "/me/authentication/microsoftauthenticatormethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods/{id}": "",
+            "/me/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods/{id}": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods/{id}": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods/{id}": "",
+            "/users/{id}/authentication/fido2methods/{id}": ""
           }
         },
         {
@@ -305,10 +305,10 @@
             "PUT"
           ],
           "paths": {
-            "/me/authentication/phonemethods/{id}": {},
-            "/users/{id}/authentication/emailmethods/{id}": {},
-            "/users/{id}/authentication/phonemethods/{id}": {},
-            "/users/{id}/authentication/methods/{id}": {}
+            "/me/authentication/phonemethods/{id}": "",
+            "/users/{id}/authentication/emailmethods/{id}": "",
+            "/users/{id}/authentication/phonemethods/{id}": "",
+            "/users/{id}/authentication/methods/{id}": ""
           }
         },
         {
@@ -320,29 +320,29 @@
             "GET"
           ],
           "paths": {
-            "/me/authentication/emailmethods": {},
-            "/me/authentication/emailmethods/{id}": {},
-            "/me/authentication/fido2methods": {},
-            "/me/authentication/fido2methods/{id}": {},
-            "/me/authentication/methods": {},
-            "/me/authentication/microsoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": {},
-            "/me/authentication/passwordmethods": {},
-            "/me/authentication/passwordmethods/{id}": {},
-            "/me/authentication/softwareoathmethods": {},
-            "/me/authentication/softwareoathmethods/{id}": {},
-            "/me/authentication/temporaryaccesspassmethods": {},
-            "/me/authentication/windowshelloforbusinessmethods": {},
-            "/users/{id}/authentication/fido2methods": {},
-            "/users/{id}/authentication/methods": {},
-            "/users/{id}/authentication/microsoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": {},
-            "/users/{id}/authentication/passwordmethods": {},
-            "/users/{id}/authentication/passwordmethods/{id}": {},
-            "/users/{id}/authentication/softwareoathmethods": {},
-            "/users/{id}/authentication/windowshelloforbusinessmethods": {},
-            "/me/authentication/methods/{id}": {}
+            "/me/authentication/emailmethods": "",
+            "/me/authentication/emailmethods/{id}": "",
+            "/me/authentication/fido2methods": "",
+            "/me/authentication/fido2methods/{id}": "",
+            "/me/authentication/methods": "",
+            "/me/authentication/microsoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/me/authentication/passwordlessmicrosoftauthenticatormethods/{id}": "",
+            "/me/authentication/passwordmethods": "",
+            "/me/authentication/passwordmethods/{id}": "",
+            "/me/authentication/softwareoathmethods": "",
+            "/me/authentication/softwareoathmethods/{id}": "",
+            "/me/authentication/temporaryaccesspassmethods": "",
+            "/me/authentication/windowshelloforbusinessmethods": "",
+            "/users/{id}/authentication/fido2methods": "",
+            "/users/{id}/authentication/methods": "",
+            "/users/{id}/authentication/microsoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordlessmicrosoftauthenticatormethods": "",
+            "/users/{id}/authentication/passwordmethods": "",
+            "/users/{id}/authentication/passwordmethods/{id}": "",
+            "/users/{id}/authentication/softwareoathmethods": "",
+            "/users/{id}/authentication/windowshelloforbusinessmethods": "",
+            "/me/authentication/methods/{id}": ""
           }
         },
         {
@@ -355,10 +355,10 @@
             "POST"
           ],
           "paths": {
-            "/me/authentication/phonemethods": {},
-            "/users/{id}/authentication/emailmethods": {},
-            "/users/{id}/authentication/phonemethods": {},
-            "/users/{id}/authentication/temporaryaccesspassmethods": {}
+            "/me/authentication/phonemethods": "",
+            "/users/{id}/authentication/emailmethods": "",
+            "/users/{id}/authentication/phonemethods": "",
+            "/users/{id}/authentication/temporaryaccesspassmethods": ""
           }
         },
         {
@@ -369,7 +369,7 @@
             "GET"
           ],
           "paths": {
-            "/users/{id}/authentication/operations/{id}": {}
+            "/users/{id}/authentication/operations/{id}": ""
           }
         },
         {
@@ -381,10 +381,10 @@
             "POST"
           ],
           "paths": {
-            "/me/authentication/phonemethods/{id}/disablesmssignin": {},
-            "/me/authentication/phonemethods/{id}/enablesmssignin": {},
-            "/users/{id}/authentication/phonemethods/{id}/disablesmssignin": {},
-            "/users/{id}/authentication/phonemethods/{id}/enablesmssignin": {}
+            "/me/authentication/phonemethods/{id}/disablesmssignin": "",
+            "/me/authentication/phonemethods/{id}/enablesmssignin": "",
+            "/users/{id}/authentication/phonemethods/{id}/disablesmssignin": "",
+            "/users/{id}/authentication/phonemethods/{id}/enablesmssignin": ""
           }
         },
         {
@@ -395,10 +395,10 @@
             "POST"
           ],
           "paths": {
-            "/users/{id}/authentication/passwordmethods/{id}/resetpassword": {},
-            "/users/{id}/authentication/methods/{id}/disablesmssignin": {},
-            "/users/{id}/authentication/methods/{id}/enablesmssignin": {},
-            "/users/{id}/authentication/methods/{id}/resetpassword": {}
+            "/users/{id}/authentication/passwordmethods/{id}/resetpassword": "",
+            "/users/{id}/authentication/methods/{id}/disablesmssignin": "",
+            "/users/{id}/authentication/methods/{id}/enablesmssignin": "",
+            "/users/{id}/authentication/methods/{id}/resetpassword": ""
           }
         }
       ]

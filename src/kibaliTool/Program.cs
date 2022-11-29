@@ -40,13 +40,23 @@ namespace KibaliTool
             };
 
             validateCommand.SetHandler(ValidateCommand.Execute, new ValidateCommandBinder());
-            
+
+            Command documentCommand = new Command("document") {
+                DocumentCommandBinder.PermissionFileOption,
+                DocumentCommandBinder.PermissionFolderOption,
+                DocumentCommandBinder.UrlOption,
+                DocumentCommandBinder.MethodOption,
+            };
+
+            documentCommand.SetHandler(DocumentCommand.Execute, new DocumentCommandBinder());
+
             var rootCommand = new RootCommand()
             {
                 importCommand,
                 queryCommand,
                 exportCommand,
-                validateCommand
+                validateCommand,
+                documentCommand
             };
             
 
@@ -118,6 +128,24 @@ namespace KibaliTool
             {
                 SourcePermissionsFile = bindingContext.ParseResult.GetValueForOption(PermissionFileOption),
                 SourcePermissionsFolder = bindingContext.ParseResult.GetValueForOption(PermissionFolderOption),
+            };
+        }
+    }
+
+    internal class DocumentCommandBinder : BinderBase<DocumentCommandParameters>
+    {
+        public static readonly Option<string> PermissionFileOption = new(new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
+        public static readonly Option<string> PermissionFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
+        public static readonly Option<string> UrlOption = new(new[] { "--url", "-u" }, "Test Url");
+        public static readonly Option<string> MethodOption = new(new[] { "--method", "-m" }, "Method");
+        protected override DocumentCommandParameters GetBoundValue(BindingContext bindingContext)
+        {
+            return new DocumentCommandParameters()
+            {
+                SourcePermissionsFile = bindingContext.ParseResult.GetValueForOption(PermissionFileOption),
+                SourcePermissionsFolder = bindingContext.ParseResult.GetValueForOption(PermissionFolderOption),
+                Url = bindingContext.ParseResult.GetValueForOption(UrlOption),
+                Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
             };
         }
     }
