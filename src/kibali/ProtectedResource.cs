@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
@@ -26,7 +27,7 @@ namespace Kibali
             Url = url;
         }
 
-        public void AddRequiredClaims(string permission, PathSet pathSet)
+        public void AddRequiredClaims(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes)
         {
             foreach (var supportedMethod in pathSet.Methods)
             {
@@ -37,7 +38,8 @@ namespace Kibali
                     {
                         supportedSchemes.Add(supportedScheme, new List<AcceptableClaim>());
                     }
-                    supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires));
+                    var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(supportedScheme);
+                    supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege));
                 }
                 if (!this.SupportedMethods.ContainsKey(supportedMethod))
                 {
@@ -49,16 +51,15 @@ namespace Kibali
             }
         }
 
-        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, string pathValue)
+        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes)
         {
-            var parsedPathValue = ParsingHelpers.ParseProperties(pathValue);
-            parsedPathValue.TryGetValue("least", out string privilegeString);
-            var leastPrivilegedPermissionSchemes = privilegeString != null ? privilegeString.Split(",") : new string[0];
             ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissionSchemes);
             var mismatchedSchemes = ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
             var duplicateErrors = ValidateDuplicatedScopes();
             return mismatchedSchemes.Union(duplicateErrors);
         }
+
+        
 
         private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegedPermissionSchemes)
         {
@@ -218,11 +219,29 @@ namespace Kibali
         public void WriteAcceptableClaims(Utf8JsonWriter writer, List<AcceptableClaim> schemes)
         {
             writer.WriteStartArray();
-            foreach (var item in schemes)
+            foreach (var item in schemes.OrderByDescending(c => c.Least))
             {
                 item.Write(writer);
             }
             writer.WriteEndArray();
+        }
+
+        public string GeneratePermissionsTable(Dictionary<string, List<AcceptableClaim>> methodClaims)
+        {
+            var permissionsStub = new List<string> { "**TODO: Provide applicable permissions.**" };
+            var markdownBuilder = new MarkDownBuilder();
+            markdownBuilder.StartTable("Permission type", "Permissions (from least to most privileged)");
+
+            var delegatedWorkScopes = methodClaims.TryGetValue("DelegatedWork", out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            markdownBuilder.AddTableRow("Delegated (work or school account)", string.Join(", ", delegatedWorkScopes));
+
+            var delegatedPersonalScopes = methodClaims.TryGetValue("DelegatedPersonal", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", string.Join(", ", delegatedPersonalScopes));
+
+            var appOnlyScopes = methodClaims.TryGetValue("Application", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            markdownBuilder.AddTableRow("Application", string.Join(", ", appOnlyScopes));
+            markdownBuilder.EndTable();
+            return markdownBuilder.ToString();
         }
     }
 }

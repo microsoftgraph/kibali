@@ -108,10 +108,11 @@ namespace Kibali
                             resource = new ProtectedResource(path.Key);
                             resources.Add(path.Key, resource);
                         }
-                        resource.AddRequiredClaims(permission.Key, pathSet);
+                        var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(path.Value);
+                        resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes);
                         if (validate)
                         {
-                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, path.Value));
+                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, leastPrivilegedPermissionSchemes));
                         }
                     }
                 }
@@ -181,6 +182,18 @@ namespace Kibali
             }
 
             return tree;
+        }
+        private static string[] ParseLeastPrivilegeSchemes(string pathValue)
+        {
+            var defaultLeastPrivilege = Array.Empty<string>();
+            if (string.IsNullOrEmpty(pathValue))
+            {
+                return defaultLeastPrivilege;
+            }
+            var parsedPathValue = ParsingHelpers.ParseProperties(pathValue);
+            parsedPathValue.TryGetValue("least", out string privilegeString);
+            var leastPrivilegedPermissionSchemes = privilegeString != null ? privilegeString.Split(",") : defaultLeastPrivilege;
+            return leastPrivilegedPermissionSchemes;
         }
     }
 

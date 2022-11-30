@@ -6,13 +6,15 @@ namespace Kibali
 {
     public class AcceptableClaim
     {
-        public AcceptableClaim(string permission, string alsoRequires)
+        public AcceptableClaim(string permission, string alsoRequires, bool least)
         {
             this.Permission = permission;
             this.AlsoRequires = alsoRequires;
+            this.Least = least;
         }
         public string Permission { get; }
-        public string AlsoRequires { get;  }
+        public string AlsoRequires { get; }
+        public bool Least { get; }
 
         internal bool IsAuthorized(string[] providedPermissions)
         {
