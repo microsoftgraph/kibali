@@ -265,7 +265,7 @@ stages:
               displayName: 'NuGet push'
               inputs:
                 command: push
-                packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
                 nuGetFeedType: external
                 publishFeedCredentials: 'microsoftgraph NuGet connection'
             - task: GitHubRelease@1
