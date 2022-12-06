@@ -295,14 +295,6 @@ stages:
               inputs:
                 artifact: Nugets
                 source: current
-            - powershell: |
-                $fileNames = "$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg", "$(Pipeline.Workspace)/Nugets/Microsoft.OpenApi.Readers.*.nupkg", "$(Pipeline.Workspace)/Nugets/Microsoft.OpenApi.Workbench.*.nupkg"
-                foreach($fileName in $fileNames) {
-                  if(Test-Path $fileName) {
-                    rm $fileName -Verbose
-                  }
-                }
-              displayName: remove other nupkgs to avoid duplication
             - task: NuGetCommand@2
               displayName: 'NuGet push'
               inputs:
