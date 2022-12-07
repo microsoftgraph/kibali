@@ -254,7 +254,7 @@ stages:
                 source: current
             - pwsh: |
                 $artifactName = Get-ChildItem -Path $(Pipeline.Workspace)\Nugets -Filter Microsoft.Graph.*.nupkg -recurse | select -First 1
-                $artifactVersion= $artifactName.Name -replace "Microsoft.Graph.", "" -replace ".nupkg", ""
+                $artifactVersion= $artifactName.Name -replace "Microsoft.Graph.Kibali", "" -replace ".nupkg", ""
                 #Set Variable $artifactName and $artifactVersion
                 Write-Host "##vso[task.setvariable variable=artifactVersion; isSecret=false; isOutput=true]$artifactVersion"
                 Write-Host "##vso[task.setvariable variable=artifactName; isSecret=false; isOutput=true]$artifactName.FullName"
@@ -269,38 +269,15 @@ stages:
                 nuGetFeedType: external
                 publishFeedCredentials: 'microsoftgraph NuGet connection'
             - task: GitHubRelease@1
-              displayName: 'GitHub release (edit)'
+              displayName: 'GitHub release (KibaliTool v$(artifactVersion))'
               condition: succeededOrFailed()
               inputs:
                 gitHubConnection: 'Github-MaggieKimani1'
                 action: edit
                 tagSource: userSpecifiedTag
                 tag: '$(artifactVersion)'
-                title: '$(artifactVersion)'
-                releaseNotesSource: inline
+                title: 'KibaliTool v$(artifactVersion)'
                 assets: '$(Pipeline.Workspace)\**\*.exe'
                 changeLogType: issueBased
     
-    - deployment: deploy_lib
-      dependsOn: []
-      environment: nuget-org
-      strategy:
-        runOnce:
-          deploy:
-            pool:
-              vmImage: ubuntu-latest
-            steps:
-            - task: DownloadPipelineArtifact@2
-              displayName: Download nupkg from artifacts
-              inputs:
-                artifact: Nugets
-                source: current
-            - task: NuGetCommand@2
-              displayName: 'NuGet push'
-              inputs:
-                command: push
-                packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
-                nuGetFeedType: external
-                publishFeedCredentials: 'microsoftgraph NuGet connection'
-
  
