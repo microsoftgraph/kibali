@@ -231,7 +231,7 @@ stages:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/Microsoft.Graph.Kibali-v$(kibaliToolversion)'
 
 - stage: deploy
-  # condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+  condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
   dependsOn: build
   jobs:
     - deployment: deploy_kibaliTool
