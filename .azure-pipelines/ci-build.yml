@@ -272,7 +272,7 @@ stages:
               displayName: 'GitHub release (KibaliTool v$(artifactVersion))'
               condition: succeededOrFailed()
               inputs:
-                gitHubConnection: 'Github-MaggieKimani1'
+                gitHubConnection: 'GitHub - thewahome'
                 action: edit
                 tagSource: userSpecifiedTag
                 tag: '$(artifactVersion)'
