@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 
 namespace Kibali
@@ -242,6 +243,80 @@ namespace Kibali
             markdownBuilder.AddTableRow("Application", string.Join(", ", appOnlyScopes));
             markdownBuilder.EndTable();
             return markdownBuilder.ToString();
+        }
+
+        public string FetchLeastPrivilege(string method = null, string scheme = null)
+        {
+            var output = string.Empty;
+            var leastPrivilege = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+            if (method != null && scheme != null)
+            {
+                if (!leastPrivilege.ContainsKey(method))
+                {
+                    leastPrivilege[method] = new Dictionary<string, HashSet<string>>();
+                }
+                leastPrivilege[method][scheme] = this.SupportedMethods[method][scheme].Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+            }
+            if (method != null && scheme == null)
+            {
+                this.SupportedMethods.TryGetValue(method, out var supportedSchemes);
+                if (supportedSchemes == null)
+                {
+                    return output;
+                }
+                foreach (var supportedScheme in supportedSchemes)
+                {
+                    if (!leastPrivilege.ContainsKey(method))
+                    {
+                        leastPrivilege[method] = new Dictionary<string, HashSet<string>>();
+                    }
+                    leastPrivilege[method][supportedScheme.Key] = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                }
+            }
+            if (method == null && scheme != null)
+            {
+                foreach (var supportedMethod in this.SupportedMethods)
+                {
+                    supportedMethod.Value.TryGetValue(scheme, out var supportedSchemeClaims);
+                    if (supportedSchemeClaims == null)
+                    {
+                        return output;
+                    }
+                    if (!leastPrivilege.ContainsKey(supportedMethod.Key))
+                    {
+                        leastPrivilege[supportedMethod.Key] = new Dictionary<string, HashSet<string>>();
+                    }
+                    leastPrivilege[supportedMethod.Key][scheme] = supportedSchemeClaims.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                }
+            }
+            if (method == null && scheme == null)
+            {
+                foreach (var supportedMethod in this.SupportedMethods)
+                {
+                    foreach (var supportedScheme in supportedMethod.Value)
+                    {
+                        if (!leastPrivilege.ContainsKey(supportedMethod.Key))
+                        {
+                            leastPrivilege[supportedMethod.Key] = new Dictionary<string, HashSet<string>>();
+                        }
+                        leastPrivilege[supportedMethod.Key][supportedScheme.Key] = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    }
+                }
+            }
+            var builder = new StringBuilder();
+            foreach (var methodEntry in leastPrivilege)
+            {
+                builder.AppendLine();
+                builder.AppendLine(methodEntry.Key);
+                foreach (var schemeEntry in methodEntry.Value)
+                {
+                    builder.AppendLine($"|{schemeEntry.Key} |{string.Join(";", schemeEntry.Value)}|");
+                    builder.AppendLine();
+                }
+                builder.AppendLine();
+            }
+            output = builder.ToString();
+            return output;
         }
     }
 }

@@ -3,6 +3,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace KibaliTool;
 
@@ -31,6 +33,15 @@ internal class ValidateCommand
             throw new ArgumentException("Please provide a source permissions file or folder");
         }
 
+        string jsonString = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        Console.WriteLine(jsonString);
+        var fileName = "C:/git/Test/MergedPermissions.json";
+        File.WriteAllText(fileName, jsonString);
+
+        var newDoc = PermissionsDocument.Load(new FileStream(fileName, FileMode.Open));
+
+        var authZChecker2 = new AuthZChecker();
+        authZChecker2.Load(newDoc);
         var authZChecker = new AuthZChecker();
         var errors = authZChecker.Validate(doc);
         if (errors.Any())
