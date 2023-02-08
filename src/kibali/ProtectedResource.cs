@@ -13,16 +13,17 @@ namespace Kibali
         // target -> restrictions -> schemes -> Ordered Permissions (CSDL Format) 
 
         // path -> Method -> Schemes -> Permissions  (Inverted format) 
-        
+
         // (Path, Method) -> Schemes -> Permissions (Docs)
         // (Path, Method) -> Scheme(delegated) -> Permissions (Graph Explorer Tab)
         // Permissions(delegated) (Graph Explorer Permissions List)
         // Schemas -> Permissions ( AAD Onboarding)
-        private Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilegedPermissions { get; set; } = new ();
+        private Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilegedPermissions { get; set; } = new();
 
         public string Url { get; set; }
         public Dictionary<string, Dictionary<string, List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
 
+        public Dictionary<(string, string), HashSet<string>> PermissionMethods {get; set;} = new();
         public ProtectedResource(string url)
         {
             Url = url;
@@ -39,6 +40,12 @@ namespace Kibali
                     {
                         supportedSchemes.Add(supportedScheme, new List<AcceptableClaim>());
                     }
+
+                    if (!this.PermissionMethods.TryAdd((permission, supportedScheme), new HashSet<string> { supportedMethod }))
+                    {
+                        this.PermissionMethods[(permission, supportedScheme)].Add(supportedMethod);
+                    }
+
                     var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(supportedScheme);
                     supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege));
                 }
@@ -251,11 +258,10 @@ namespace Kibali
             var leastPrivilege = new Dictionary<string, Dictionary<string, HashSet<string>>>();
             if (method != null && scheme != null)
             {
-                if (!leastPrivilege.ContainsKey(method))
-                {
-                    leastPrivilege[method] = new Dictionary<string, HashSet<string>>();
-                }
-                leastPrivilege[method][scheme] = this.SupportedMethods[method][scheme].Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
+                var permissions = this.SupportedMethods[method][scheme].Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                Disambiguate(method, scheme, permissions);
+                leastPrivilege[method][scheme] = Disambiguate(method, scheme, permissions);
             }
             if (method != null && scheme == null)
             {
@@ -266,11 +272,9 @@ namespace Kibali
                 }
                 foreach (var supportedScheme in supportedSchemes)
                 {
-                    if (!leastPrivilege.ContainsKey(method))
-                    {
-                        leastPrivilege[method] = new Dictionary<string, HashSet<string>>();
-                    }
-                    leastPrivilege[method][supportedScheme.Key] = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
+                    var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    leastPrivilege[method][supportedScheme.Key] = Disambiguate(method, supportedScheme.Key, permissions);
                 }
             }
             if (method == null && scheme != null)
@@ -280,13 +284,11 @@ namespace Kibali
                     supportedMethod.Value.TryGetValue(scheme, out var supportedSchemeClaims);
                     if (supportedSchemeClaims == null)
                     {
-                        return output;
+                        continue;
                     }
-                    if (!leastPrivilege.ContainsKey(supportedMethod.Key))
-                    {
-                        leastPrivilege[supportedMethod.Key] = new Dictionary<string, HashSet<string>>();
-                    }
-                    leastPrivilege[supportedMethod.Key][scheme] = supportedSchemeClaims.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
+                    var permissions = supportedSchemeClaims.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    leastPrivilege[supportedMethod.Key][scheme] = Disambiguate(supportedMethod.Key, scheme, permissions);
                 }
             }
             if (method == null && scheme == null)
@@ -295,11 +297,9 @@ namespace Kibali
                 {
                     foreach (var supportedScheme in supportedMethod.Value)
                     {
-                        if (!leastPrivilege.ContainsKey(supportedMethod.Key))
-                        {
-                            leastPrivilege[supportedMethod.Key] = new Dictionary<string, HashSet<string>>();
-                        }
-                        leastPrivilege[supportedMethod.Key][supportedScheme.Key] = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                        leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
+                        var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                        leastPrivilege[supportedMethod.Key][supportedScheme.Key] = Disambiguate(supportedMethod.Key, supportedScheme.Key, permissions);
                     }
                 }
             }
@@ -317,6 +317,25 @@ namespace Kibali
             }
             output = builder.ToString();
             return output;
+        }
+
+        private HashSet<string> Disambiguate(string method, string scheme, HashSet<string> permissions)
+        {
+            if (permissions.Count > 1)
+            {
+                foreach (var perm in permissions)
+                {
+                    if (!(this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> perms) && perms.Count == 1))
+                    {
+                        continue;
+                    }
+                    if (perms.First() == method)
+                    {
+                        return new HashSet<string> { perm };
+                    }
+                }
+            }
+            return permissions;
         }
     }
 }
