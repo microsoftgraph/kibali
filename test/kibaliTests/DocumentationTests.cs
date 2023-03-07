@@ -13,11 +13,11 @@ public class DocumentationTests
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
-|Permission type|Permissions (from least to most privileged)|
-|:---|:---|
-|Delegated (work or school account)|Foo.Read, Foo.ReadWrite|
-|Delegated (personal Microsoft account)|**TODO: Provide applicable permissions.**|
-|Application|Foo.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Permission type|Least privileged permission|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
+|Delegated (personal Microsoft account)|**TODO: Provide applicable permissions.**||
+|Application|Foo.ReadWrite||".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
 

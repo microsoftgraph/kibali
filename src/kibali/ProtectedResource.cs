@@ -230,18 +230,32 @@ namespace Kibali
         {
             var permissionsStub = new List<string> { "**TODO: Provide applicable permissions.**" };
             var markdownBuilder = new MarkDownBuilder();
-            markdownBuilder.StartTable("Permission type", "Permissions (from least to most privileged)");
+            markdownBuilder.StartTable("Permission type", "Least privileged permission", "Higher privileged permissions");
+            var least = string.Empty;
+            var higher = string.Empty;
 
             var delegatedWorkScopes = methodClaims.TryGetValue("DelegatedWork", out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Delegated (work or school account)", string.Join(", ", delegatedWorkScopes));
+            (least, higher) = ExtractScopes(delegatedWorkScopes);
+            markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
 
             var delegatedPersonalScopes = methodClaims.TryGetValue("DelegatedPersonal", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", string.Join(", ", delegatedPersonalScopes));
+            (least, higher) = ExtractScopes(delegatedPersonalScopes);
+            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", least, higher);
 
             var appOnlyScopes = methodClaims.TryGetValue("Application", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Application", string.Join(", ", appOnlyScopes));
+            (least, higher) = ExtractScopes(appOnlyScopes);
+            markdownBuilder.AddTableRow("Application", least, higher);
             markdownBuilder.EndTable();
             return markdownBuilder.ToString();
         }
+        
+        private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes)
+        {
+            var least = orderedScopes.First();
+            var others = orderedScopes.Skip(1);
+            var higher = others.Any() ? string.Join(", ", others) : string.Empty;
+            return (least, higher);
+        }
     }
+
 }
