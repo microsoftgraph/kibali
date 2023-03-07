@@ -228,7 +228,7 @@ namespace Kibali
 
         public string GeneratePermissionsTable(Dictionary<string, List<AcceptableClaim>> methodClaims)
         {
-            var permissionsStub = new List<string> { "**TODO: Provide applicable permissions.**" };
+            var permissionsStub = new List<string> { "Not supported." };
             var markdownBuilder = new MarkDownBuilder();
             markdownBuilder.StartTable("Permission type", "Least privileged permission", "Higher privileged permissions");
             var least = string.Empty;
@@ -253,7 +253,7 @@ namespace Kibali
         {
             var least = orderedScopes.First();
             var others = orderedScopes.Skip(1);
-            var higher = others.Any() ? string.Join(", ", others) : string.Empty;
+            var higher = others.Any() ? string.Join(", ", others) : "Not supported.";
             return (least, higher);
         }
     }

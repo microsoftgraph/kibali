@@ -16,8 +16,8 @@ public class DocumentationTests
 |Permission type|Least privileged permission|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
-|Delegated (personal Microsoft account)|**TODO: Provide applicable permissions.**||
-|Application|Foo.ReadWrite||".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Foo.ReadWrite|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
 
