@@ -9,7 +9,7 @@ public class DocumentationTests
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET");
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
@@ -24,15 +24,66 @@ public class DocumentationTests
     }
 
     [Fact]
-    public void DocumentationTableNotGenerated()
+    public void DocumentationTableNotGeneratedMissingPath()
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET");
-        var table = generator.GenerateTable();
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET", true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = @"
+|Permission type|Least privileged permission|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Not supported.|Not supported.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expectedTable, table);
 
-        Assert.Equal(string.Empty, table);
+    }
 
+    [Fact]
+    public void DocumentationTableNotGeneratedNoMethod()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null, true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = @"
+|Permission type|Least privileged permission|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Not supported.|Not supported.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expectedTable, table);
+
+    }
+
+    [Fact]
+    public void DocumentationTableNotGeneratedUnsupportedMethod()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH", true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = @"
+|Permission type|Least privileged permission|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Not supported.|Not supported.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expectedTable, table, true);
+
+    }
+
+    [Fact]
+    public void DocumentationTableNotGeneratedNoDefault()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH");
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = string.Empty;
+        Assert.Equal(expectedTable, table);
+        
     }
 
 
