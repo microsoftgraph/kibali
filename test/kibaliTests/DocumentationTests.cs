@@ -9,7 +9,7 @@ public class DocumentationTests
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET");
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
@@ -28,7 +28,7 @@ public class DocumentationTests
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET");
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permission|Higher privileged permissions|
@@ -45,7 +45,7 @@ public class DocumentationTests
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null, true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permission|Higher privileged permissions|
@@ -62,7 +62,7 @@ public class DocumentationTests
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH");
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permission|Higher privileged permissions|
@@ -70,8 +70,20 @@ public class DocumentationTests
 |Delegated (work or school account)|Not supported.|Not supported.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
 |Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-        Assert.Equal(expectedTable, table);
+        Assert.Equal(expectedTable, table, true);
 
+    }
+
+    [Fact]
+    public void DocumentationTableNotGeneratedNoDefault()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH");
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = string.Empty;
+        Assert.Equal(expectedTable, table);
+        
     }
 
 

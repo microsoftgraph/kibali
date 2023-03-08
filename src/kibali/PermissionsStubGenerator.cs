@@ -5,13 +5,15 @@ public class PermissionsStubGenerator
     private readonly PermissionsDocument document;
     private readonly string path;
     private readonly string method;
-    public PermissionsStubGenerator(PermissionsDocument document, string path, string method)
+    private readonly bool generateDefault;
+    public PermissionsStubGenerator(PermissionsDocument document, string path, string method, bool generateDefault = false)
     {
         this.document = document;
         this.path = path;
         this.method = method;
+        this.generateDefault = generateDefault;
     }
-
+    
     public PermissionsDocument Document { get; set; }
 
     public string Path { get; set; }
@@ -24,7 +26,7 @@ public class PermissionsStubGenerator
         authZChecker.Load(this.document);
 
         var resource = authZChecker.FindResource(this.path);
-        var table = this.UnsupportedPermissionsStub();
+        var table = this.generateDefault ? this.UnsupportedPermissionsStub() : string.Empty;
         if (resource == null)
         {
             return table;
