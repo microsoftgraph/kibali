@@ -327,10 +327,11 @@ namespace Kibali
  
         private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilege)
         {
-            var permissionsStub = new List<string> { "Not supported." };
+            var permissionsStub = new List<string>();
+            var scopes = new HashSet<string>();
 
             var delegatedWorkScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            var leastPrivilegeScheme = leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
+            var leastPrivilegeScheme = leastPrivilege.TryGetValue(scheme, out scopes);
             (var least, var higher) = ExtractScopes(delegatedWorkScopes, scopes);
             return (least, higher);
         }
@@ -365,7 +366,7 @@ namespace Kibali
         
         private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
         {
-            var least = leastPrivilege?.First();
+            var least = leastPrivilege != null && leastPrivilege.Any() ? leastPrivilege.First() : "Not supported.";
             orderedScopes = orderedScopes.Where(s => s!= least);
             var higher = orderedScopes.Any() ? string.Join(", ", orderedScopes) : "Not supported.";
             return (least, higher);

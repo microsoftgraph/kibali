@@ -19,7 +19,8 @@ public class LeastPrivilegeTests
 
         // Act
         var resource = authZChecker.FindResource("/bar");
-        var leastPrivilege = resource.FetchLeastPrivilege().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var leastPrivilege = resource.FetchLeastPrivilege();
+        var actual = resource.WriteLeastPrivilegeTable(leastPrivilege).Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         // Assert
         var expected = @"
@@ -30,7 +31,7 @@ POST
 |DelegatedPersonal |Foo.Read|
 |Application |Foo.Read|
 ".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-        Assert.Equal(expected, leastPrivilege);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -42,7 +43,8 @@ POST
 
         // Act
         var resource = authZChecker.FindResource("/bar");
-        var leastPrivilege = resource.FetchLeastPrivilege("GET").Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var leastPrivilege = resource.FetchLeastPrivilege("GET");
+        var actual = resource.WriteLeastPrivilegeTable(leastPrivilege).Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         // Assert
         var expected = @"
@@ -50,7 +52,7 @@ GET
 |DelegatedPersonal |Foo.Read|
 |Application |Foo.Read|
 ".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-        Assert.Equal(expected, leastPrivilege);
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -62,7 +64,8 @@ GET
 
         // Act
         var resource = authZChecker.FindResource("/bar");
-        var leastPrivilege = resource.FetchLeastPrivilege(null, "Application").Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var leastPrivilege = resource.FetchLeastPrivilege(null, "Application");
+        var actual = resource.WriteLeastPrivilegeTable(leastPrivilege).Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         // Assert
         var expected = @"
@@ -70,7 +73,7 @@ GET
 |Application |Foo.Read|
 POST
 |Application |Foo.Read|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-        Assert.Equal(expected, leastPrivilege);
+        Assert.Equal(expected, actual);
     }
 
     private PermissionsDocument CreatePermissionsDocument()
