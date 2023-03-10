@@ -234,25 +234,26 @@ namespace Kibali
             writer.WriteEndArray();
         }
 
-        public string GeneratePermissionsTable(Dictionary<string, List<AcceptableClaim>> methodClaims)
+        public string GeneratePermissionsTable(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
         {
-            var permissionsStub = new List<string> { "**TODO: Provide applicable permissions.**" };
+            var leastPrivilege = this.FetchLeastPrivilege(method);
             var markdownBuilder = new MarkDownBuilder();
-            markdownBuilder.StartTable("Permission type", "Permissions (from least to most privileged)");
+            markdownBuilder.StartTable("Permission type", "Least privileged permission", "Higher privileged permissions");
+ 
+            (var least, var higher) = GetTableScopes("DelegatedWork", methodClaims, leastPrivilege[method]);
+            markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
 
-            var delegatedWorkScopes = methodClaims.TryGetValue("DelegatedWork", out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Delegated (work or school account)", string.Join(", ", delegatedWorkScopes));
+            (least, higher) = GetTableScopes("DelegatedPersonal", methodClaims, leastPrivilege[method]);
+            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", least, higher);
 
-            var delegatedPersonalScopes = methodClaims.TryGetValue("DelegatedPersonal", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", string.Join(", ", delegatedPersonalScopes));
-
-            var appOnlyScopes = methodClaims.TryGetValue("Application", out claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            markdownBuilder.AddTableRow("Application", string.Join(", ", appOnlyScopes));
+            (least, higher) = GetTableScopes("Application", methodClaims, leastPrivilege[method]);
+            markdownBuilder.AddTableRow("Application", least, higher);
+            
             markdownBuilder.EndTable();
             return markdownBuilder.ToString();
         }
 
-        public string FetchLeastPrivilege(string method = null, string scheme = null)
+        public Dictionary<string, Dictionary<string, HashSet<string>>> FetchLeastPrivilege(string method = null, string scheme = null)
         {
             var output = string.Empty;
             var leastPrivilege = new Dictionary<string, Dictionary<string, HashSet<string>>>();
@@ -267,7 +268,7 @@ namespace Kibali
                 this.SupportedMethods.TryGetValue(method, out var supportedSchemes);
                 if (supportedSchemes == null)
                 {
-                    return output;
+                    return leastPrivilege;
                 }
                 foreach (var supportedScheme in supportedSchemes.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
                 {
@@ -302,6 +303,12 @@ namespace Kibali
                     }
                 }
             }
+            return leastPrivilege;
+        }
+
+        public string WriteLeastPrivilegeTable(Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilege)
+        {
+            string output;
             var builder = new StringBuilder();
             foreach (var methodEntry in leastPrivilege)
             {
@@ -316,6 +323,16 @@ namespace Kibali
             }
             output = builder.ToString();
             return output;
+        }
+ 
+        private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilege)
+        {
+            var permissionsStub = new List<string> { "Not supported." };
+
+            var delegatedWorkScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            var leastPrivilegeScheme = leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
+            (var least, var higher) = ExtractScopes(delegatedWorkScopes, scopes);
+            return (least, higher);
         }
 
         private void PopulateLeastPrivilege(Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilege, string method, string scheme, HashSet<string> permissions)
@@ -345,5 +362,14 @@ namespace Kibali
             }
             return permissions;
         }
+        
+        private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
+        {
+            var least = leastPrivilege?.First();
+            orderedScopes = orderedScopes.Where(s => s!= least);
+            var higher = orderedScopes.Any() ? string.Join(", ", orderedScopes) : "Not supported.";
+            return (least, higher);
+        }
     }
+
 }
