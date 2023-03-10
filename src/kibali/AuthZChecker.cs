@@ -31,7 +31,7 @@ namespace Kibali
 
         public ProtectedResource FindResource(string url)
         {
-            var parsedUrl = new Uri(new Uri("https://example.org/"), url, true);
+            var parsedUrl = new Uri(new Uri("https://example.org/"), url.ToLowerInvariant(), true);
             var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
 
             return Find(UrlTree, segments);
@@ -98,15 +98,16 @@ namespace Kibali
                     foreach (var path in pathSet.Paths)
                     {
                         ProtectedResource resource;
-                        if (resources.ContainsKey(path.Key))
+                        var pathKey = path.Key.ToLowerInvariant();
+                        if (resources.ContainsKey(pathKey))
                         {
-                            resource = resources[path.Key];
+                            resource = resources[pathKey];
 
                         }
                         else
                         {
-                            resource = new ProtectedResource(path.Key);
-                            resources.Add(path.Key, resource);
+                            resource = new ProtectedResource(pathKey);
+                            resources.Add(pathKey, resource);
                         }
                         var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(path.Value);
                         resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes);

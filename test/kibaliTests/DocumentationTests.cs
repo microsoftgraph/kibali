@@ -75,6 +75,23 @@ public class DocumentationTests
     }
 
     [Fact]
+    public void DocumentationTableNotGeneratedNoPrivilege()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", null, true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = @"
+|Permission type|Least privileged permission|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Not supported.|Not supported.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expectedTable, table);
+
+    }
+
+    [Fact]
     public void DocumentationTableNotGeneratedNoDefault()
     {
         var permissionsDocument = CreatePermissionsDocument();
@@ -120,7 +137,8 @@ public class DocumentationTests
                                 "DelegatedWork"
                             },
                             Paths = {
-                                { "/foo",  "least=Application" }
+                                { "/foo",  "least=Application" },
+                                { "/fooNoPrivilege",  "" }
                             }
                         }
                     }
