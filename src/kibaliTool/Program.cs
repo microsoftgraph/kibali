@@ -27,7 +27,8 @@ namespace KibaliTool
                 QueryCommandBinder.PermissionFileOption,
                 QueryCommandBinder.UrlOption,
                 QueryCommandBinder.MethodOption,
-                QueryCommandBinder.SchemeOption
+                QueryCommandBinder.SchemeOption,
+                QueryCommandBinder.LeastPrivilegeOption
             };
             
             queryCommand.SetHandler(QueryCommand.Execute, new QueryCommandBinder());
@@ -103,6 +104,7 @@ namespace KibaliTool
         public static Option<string> UrlOption = new (new[] { "--url", "-u" }, "Test Url");
         public static Option<string> MethodOption = new (new[] { "--method", "-m" }, "Method");
         public static Option<string> SchemeOption = new( new[] { "--scheme", "-s" }, "Scheme");
+        public static Option<bool> LeastPrivilegeOption = new(new[] { "--least", "-l" }, "LeastPrivilege");
 
         protected override QueryCommandParameters GetBoundValue(BindingContext bindingContext)
         {
@@ -111,7 +113,8 @@ namespace KibaliTool
                 SourcePermissionsFile = bindingContext.ParseResult.GetValueForOption(PermissionFileOption),
                 Url = bindingContext.ParseResult.GetValueForOption(UrlOption),
                 Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
-                Scheme = bindingContext.ParseResult.GetValueForOption(SchemeOption)
+                Scheme = bindingContext.ParseResult.GetValueForOption(SchemeOption),
+                LeastPrivilege = bindingContext.ParseResult.GetValueForOption(LeastPrivilegeOption),
             };
         }
     }
