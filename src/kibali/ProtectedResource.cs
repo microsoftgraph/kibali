@@ -18,8 +18,6 @@ namespace Kibali
         // (Path, Method) -> Scheme(delegated) -> Permissions (Graph Explorer Tab)
         // Permissions(delegated) (Graph Explorer Permissions List)
         // Schemas -> Permissions ( AAD Onboarding)
-        private Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilegedPermissions { get; set; } = new();
-
         public string Url { get; set; }
         public Dictionary<string, Dictionary<string, List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
 
