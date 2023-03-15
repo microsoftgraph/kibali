@@ -24,9 +24,15 @@ public class LeastPrivilegeTests
 
         // Assert
         var expected = @"
+DELETE
+|DelegatedPersonal |Foo.Read|
+|Application |Foo.Read|
 GET
 |DelegatedPersonal |Foo.Read|
 |Application |Foo.Read|
+PATCH
+|DelegatedPersonal |Bar.Read|
+|Application |Bar.Read|
 POST
 |DelegatedPersonal |Foo.Read|
 |Application |Foo.Read|
@@ -56,6 +62,27 @@ GET
     }
 
     [Fact]
+    public void FindLeastPrivilegeMethodProvidedAmbiguous()
+    {
+        // Arrange
+        var authZChecker = new AuthZChecker();
+        authZChecker.Load(CreatePermissionsDocument());
+
+        // Act
+        var resource = authZChecker.FindResource("/bar");
+        var leastPrivilege = resource.FetchLeastPrivilege("PATCH");
+        var actual = resource.WriteLeastPrivilegeTable(leastPrivilege).Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        // Assert
+        var expected = @"
+PATCH
+|DelegatedPersonal |Bar.Read|
+|Application |Bar.Read|
+".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public void FindLeastPrivilegeSchemeProvided()
     {
         // Arrange
@@ -69,8 +96,12 @@ GET
 
         // Assert
         var expected = @"
+DELETE
+|Application |Foo.Read|
 GET
 |Application |Foo.Read|
+PATCH
+|Application |Bar.Read|
 POST
 |Application |Foo.Read|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         Assert.Equal(expected, actual);
@@ -102,7 +133,21 @@ POST
                                 "DelegatedPersonal","Application"
                             },
                             Methods = {
-                                "GET","POST"
+                                "GET","POST",
+                            },
+                            Paths = {
+                                { "/bar",  "least=DelegatedPersonal,Application" },
+                                { "/bar/{id}",  null },
+                                { "/bar/{id}/schmo",  null }
+                            }
+
+                        },
+                        new PathSet() {
+                            SchemeKeys = {
+                                "DelegatedPersonal","Application"
+                            },
+                            Methods = {
+                                "GET","PATCH", "DELETE"
                             },
                             Paths = {
                                 { "/bar",  "least=DelegatedPersonal,Application" },
@@ -128,6 +173,20 @@ POST
                             Paths = {
                                 { "/bar/{id}",  null },
                             }
+                        },
+                        new PathSet() {
+                            SchemeKeys = {
+                                "DelegatedPersonal","Application"
+                            },
+                            Methods = {
+                                "PATCH"
+                            },
+                            Paths = {
+                                { "/bar",  "least=DelegatedPersonal,Application" },
+                                { "/bar/{id}",  null },
+                                { "/bar/{id}/schmo",  null }
+                            }
+
                         }
                     }
         };

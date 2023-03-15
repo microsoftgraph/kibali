@@ -70,7 +70,7 @@ namespace KibaliTool
             {
                 Console.WriteLine();
                 var leastPrivilege = resource.FetchLeastPrivilege(queryCommandParameters.Method, queryCommandParameters.Scheme);
-                Console.WriteLine(leastPrivilege);
+                Console.WriteLine(resource.WriteLeastPrivilegeTable(leastPrivilege));
             }
 
             return 0;

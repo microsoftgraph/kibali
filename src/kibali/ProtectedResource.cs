@@ -61,87 +61,31 @@ namespace Kibali
 
         public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes)
         {
-            ComputeLeastPrivilegeEntries(permission, pathSet, leastPrivilegedPermissionSchemes);
             var mismatchedSchemes = ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
-            var duplicateErrors = ValidateDuplicatedScopes();
-            return mismatchedSchemes.Union(duplicateErrors);
-        }
-
-        
-
-        private void ComputeLeastPrivilegeEntries(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegedPermissionSchemes)
-        {
-            foreach (var supportedMethod in pathSet.Methods)
+            var duplicateErrors = new HashSet<PermissionsError> ();
+            var privs = this.FetchLeastPrivilege();
+            foreach (var methodPrivs in privs)
             {
-                var schemeLeastPrivilegeScopes = new Dictionary<string, HashSet<string>>();
-                foreach (var supportedScheme in pathSet.SchemeKeys)
+                var method = methodPrivs.Key;
+                foreach (var schemePrivs in methodPrivs.Value)
                 {
-                    if (!leastPrivilegedPermissionSchemes.Contains(supportedScheme))
+                    var scheme = schemePrivs.Key;
+                    if (schemePrivs.Value.Count > 1)
                     {
-                        continue;
-                    }
-                    if (!schemeLeastPrivilegeScopes.ContainsKey(supportedScheme))
-                    {
-                        schemeLeastPrivilegeScopes.Add(supportedScheme, new HashSet<string>());
-                    }
-                    schemeLeastPrivilegeScopes[supportedScheme].Add(permission);
-                }
-                if (!this.leastPrivilegedPermissions.TryGetValue(supportedMethod, out var methodLeastPrivilegeScopes))
-                {
-                    this.leastPrivilegedPermissions.Add(supportedMethod, schemeLeastPrivilegeScopes);
-                }
-                else
-                {
-                    UpdatePrivilegedPermissions(methodLeastPrivilegeScopes, schemeLeastPrivilegeScopes, supportedMethod);
-                }   
-            }
-        }
-
-        private HashSet<PermissionsError> ValidateDuplicatedScopes()
-        {
-            var errors = new HashSet<PermissionsError>();
-            foreach (var methodScopes in this.leastPrivilegedPermissions)
-            {
-                var method = methodScopes.Key;
-                foreach (var schemeScope in methodScopes.Value)
-                {
-                    var scopes = schemeScope.Value;
-                    var scheme = schemeScope.Key;
-                    if (scopes.Count > 1 && !IsFalsePositiveDuplicate(method, scopes))
-                    {
-                        errors.Add(new PermissionsError
+                        duplicateErrors.Add(new PermissionsError
                         {
                             Path = this.Url,
                             ErrorCode = PermissionsErrorCode.DuplicateLeastPrivilegeScopes,
-                            Message = string.Format(StringConstants.DuplicateLeastPrivilegeSchemeErrorMessage, string.Join(", ", scopes), scheme, method),
+                            Message = string.Format(StringConstants.DuplicateLeastPrivilegeSchemeErrorMessage, string.Join(", ", schemePrivs.Value), scheme, method),
                         });
                     }
                 }
             }
-            return errors;
+            
+            return mismatchedSchemes.Union(duplicateErrors);
         }
 
-        /// <summary>
-        /// Check if the duplicate is a false positive.
-        /// </summary>
-        /// <param name="method">HTTP Method.</param>
-        /// <param name="scopes">Duplicated permission scopes.</param>
-        /// <returns>True if the duplicate is a false positive (invalid).</returns>
-        private bool IsFalsePositiveDuplicate(string method, HashSet<string> scopes)
-        {
-            // GET operations can be done by ReadWrite permissions but we should only have one Read permission
-            // which is the least privileged for Read operations.
-            if (method == "GET")
-            {
-                var groupedOperations = scopes.GroupBy(x => x.Split('.')[1]).ToDictionary(g => g.Key, g => g.Count());
-                groupedOperations.TryGetValue("Read", out int readCount);
-                groupedOperations.TryGetValue("ReadBasic", out int readBasicCount);
-                readCount += readBasicCount;
-                return readCount == 1;
-            }
-            return false;
-        }
-
+        
         private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegePermissionSchemes)
         {
             var mismatchedPrivilegeSchemes = leastPrivilegePermissionSchemes.Except(pathSet.SchemeKeys);
@@ -158,21 +102,6 @@ namespace Kibali
                 });
             }
             return errors;
-        }
-
-        private void UpdatePrivilegedPermissions(Dictionary<string, HashSet<string>> existingPermissions, Dictionary<string, HashSet<string>> newPermissions, string method)
-        {
-            foreach (var newPermission in newPermissions)
-            {
-                if (existingPermissions.TryGetValue(newPermission.Key, out var existingPermission))
-                {
-                    existingPermission.UnionWith(newPermission.Value);
-                }
-                else
-                {
-                    existingPermissions[newPermission.Key] = newPermission.Value;
-                }
-            }
         }
 
         private void Update(Dictionary<string, List<AcceptableClaim>> existingSchemes, Dictionary<string, List<AcceptableClaim>> newSchemes)
@@ -347,19 +276,54 @@ namespace Kibali
 
         private HashSet<string> Disambiguate(string method, string scheme, HashSet<string> permissions)
         {
+            // If more than one permission exists as the least privilege due to grouping of the methods
             if (permissions.Count > 1)
             {
+                var exclusivePrivilegeCount = 0;
                 foreach (var perm in permissions)
                 {
-                    if (!(this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> perms) && perms.Count == 1))
+                    if ((this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) && supportedMethods.Count == 1))
+                    {
+                        exclusivePrivilegeCount++;
+                    }
+                }
+                if (exclusivePrivilegeCount > 1)
+                {
+                    return permissions;
+                }
+
+
+                // Check for the permission supports the provided method only as the least privilege
+                foreach (var perm in permissions)
+                {
+                    if (!(this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) && supportedMethods.Count == 1))
                     {
                         continue;
                     }
-                    if (perms.First() == method)
+                    if (supportedMethods.First() == method)
                     {
                         return new HashSet<string> { perm };
                     }
                 }
+
+                var permissionMethodsCount = 100;
+                var leastPrivilegePermission = permissions.First();
+                // Check for the permission that supports the fewest number of methods as least privilege
+                // TODO: Use permission risk levels once they get added to the model.
+                foreach (var perm in permissions)
+                {
+                    if (!this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods))
+                    {
+                        continue;
+                    }
+                    if (supportedMethods.Count < permissionMethodsCount && supportedMethods.Contains(method))
+                    {
+                        leastPrivilegePermission = perm;
+                        permissionMethodsCount = supportedMethods.Count;
+                    }
+                }
+
+                return new HashSet<string> { leastPrivilegePermission };
             }
             return permissions;
         }
