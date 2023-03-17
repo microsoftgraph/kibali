@@ -11,6 +11,7 @@ namespace KibaliTool
         public string Url;
         public string Method;
         public string Scheme;
+        public bool LeastPrivilege;
     }
 
     internal class QueryCommand
@@ -64,6 +65,14 @@ namespace KibaliTool
             }
 
             await writer.FlushAsync();
+
+            if (queryCommandParameters.LeastPrivilege)
+            {
+                Console.WriteLine();
+                var leastPrivilege = resource.FetchLeastPrivilege(queryCommandParameters.Method, queryCommandParameters.Scheme);
+                Console.WriteLine(resource.WriteLeastPrivilegeTable(leastPrivilege));
+            }
+
             return 0;
         }
     }
