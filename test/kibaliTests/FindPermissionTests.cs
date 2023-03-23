@@ -80,6 +80,31 @@ namespace KibaliTests
             Assert.Null(resource);
         }
 
+        [Fact]
+        public void FindRelatedBracesEnd()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/asdasd/schmo/(value)");
+
+            Assert.Equal("/bar/{id}/schmo", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["Application"], ac => ac.Permission == "Foo.Read");
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Foo.Read");
+        }
+
+        [Fact]
+        public void FindRelatedBracesInfix()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/(value)/asdasd/schmo");
+
+            Assert.Equal("/bar/{id}/schmo", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["Application"], ac => ac.Permission == "Foo.Read");
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Foo.Read");
+        }
 
         private PermissionsDocument CreatePermissionsDocument()
         {
