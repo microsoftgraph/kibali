@@ -9,7 +9,7 @@ namespace Kibali
         public string Note { get; set; }
         public bool Implicit { get; set; } = false;
         public string PrivilegeLevel { get; set; }
-        public Dictionary<string, Scheme> Schemes { get; set; } = new Dictionary<string, Scheme>();
+        public SortedDictionary<string, Scheme> Schemes { get; set; } = new SortedDictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
         public ProvisioningInfo ProvisioningInfo { get; set; } = new();
 
@@ -56,7 +56,7 @@ namespace Kibali
             { "privilegeLevel", (o,v) => {o.PrivilegeLevel= v.GetString();  } },
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
             { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
-            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetMap(v, Scheme.Load);  } },
+            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetOrderedMap(v, Scheme.Load);  } },
             { "provisioningInfo", (o,v) => {o.ProvisioningInfo = ProvisioningInfo.Load(v);  } },
         };
     }

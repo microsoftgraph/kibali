@@ -8,9 +8,9 @@ namespace Kibali
 {
     public class PermissionsDocument
     {
-        private Dictionary<string, Permission> permissions = new Dictionary<string, Permission>();
+        private SortedDictionary<string, Permission> permissions = new SortedDictionary<string, Permission>();
         
-        public Dictionary<string, Permission> Permissions { get => permissions; set => permissions = value;  }
+        public SortedDictionary<string, Permission> Permissions { get => permissions; set => permissions = value;  }
 
         public async Task WriteAsync(FileStream outStream)
         {
@@ -52,13 +52,15 @@ namespace Kibali
         public static PermissionsDocument LoadFromFolder(string documentPath)
         {
             var mergedDoc = new PermissionsDocument();
-            foreach(var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))
+            var mergedPermissions = new Dictionary<string, Permission>();
+            foreach (var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))
             {
                 using var stream = new FileStream(permissionsFile, FileMode.Open);
                 var doc = Load(stream);
-                mergedDoc.Permissions = mergedDoc.Permissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
+                mergedPermissions = mergedPermissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
             }
 
+            mergedDoc.Permissions = new SortedDictionary<string, Permission>(mergedPermissions);
             return mergedDoc;
         }
 
@@ -73,7 +75,7 @@ namespace Kibali
 
         private static readonly FixedFieldMap<PermissionsDocument> handlers = new()
         {
-            { "permissions", (d,v) => { d.Permissions = ParsingHelpers.GetMap(v,Permission.Load);  } },
+            { "permissions", (d,v) => { d.Permissions = ParsingHelpers.GetOrderedMap(v,Permission.Load);  } },
             { "$schema", (d,v) => {  } }
         };
         

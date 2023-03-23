@@ -7,26 +7,26 @@ namespace Kibali
 {
     public class PathSet
     {
-        public HashSet<string> SchemeKeys { get; set; } = new HashSet<string>();
-        public HashSet<string> Methods { get; set; } = new HashSet<string>();
+        public SortedSet<string> SchemeKeys { get; set; } = new SortedSet<string>();
+        public SortedSet<string> Methods { get; set; } = new SortedSet<string>();
         public string AlsoRequires { get; set; }
-        public List<string> ExcludedProperties { get; set; } = new List<string>();
-        public List<string> IncludedProperties { get; set; } = new List<string>();
+        public SortedSet<string> ExcludedProperties { get; set; } = new SortedSet<string>();
+        public SortedSet<string> IncludedProperties { get; set; } = new SortedSet<string>();
         
 
-        public Dictionary<string, string> Paths
+        public SortedDictionary<string, string> Paths
         {
             get
             {
                 if (paths == null)
                 {
-                    paths = new Dictionary<string, string>();
+                    paths = new SortedDictionary<string, string>();
                 };
                 return paths;
             }
             set { paths = value; }
         }
-        private Dictionary<string, string> paths;
+        private SortedDictionary<string, string> paths;
 
         public void Write(Utf8JsonWriter writer)
         {
@@ -101,11 +101,11 @@ namespace Kibali
         private static FixedFieldMap<PathSet> handlers = new()
         {
             { "alsoRequires", (o,v) => {o.AlsoRequires = v.GetString();  } },
-            { "methods", (o,v) => {o.Methods = ParsingHelpers.GetHashSetOfString(v);  } },
-            { "schemeKeys", (o,v) => {o.SchemeKeys = ParsingHelpers.GetHashSetOfString(v);  } },
-            { "paths", (o,v) => {o.Paths = ParsingHelpers.GetMap(v, x => x.ToString()); } },
-            { "includedProperties", (o,v) => {o.IncludedProperties = ParsingHelpers.GetListOfString(v);  } },
-            { "excludedProperties", (o,v) => {o.ExcludedProperties = ParsingHelpers.GetListOfString(v);  } },
+            { "methods", (o,v) => {o.Methods = ParsingHelpers.GetOrderedHashSetOfString(v);  } },
+            { "schemeKeys", (o,v) => {o.SchemeKeys = ParsingHelpers.GetOrderedHashSetOfString(v);  } },
+            { "paths", (o,v) => {o.Paths = ParsingHelpers.GetOrderedMap(v, x => x.ToString()); } },
+            { "includedProperties", (o,v) => {o.IncludedProperties = ParsingHelpers.GetOrderedHashSetOfString(v);  } },
+            { "excludedProperties", (o,v) => {o.ExcludedProperties = ParsingHelpers.GetOrderedHashSetOfString(v);  } },
         };
     }
 
