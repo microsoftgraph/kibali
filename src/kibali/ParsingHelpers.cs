@@ -38,6 +38,16 @@ namespace Kibali
             return map;
         }
 
+        internal static SortedDictionary<string, T> GetOrderedMap<T>(JsonElement v, Func<JsonElement, T> load)
+        {
+            var map = new SortedDictionary<string, T>();
+            foreach (var item in v.EnumerateObject())
+            {
+                map.Add(item.Name, load(item.Value));
+            }
+            return map;
+        }
+
         internal static List<string> GetListOfString(JsonElement v)
         {
             var list = new List<string>();
@@ -56,6 +66,16 @@ namespace Kibali
                 hashSet.Add(item.GetString());
             }
             return hashSet;
+        }
+
+        internal static SortedSet<string> GetOrderedHashSetOfString(JsonElement v)
+        {
+            var sortedSet = new SortedSet<string>();
+            foreach (var item in v.EnumerateArray())
+            {
+                sortedSet.Add(item.GetString());
+            }
+            return sortedSet;
         }
 
         /// <summary>

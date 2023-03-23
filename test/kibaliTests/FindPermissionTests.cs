@@ -1,11 +1,4 @@
 ﻿using Kibali;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace KibaliTests
@@ -80,6 +73,31 @@ namespace KibaliTests
             Assert.Null(resource);
         }
 
+        [Fact]
+        public void FindRelatedBracesEnd()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/asdasd/SCHMO/(value)");
+
+            Assert.Equal("/bar/{id}/schmo", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["Application"], ac => ac.Permission == "Foo.Read");
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Foo.Read");
+        }
+
+        [Fact]
+        public void FindRelatedBracesInfix()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/(value)/asdasd/SchMO");
+
+            Assert.Equal("/bar/{id}/schmo", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["Application"], ac => ac.Permission == "Foo.Read");
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Foo.Read");
+        }
 
         private PermissionsDocument CreatePermissionsDocument()
         {

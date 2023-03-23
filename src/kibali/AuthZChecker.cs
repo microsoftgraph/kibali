@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Kibali
 {
@@ -31,7 +32,7 @@ namespace Kibali
 
         public ProtectedResource FindResource(string url)
         {
-            var parsedUrl = new Uri(new Uri("https://example.org/"), url.ToLowerInvariant(), true);
+            var parsedUrl = new Uri(new Uri("https://example.org/"), CleanRequestUrl(url), true);
             var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
 
             return Find(UrlTree, segments);
@@ -98,7 +99,7 @@ namespace Kibali
                     foreach (var path in pathSet.Paths)
                     {
                         ProtectedResource resource;
-                        var pathKey = path.Key.ToLowerInvariant();
+                        var pathKey = CleanRequestUrl(path.Key);
                         if (resources.ContainsKey(pathKey))
                         {
                             resource = resources[pathKey];
@@ -195,6 +196,17 @@ namespace Kibali
             parsedPathValue.TryGetValue("least", out string privilegeString);
             var leastPrivilegedPermissionSchemes = privilegeString != null ? privilegeString.Split(",") : defaultLeastPrivilege;
             return leastPrivilegedPermissionSchemes;
+        }
+
+        private static string CleanRequestUrl(string requestUrl)
+        {
+            if (string.IsNullOrEmpty(requestUrl))
+            {
+                return requestUrl;
+            }
+
+            var cleaned = Regex.Replace(requestUrl.ToLowerInvariant(), @"\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
+            return cleaned;
         }
     }
 
