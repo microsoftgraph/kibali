@@ -90,8 +90,8 @@ namespace KibaliTool
                 var perm = doc.Permissions[permissionInfo.Permission];
                 foreach (var pathDetails in permissionInfo.Paths)
                 {
-                    HashSet<string> methods = new HashSet<string>();
-                    HashSet<string> schemes = new HashSet<string>();
+                    SortedSet<string> methods = new SortedSet<string>();
+                    SortedSet<string> schemes = new SortedSet<string>();
                     foreach (var entry in pathDetails)
                     {
                         methods.Add(entry.Method);
@@ -153,7 +153,7 @@ namespace KibaliTool
 
         }
 
-        private static PathSet GetOrCreatePathSet(Permission perm, HashSet<string> methods, HashSet<string> schemes)
+        private static PathSet GetOrCreatePathSet(Permission perm, SortedSet<string> methods, SortedSet<string> schemes)
         {
             foreach (var pathSet in perm.PathSets)
             {
@@ -172,7 +172,7 @@ namespace KibaliTool
         }
         public static async Task WriteSingleDocument(PermissionsDocument doc, string outputPath)
         {
-            doc.Permissions = doc.Permissions.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+            doc.Permissions = new SortedDictionary<string, Permission>(doc.Permissions.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value));
             Directory.CreateDirectory(outputPath);
             var filename = "GraphPermissions";
             using (var outStream = new FileStream($"{outputPath}/{filename}.json", FileMode.Create))
