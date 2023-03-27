@@ -165,7 +165,7 @@ namespace Kibali
         {
             var leastPrivilege = this.FetchLeastPrivilege(method);
             var markdownBuilder = new MarkDownBuilder();
-            markdownBuilder.StartTable("Permission type", "Least privileged permission", "Higher privileged permissions");
+            markdownBuilder.StartTable("Permission type", "Least privileged permissions", "Higher privileged permissions");
  
             (var least, var higher) = GetTableScopes("DelegatedWork", methodClaims, leastPrivilege[method]);
             markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
