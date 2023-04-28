@@ -24,18 +24,32 @@ namespace Kibali
                 return resources;
             }
         }
+
+        public bool LenientMatch { get; set; }
         public void Load(PermissionsDocument permissionsDocument)
         {
             this.permissionsDocuments.Add(permissionsDocument);
             InvertPermissionsDocument(permissionsDocument);
         }
 
+        public ProtectedResource Lookup(string url)
+        {
+            var parsedUrl = new Uri(new Uri("https://example.org/"), url, true);
+            var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
+            return Find(UrlTree, segments);
+        }
+
         public ProtectedResource FindResource(string url)
         {
-            var parsedUrl = new Uri(new Uri("https://example.org/"), CleanRequestUrl(url), true);
-            var segments = parsedUrl.AbsolutePath.Split("/").Skip(1);
-
-            return Find(UrlTree, segments);
+            if (LenientMatch)
+            {
+                url = CleanRequestUrl(url);
+                return Lookup(url);
+            }
+            else
+            {
+                return Lookup(url);
+            }
         }
 
         public IEnumerable<AcceptableClaim> GetRequiredPermissions(string url, string method, string scheme)
@@ -99,7 +113,7 @@ namespace Kibali
                     foreach (var path in pathSet.Paths)
                     {
                         ProtectedResource resource;
-                        var pathKey = CleanRequestUrl(path.Key);
+                        var pathKey = this.LenientMatch ? CleanRequestUrl(path.Key) : path.Key;
                         if (resources.ContainsKey(pathKey))
                         {
                             resource = resources[pathKey];
@@ -205,8 +219,9 @@ namespace Kibali
                 return requestUrl;
             }
 
-            var cleaned = Regex.Replace(requestUrl.ToLowerInvariant(), @"\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
-            return cleaned;
+            var parensRemoved = Regex.Replace(requestUrl.ToLowerInvariant(), @"\/\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
+            var braceValuesReplaced = Regex.Replace(parensRemoved, @"\{.*?\}", "{id}", RegexOptions.None, TimeSpan.FromSeconds(5));
+            return braceValuesReplaced;
         }
     }
 

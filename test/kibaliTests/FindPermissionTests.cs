@@ -74,9 +74,9 @@ namespace KibaliTests
         }
 
         [Fact]
-        public void FindRelatedBracesEnd()
+        public void FindRelatedBracesEndLenient()
         {
-            var authZChecker = new AuthZChecker();
+            var authZChecker = new AuthZChecker() { LenientMatch = true };
             authZChecker.Load(CreatePermissionsDocument());
 
             var resource = authZChecker.FindResource("/bar/asdasd/SCHMO/(value)");
@@ -87,9 +87,9 @@ namespace KibaliTests
         }
 
         [Fact]
-        public void FindRelatedBracesInfix()
+        public void FindRelatedBracesInfixLenient()
         {
-            var authZChecker = new AuthZChecker();
+            var authZChecker = new AuthZChecker() { LenientMatch = true };
             authZChecker.Load(CreatePermissionsDocument());
 
             var resource = authZChecker.FindResource("/bar/(value)/asdasd/SchMO");
@@ -97,6 +97,30 @@ namespace KibaliTests
             Assert.Equal("/bar/{id}/schmo", resource.Url);
             Assert.Contains(resource.SupportedMethods["GET"]["Application"], ac => ac.Permission == "Foo.Read");
             Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Foo.Read");
+        }
+
+        [Fact]
+        public void FindRelatedBracesInfixNotLenient()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/{id}/({value})");
+
+            Assert.Equal("/bar/{id}/({value})", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedPersonal"], ac => ac.Permission == "Bar.Read");
+        }
+
+        [Fact]
+        public void FindRelatedBracesReplaceLenient()
+        {
+            var authZChecker = new AuthZChecker() { LenientMatch = true };
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/{some}:/{path}:/stuff/");
+
+            Assert.Equal("/bar/{id}:/{id}:/stuff", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedPersonal"], ac => ac.Permission == "Bar.Read");
         }
 
         private PermissionsDocument CreatePermissionsDocument()
@@ -150,6 +174,8 @@ namespace KibaliTests
                             },
                             Paths = {
                                 { "/bar/{id}",  null },
+                                { "/bar/{id}/({value})",  null },
+                                { "/bar/{id}:/{id}:/stuff",  null },
                             }
                         }
                     }
