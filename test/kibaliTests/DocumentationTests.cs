@@ -13,7 +13,7 @@ public class DocumentationTests
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
-|Permission type|Least privileged permission|Higher privileged permissions|
+|Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
@@ -31,7 +31,7 @@ public class DocumentationTests
         var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
-|Permission type|Least privileged permission|Higher privileged permissions|
+|Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Not supported.|Not supported.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
@@ -48,7 +48,7 @@ public class DocumentationTests
         var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null, true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
-|Permission type|Least privileged permission|Higher privileged permissions|
+|Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Not supported.|Not supported.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
@@ -65,7 +65,7 @@ public class DocumentationTests
         var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH", true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
-|Permission type|Least privileged permission|Higher privileged permissions|
+|Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Not supported.|Not supported.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
@@ -82,7 +82,7 @@ public class DocumentationTests
         var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", null, true);
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
-|Permission type|Least privileged permission|Higher privileged permissions|
+|Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
 |Delegated (work or school account)|Not supported.|Not supported.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
