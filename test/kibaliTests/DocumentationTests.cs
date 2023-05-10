@@ -17,7 +17,7 @@ public class DocumentationTests
 |:---|:---|:---|
 |Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Foo.ReadWrite|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Application|Foo.ReadWrite|Not available.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
 
