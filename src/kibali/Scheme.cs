@@ -19,7 +19,7 @@ namespace Kibali
             if (!String.IsNullOrEmpty(AdminDescription)) writer.WriteString("adminDescription", AdminDescription);
             if (!String.IsNullOrEmpty(UserDisplayName)) writer.WriteString("userDisplayName", UserDisplayName);
             if (!String.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
-            if (RequiresAdminConsent == true) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
+            if (RequiresAdminConsent) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
 
             writer.WriteEndObject();
         }
