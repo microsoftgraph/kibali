@@ -1,11 +1,9 @@
 ﻿using Kibali;
-using KibaliTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -155,13 +153,10 @@ namespace KibaliTool
 
         private static PathSet GetOrCreatePathSet(Permission perm, SortedSet<string> methods, SortedSet<string> schemes)
         {
-            foreach (var pathSet in perm.PathSets)
-            {
-                if (pathSet.SchemeKeys.SetEquals(schemes) && pathSet.Methods.SetEquals(methods))
-                {
-                    return pathSet;
-                }
-            }
+            var pathSet = perm.PathSets.FirstOrDefault(x => x.SchemeKeys.SetEquals(schemes) && x.Methods.SetEquals(methods));
+            if (pathSet != null)
+                return pathSet;
+
             var newPathSet = new PathSet()
             {
                 Methods = methods,

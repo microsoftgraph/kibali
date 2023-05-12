@@ -85,13 +85,11 @@ namespace Kibali
                 return AccessRequestResult.UnsupportedScheme;
             }
 
-            foreach (var claim in acceptableClaims)
+            if (acceptableClaims.Any(claim => claim.IsAuthorized(providedPermissions)))
             {
-                if (claim.IsAuthorized(providedPermissions))
-                {
-                    return AccessRequestResult.Success;
-                }
+                return AccessRequestResult.Success;
             }
+
             return AccessRequestResult.InsufficientPermissions;
         }
 
