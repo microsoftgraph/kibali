@@ -15,7 +15,6 @@ namespace Kibali
 {
     public class AuthZChecker
     {
-        private readonly List<PermissionsDocument> permissionsDocuments = new List<PermissionsDocument>();
         private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
         private OpenApiUrlTreeNode urlTree;
 
@@ -28,7 +27,6 @@ namespace Kibali
         public bool LenientMatch { get; set; }
         public void Load(PermissionsDocument permissionsDocument)
         {
-            this.permissionsDocuments.Add(permissionsDocument);
             InvertPermissionsDocument(permissionsDocument);
         }
 
