@@ -32,28 +32,32 @@ namespace Kibali
             foreach (var supportedMethod in pathSet.Methods)
             {
                 var supportedSchemes = new Dictionary<string, List<AcceptableClaim>>();
-                foreach (var supportedScheme in pathSet.SchemeKeys)
+                foreach (var schemeKey in pathSet.SchemeKeys)
                 {
-                    if (!supportedSchemes.ContainsKey(supportedScheme))
+                    if(!supportedSchemes.TryGetValue(schemeKey, out var acceptableClaims))
                     {
-                        supportedSchemes.Add(supportedScheme, new List<AcceptableClaim>());
+                        acceptableClaims = new List<AcceptableClaim>();
+                        supportedSchemes.Add(schemeKey, acceptableClaims);
                     }
 
-                    if (!this.PermissionMethods.TryAdd((permission, supportedScheme), new HashSet<string> { supportedMethod }))
+                    var permissionMethodKey = (permission, schemeKey);
+                    if (!this.PermissionMethods.TryAdd(permissionMethodKey, new HashSet<string> { supportedMethod }))
                     {
-                        this.PermissionMethods[(permission, supportedScheme)].Add(supportedMethod);
+                        this.PermissionMethods[permissionMethodKey].Add(supportedMethod);
                     }
 
-                    var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(supportedScheme);
-                    supportedSchemes[supportedScheme].Add(new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege));
+                    var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(schemeKey);
+                    acceptableClaims.Add(new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege));
                 }
-                if (!this.SupportedMethods.ContainsKey(supportedMethod))
+
+                if (!this.SupportedMethods.TryGetValue(supportedMethod, out var existingSupportedSchemes))
                 {
                     this.SupportedMethods.Add(supportedMethod, supportedSchemes);
-                } else
+                }
+                else
                 {
-                    Update(this.SupportedMethods[supportedMethod], supportedSchemes);
-                };
+                    Update(existingSupportedSchemes, supportedSchemes);
+                }
             }
         }
 

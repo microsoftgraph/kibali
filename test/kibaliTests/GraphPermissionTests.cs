@@ -25,8 +25,10 @@ namespace KibaliTests
             userAuthPermissions = PermissionsDocument.Load(authStream);
         }
 
-        [Fact]
-        public void GraphFindMailReadAll()
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("POST")]
+        public void GraphFindMailReadAll(string httpMethod)
         {
 
             var authZChecker = new AuthZChecker();
@@ -34,9 +36,9 @@ namespace KibaliTests
 
             var resource = authZChecker.FindResource("/me/messages");
 
-            Assert.True(resource.SupportedMethods.ContainsKey("GET"));
-            Assert.True(resource.SupportedMethods.ContainsKey("POST"));
-            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "Mail.Read");
+            Assert.True(resource.SupportedMethods.TryGetValue(httpMethod, out var methodPermissions));
+            var expectedPermission = httpMethod == "GET" ? "Mail.Read" : "Mail.ReadWrite";
+            Assert.Contains(methodPermissions["DelegatedWork"], ac => ac.Permission == expectedPermission);    
         }
 
         [Fact]
@@ -46,9 +48,9 @@ namespace KibaliTests
             authZChecker.Load(userAuthPermissions);
 
             var resource = authZChecker.FindResource("/users/sdfsdfsdfsdf/authentication/microsoftauthenticatormethods");
-            
-            Assert.True(resource.SupportedMethods.ContainsKey("GET"));
-            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "UserAuthenticationMethod.ReadWrite");
+
+            Assert.True(resource.SupportedMethods.TryGetValue("GET", out var methodPermissions));
+            Assert.Contains(methodPermissions["DelegatedWork"], ac => ac.Permission == "UserAuthenticationMethod.ReadWrite");
         }
 
         [Fact]
@@ -59,8 +61,8 @@ namespace KibaliTests
 
             var resource = authZChecker.FindResource("/users/sdfsdfsdfsdf/authentication/microsoftauthenticatormethods");
 
-            Assert.True(resource.SupportedMethods.ContainsKey("GET"));
-            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedWork"], ac => ac.Permission == "UserAuthenticationMethod.ReadWrite");
+            Assert.True(resource.SupportedMethods.TryGetValue("GET", out var methodPermissions));
+            Assert.Contains(methodPermissions["DelegatedWork"], ac => ac.Permission == "UserAuthenticationMethod.ReadWrite");
         }
 
         [Fact]

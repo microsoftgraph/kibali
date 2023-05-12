@@ -110,14 +110,8 @@ namespace Kibali
                 {
                     foreach (var path in pathSet.Paths)
                     {
-                        ProtectedResource resource;
                         var pathKey = this.LenientMatch ? CleanRequestUrl(path.Key) : path.Key;
-                        if (resources.ContainsKey(pathKey))
-                        {
-                            resource = resources[pathKey];
-
-                        }
-                        else
+                        if (!resources.TryGetValue(pathKey, out var resource))
                         {
                             resource = new ProtectedResource(pathKey);
                             resources.Add(pathKey, resource);
@@ -143,9 +137,9 @@ namespace Kibali
                 return (urlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
             }
 
-            if (urlTree.Children.ContainsKey(segment))
+            if (urlTree.Children.TryGetValue(segment, out var urlTreeNode))
             {
-                return Find(urlTree.Children[segment], segments: segments.Skip(1));
+                return Find(urlTreeNode, segments.Skip(1));
             }
             else
             {
