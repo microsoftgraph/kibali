@@ -122,7 +122,7 @@ namespace oauthpermissions
             var target = urlToTarget.Replace(url, "");
             return "microsoft.graph"+target;
         }
-        private static Regex urlToTarget = new Regex("/{[^/]*");
+        private static readonly Regex urlToTarget = new Regex("/{[^/]*");
 
         private static void WritePermissionAnnotations(XmlWriter xmlWriter, KeyValuePair<string, Permission> permission, string scheme)
         {
