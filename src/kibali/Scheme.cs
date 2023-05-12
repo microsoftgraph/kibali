@@ -15,10 +15,10 @@ namespace Kibali
         {
             writer.WriteStartObject();
 
-            if (!String.IsNullOrEmpty(AdminDisplayName)) writer.WriteString("adminDisplayName", AdminDisplayName);
-            if (!String.IsNullOrEmpty(AdminDescription)) writer.WriteString("adminDescription", AdminDescription);
-            if (!String.IsNullOrEmpty(UserDisplayName)) writer.WriteString("userDisplayName", UserDisplayName);
-            if (!String.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
+            if (!string.IsNullOrEmpty(AdminDisplayName)) writer.WriteString("adminDisplayName", AdminDisplayName);
+            if (!string.IsNullOrEmpty(AdminDescription)) writer.WriteString("adminDescription", AdminDescription);
+            if (!string.IsNullOrEmpty(UserDisplayName)) writer.WriteString("userDisplayName", UserDisplayName);
+            if (!string.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
             if (RequiresAdminConsent) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
 
             writer.WriteEndObject();

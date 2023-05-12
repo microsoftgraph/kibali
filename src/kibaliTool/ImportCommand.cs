@@ -189,7 +189,7 @@ namespace KibaliTool
             foreach (var permPair in doc.Permissions.OrderBy(p => p.Key))
             {
                 var resource = permPair.Key.Split('.').Take(1).FirstOrDefault();
-                if (String.IsNullOrEmpty(currentResource))
+                if (string.IsNullOrEmpty(currentResource))
                 {
                     currentResource = resource;
                 }

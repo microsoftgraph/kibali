@@ -26,7 +26,7 @@ namespace Kibali
             writer.WriteStartObject();
             writer.WritePropertyName("permission");
             writer.WriteStringValue(this.Permission);
-            if (!String.IsNullOrEmpty(this.AlsoRequires))
+            if (!string.IsNullOrEmpty(this.AlsoRequires))
             {
                 writer.WritePropertyName("alsoRequires");
                 writer.WriteStringValue(this.AlsoRequires);
