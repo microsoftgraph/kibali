@@ -12,6 +12,7 @@ namespace KibaliTool
         public string Method;
         public string Scheme;
         public bool LeastPrivilege;
+        public bool LenientMatch;
     }
 
     internal class QueryCommand
@@ -21,7 +22,7 @@ namespace KibaliTool
         {
             var doc = PermissionsDocument.Load(new FileStream(queryCommandParameters.SourcePermissionsFile, FileMode.Open));
 
-            var authZChecker = new AuthZChecker();
+            var authZChecker = new AuthZChecker() { LenientMatch = queryCommandParameters.LenientMatch };
             authZChecker.Load(doc);
 
             var resource = authZChecker.FindResource(queryCommandParameters.Url);

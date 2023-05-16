@@ -6,12 +6,14 @@ public class PermissionsStubGenerator
     private readonly string path;
     private readonly string method;
     private readonly bool generateDefault;
-    public PermissionsStubGenerator(PermissionsDocument document, string path, string method, bool generateDefault = false)
+    private readonly bool lenientMatch;
+    public PermissionsStubGenerator(PermissionsDocument document, string path, string method, bool generateDefault = false, bool lenientMatch = false)
     {
         this.document = document;
         this.path = path;
         this.method = method;
         this.generateDefault = generateDefault;
+        this.lenientMatch = lenientMatch;
     }
     
     public PermissionsDocument Document { get; set; }
@@ -20,9 +22,11 @@ public class PermissionsStubGenerator
 
     public string Method { get; set; }
 
+    public bool LenientMatch { get; set; }
+
     public string GenerateTable()
     {
-        var authZChecker = new AuthZChecker();
+        var authZChecker = new AuthZChecker() { LenientMatch = this.lenientMatch };
         authZChecker.Load(this.document);
 
         var resource = authZChecker.FindResource(this.path);
