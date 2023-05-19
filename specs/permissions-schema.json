@@ -33,15 +33,6 @@
                     "$ref": "#/definitions/provisioningInfo"
                 },
                 
-                "privilegeLevel": {
-                    "type": "string",
-                    "enum": [
-                        "low",
-                        "medium",
-                        "high"
-                    ]
-                },
-                
                 "schemes": {
                     "type": "object",
                     "patternProperties": {
@@ -58,22 +49,10 @@
                 }
             }
         },
-        "provisioningInfo":{
+        "ownerInfo":{
             "type": "object",
             "properties": {
-                "isHidden": {
-                    "type": "boolean"
-                },
                 "ownerSecurityGroup": {
-                    "type": "string"
-                },
-                "requiredEnvironments": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "resourceAppId": {
                     "type": "string"
                 }
             }
@@ -131,15 +110,8 @@
             }
         },
         "path": {
-            "type": "object",
-            "properties": {
-                "leastPrivilegePermission": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
+            "type": "string",
+            "pattern": "^([\\w]+=[\\w]+;)*([\\w]+=[\\w]+)?$"
         },
         "scheme": {
             "type": "object",
@@ -158,6 +130,11 @@
                 },
                 "userConsentDescription": {
                     "type": "string"
+                },
+                "privilegeLevel": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5
                 }
             }
         }
