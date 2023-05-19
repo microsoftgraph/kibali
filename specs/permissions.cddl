@@ -9,17 +9,14 @@ permissionName = tstr .pcre "[\\w]+\\.[\\w]+[\\.[\\w]+]?"
 permission = {
     ? note: tstr,
     ? implicit: bool .default false,
-    ? provisioningInfo: provisioningInfo,
+    ? ownerInfo: ownerInfo,
     ? privilegeLevel: low / medium / high .default high,
     schemes: {+ schemeKeys => scheme}, ; Table of supported schemes
     pathSets: [+ pathSet]  ; List of pathSets
 }
 
 provisioningInfo = {
-    ? isHidden: bool .default false,
     ownerSecurityGroup: tstr,
-    ? requiredEnvironments: [+ tstr], ; List of environments where this permission is available
-    ? resourceAppId: tstr
 }
 
 schemeKeys = DelegatedWork / DelegatedPersonal / Application

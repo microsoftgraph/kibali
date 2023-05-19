@@ -1,0 +1,31 @@
+; Graph Permissions Deployment Document
+
+permissionDeployments = {
+    permissionDeployments: {* permissionName => permissionDeployment} 
+}
+
+permissionDeployment = {
+    resourceAppId: tstr,
+    environments: {+ environmentName => environment}
+}
+
+environmentName = tstr
+environment = {
+    versions: {* versionName => version}
+}
+
+versionName = tstr
+
+version = {
+    schemes: {+ schemeKeys => scheme}
+}
+
+schemeKeys = DelegatedWork / DelegatedPersonal / Application
+
+scheme = {
+    isHidden: bool .default false,
+    isDisabled: bool .default false,
+    id: tstr
+}
+
+

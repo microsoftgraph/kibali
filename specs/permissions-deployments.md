@@ -14,76 +14,79 @@ The provisioning info file is a single file for all permissions. Permissions are
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-## <a name="permissionsObject"></a> Permissions JSON Object
+## <a name="permissionsDeploymentDocumentObject"></a> PermissionsDeployments Document Object
 
-This is the top level object in the provisioning info file. It contains a list of permission claim values and the cloud environments in which they are present.
+This is the top level object in the provisioning info file. It contains a "permissionDeployments" property that contains a JSON object.
 
 ```json
-"permissions": {
-  “Foo.Read.All”: {
-    "resourceAppId": "00000003-0000-0000-c000-000000000000",
-    "environments": {
-        "global": {
-          "versions": {
-            "v1": {
-                "schemes": [
-                  {
-                    "DelegatedWork": {
-                      "isPresent": true,
-                      "isHidden": false,
-                      "isDisabled": false,
-                      "id": "bed71653-0fa8-42a0-b33c-a1aab02ecda6"
+{
+    "permissionDeployments": {
+    "Foo.Read.All": {
+        "resourceAppId": "00000003-0000-0000-c000-000000000000",
+        "environments": {
+            "global": {
+                "versions": {
+                    "v1": {
+                        "schemes": [
+                        {
+                            "DelegatedWork": {
+                            "isHidden": false,
+                            "isDisabled": false,
+                            "id": "bed71653-0fa8-42a0-b33c-a1aab02ecda6"
+                            }
+                        }
+                        ]
+                    },
+                    "beta": {
+                        "schemes": [
+                        {
+                            "DelegatedWork": {
+                            "isHidden": false,
+                            "isDisabled": false,
+                            "id": "bed71753-0fq8-42a2-b33c-c1acb02ecd17"
+                            }
+                        }
+                        ]
                     }
-                  }
-                ]
-            },
-            "beta": {
-                "schemes": [
-                  {
-                    "DelegatedWork": {
-                      "isPresent": true,
-                      "isHidden": false,
-                      "isDisabled": false,
-                      "id": "bed71753-0fq8-42a2-b33c-c1acb02ecd17"
-                    }
-                  }
-                ]
-            },
-          }
+                }
+            }
         }
     }
-  }
+    }
 }
 ```
 
 In this example, the permission "Foo.Read.All" is present in the global environment in both v1 and beta versions. The "DelegatedWork" scheme is present in both versions. Note that the same scheme of the same permission have permission has different GUIDs in the two clouds.
 
-### permissions
+### permissionDeployments Object
 
-The "permissions" member is a JSON object whose members permission objects. The key of each member is the claim identifier used for the [Permission Object](#permissionObject)
+The "permissionDeployments" object contains a map of  permission names to "permissionDeployment" objects. 
 
+### <a name="permissionDeploymentObject"></a>PermissionDeployment Object
 
-### <a name="permissionObject"></a>Permission Object
-
-This member is a JSON object that describes the provisioning info for a permission.
+This is a JSON object that describes where a permission has been deployed and is available.
 
 #### environments
 
-The "environments" member is an array of objects that identifies the deployment environments in which the permission SHOULD be supported. The key of each member is the cloud environment identifier used for the [Cloud Environment Object](#cloudEnvironmentObject)
+The "environments" member is a JSON object that identifies the deployment environments in which the permission SHOULD be supported. Each key of the object is an environment identifier used for the [Environment Object](#environmentObject)
 
-### <a name="cloudEnvironmentObject"></a>Cloud Environment Object
+### <a name="environmentObject"></a>Environment Object
 
+The environment object represents where a permission has been deployed.
+
+#### versions
 This member is a JSON object whose members are version objects. The key of each member is the version identifier used for the [Version Object](#versionObject).
 
 ### <a name="versionObject"></a>Version Object
 
-This member is a JSON object whose members are scheme objects. The key of each member is the scheme identifier used for the [Scheme Object](#schemeObject).
+The version object represents which version a permission is available in.
+
+#### schemes
+This  member is a JSON object whose members are scheme objects. The key of each member is the scheme identifier used for the [Scheme Object](#schemeObject).
+
 
 ### <a name="schemeObject"></a>Scheme Object
 This member is a JSON object whose keys are permission scheme identifiers. The members of the scheme object are the provisioning info for the scheme in the cloud environment.
-
-#### isPresent
-The "isPresent" member is a boolean value that indicates if a permission is present in the environment.
 
 #### isHidden
 The "isHidden" member is a boolean value that indicates if a permission should be publicly usable in the API.
