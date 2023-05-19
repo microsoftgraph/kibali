@@ -11,6 +11,8 @@ namespace Kibali
         public string UserDescription { get; set; }
         public bool RequiresAdminConsent { get; set; }
 
+        public int PrivilegeLevel { get; set; }
+
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
@@ -20,9 +22,11 @@ namespace Kibali
             if (!String.IsNullOrEmpty(UserDisplayName)) writer.WriteString("userDisplayName", UserDisplayName);
             if (!String.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
             if (RequiresAdminConsent == true) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
+            if (PrivilegeLevel != 0) writer.WriteNumber("privilegeLevel", PrivilegeLevel);
 
             writer.WriteEndObject();
         }
+
 
         public static Scheme Load(JsonElement value)
         {
@@ -38,6 +42,7 @@ namespace Kibali
             { "userDisplayName", (o,v) => {o.UserDisplayName = v.GetString();  } },
             { "userDescription", (o,v) => {o.UserDescription = v.GetString();  } },
             { "requiresAdminConsent", (o,v) => {o.RequiresAdminConsent = v.GetBoolean();  } },
+            { "privilegeLevel", (o,v) => {o.PrivilegeLevel = v.GetInt32();  } },
         };
     }
 
