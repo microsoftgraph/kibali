@@ -31,11 +31,10 @@ namespace oauthpermissions
 
         public static void Export(TextWriter writer, PermissionsDocument permissionsDocument)
         {
-            var xmlWriter = XmlWriter.Create(writer);
+            using var xmlWriter = XmlWriter.Create(writer);
             xmlWriter.WriteStartDocument();
 
             xmlWriter.WriteStartElement("Schema");
-
             xmlWriter.WriteStartElement("Annotations");
             xmlWriter.WriteAttributeString("Target", "microsoft.graph.GraphService");
             xmlWriter.WriteStartElement("Annotation");
@@ -53,16 +52,13 @@ namespace oauthpermissions
             var authZChecker = new AuthZChecker();
             authZChecker.Load(permissionsDocument);
 
-            // Write out all permissions info...
             foreach (var resource in authZChecker.Resources)
             {
                 WriteResourceAnnotations(xmlWriter, resource);
             }
 
             xmlWriter.WriteEndElement();
-
             xmlWriter.WriteEndDocument();
-
         }
 
         private static void CreateSchemePermissions(PermissionsDocument permissionsDocument, XmlWriter xmlWriter, string scheme)
@@ -87,10 +83,6 @@ namespace oauthpermissions
             
             xmlWriter.WriteStartElement("Annotations");
             xmlWriter.WriteAttributeString("Target", UrlToTarget(resource.Value.Url));
-            //foreach (var method in resource.Value.)
-            //{
-
-            //}
             xmlWriter.WriteStartElement("Annotation");
             // ReadResrictions
             // UpdateRestrictions
@@ -122,7 +114,7 @@ namespace oauthpermissions
             var target = urlToTarget.Replace(url, "");
             return "microsoft.graph"+target;
         }
-        private static Regex urlToTarget = new Regex("/{[^/]*");
+        private static readonly Regex urlToTarget = new("/{[^/]*");
 
         private static void WritePermissionAnnotations(XmlWriter xmlWriter, KeyValuePair<string, Permission> permission, string scheme)
         {

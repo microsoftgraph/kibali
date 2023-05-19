@@ -17,8 +17,8 @@ namespace Kibali
         {
             writer.WriteStartObject();
 
-            if (!String.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
-            if (Implicit == true) writer.WriteBoolean("implicit", Implicit);
+            if (!string.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
+            if (Implicit) writer.WriteBoolean("implicit", Implicit);
 
             writer.WritePropertyName("schemes");
             writer.WriteStartObject();
