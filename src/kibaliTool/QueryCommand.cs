@@ -19,7 +19,8 @@ namespace KibaliTool
         
         public static async Task<int> Execute(QueryCommandParameters queryCommandParameters)
         {
-            var doc = PermissionsDocument.Load(new FileStream(queryCommandParameters.SourcePermissionsFile, FileMode.Open));
+            using var fileStream = new FileStream(queryCommandParameters.SourcePermissionsFile, FileMode.Open);
+            var doc = PermissionsDocument.Load(fileStream);
 
             var authZChecker = new AuthZChecker();
             authZChecker.Load(doc);

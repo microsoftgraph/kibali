@@ -19,7 +19,6 @@ namespace KibaliTool
 
     internal class ImportCommand
     {
-
         public static async Task<int> Execute(ImportCommandParameters commandOptions)
         {
             var doc = new PermissionsDocument();
@@ -37,36 +36,16 @@ namespace KibaliTool
             return 0;
         } 
 
-
-        public static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputfile, string permissionsFile)
+        public static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputFile, string permissionsFile)
         {
-            Stream input = null;
-            if (inputfile.StartsWith("http"))
-            {
-                var client = new HttpClient();
-                input = await client.GetStreamAsync(inputfile);
-            }
-            else
-            {
-                input = new FileStream(inputfile, FileMode.Open);
-            }
+            JsonElement rootObject;
+            JsonElement permissionsObject;
 
-            var jsonDoc = await JsonDocument.ParseAsync(input);
-            var rootObject = jsonDoc.RootElement;
-
-
-            Stream permissionsInput = null;
-            if (permissionsFile.StartsWith("http"))
+            using (var client = new HttpClient())
             {
-                var client = new HttpClient();
-                permissionsInput = await client.GetStreamAsync(permissionsFile);
+                rootObject = await FetchAndParseJsonAsync(inputFile, client);
+                permissionsObject = await FetchAndParseJsonAsync(permissionsFile, client);
             }
-            else
-            {
-                permissionsInput = new FileStream(permissionsFile, FileMode.Open);
-            }
-            var permissionsDoc = await JsonDocument.ParseAsync(permissionsInput);
-            var permissionsObject = permissionsDoc.RootElement;
 
             var apiPermissions = rootObject.GetProperty("ApiPermissions");
 
@@ -165,6 +144,7 @@ namespace KibaliTool
             perm.PathSets.Add(newPathSet);
             return newPathSet;
         }
+
         public static async Task WriteSingleDocument(PermissionsDocument doc, string outputPath)
         {
             doc.Permissions = new SortedDictionary<string, Permission>(doc.Permissions.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value));
@@ -230,6 +210,26 @@ namespace KibaliTool
                 }
             }
             return entries;
+        }
+
+        private static async Task<JsonElement> FetchAndParseJsonAsync(string path, HttpClient client)
+        {
+            Stream inputStream;
+
+            if (path.StartsWith("http"))
+            {
+                inputStream = await client.GetStreamAsync(path);
+            }
+            else
+            {
+                inputStream = new FileStream(path, FileMode.Open);
+            }
+
+            using (inputStream)
+            {
+                var jsonDoc = await JsonDocument.ParseAsync(inputStream);
+                return jsonDoc.RootElement;
+            }
         }
 
         //private static void ProcessPermissionsSchemes(string schemeType, JsonElement schemes, PermissionsDocument doc)
