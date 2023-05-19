@@ -333,8 +333,8 @@ namespace Kibali
         private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
         {
             var least = leastPrivilege != null && leastPrivilege.Any() ? leastPrivilege.First() : "Not supported.";
-            orderedScopes = orderedScopes.Where(s => s!= least);
-            var higher = orderedScopes.Any() ? string.Join(", ", orderedScopes) : "Not supported.";
+            var filteredScopes = orderedScopes.Where(s => s!= least);
+            var higher = filteredScopes.Any() ? string.Join(", ", filteredScopes) : leastPrivilege != null && leastPrivilege.Any() ? "Not available." : "Not supported.";
             return (least, higher);
         }
     }

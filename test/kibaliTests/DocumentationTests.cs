@@ -17,7 +17,46 @@ public class DocumentationTests
 |:---|:---|:---|
 |Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Foo.ReadWrite|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Application|Foo.ReadWrite|Not available.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+        
+    }
+
+
+    [Fact]
+    public void DocumentationTableGeneratedLenient()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true, true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Foo.ReadWrite|Not available.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+
+    }
+
+    [Fact]
+    public void DocumentationTableNotGeneratedNotLenient()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Not supported.|Not supported.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
 

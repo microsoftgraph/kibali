@@ -28,7 +28,8 @@ namespace KibaliTool
                 QueryCommandBinder.UrlOption,
                 QueryCommandBinder.MethodOption,
                 QueryCommandBinder.SchemeOption,
-                QueryCommandBinder.LeastPrivilegeOption
+                QueryCommandBinder.LeastPrivilegeOption,
+                QueryCommandBinder.LenientMatchOption,
             };
             
             queryCommand.SetHandler(QueryCommand.Execute, new QueryCommandBinder());
@@ -105,6 +106,7 @@ namespace KibaliTool
         public static Option<string> MethodOption = new (new[] { "--method", "-m" }, "Method");
         public static Option<string> SchemeOption = new( new[] { "--scheme", "-s" }, "Scheme");
         public static Option<bool> LeastPrivilegeOption = new(new[] { "--least", "-l" }, "LeastPrivilege");
+        public static Option<bool> LenientMatchOption = new(new[] { "--lenient", "--lm" }, "LenientMatch");
 
         protected override QueryCommandParameters GetBoundValue(BindingContext bindingContext)
         {
@@ -115,6 +117,7 @@ namespace KibaliTool
                 Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
                 Scheme = bindingContext.ParseResult.GetValueForOption(SchemeOption),
                 LeastPrivilege = bindingContext.ParseResult.GetValueForOption(LeastPrivilegeOption),
+                LenientMatch = bindingContext.ParseResult.GetValueForOption(LenientMatchOption),
             };
         }
     }
