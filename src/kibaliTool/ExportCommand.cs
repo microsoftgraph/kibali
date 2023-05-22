@@ -7,13 +7,11 @@ namespace KibaliTool
 {
     internal class ExportCommand
     {
-
         public async Task<int> Execute(string sourcePermissionsFile, string outFile)
         {
-            var doc = PermissionsDocument.Load(new FileStream(sourcePermissionsFile, FileMode.Open));
-            
+            using var sourceFileStream = new FileStream(sourcePermissionsFile, FileMode.Open);
+            var doc = PermissionsDocument.Load(sourceFileStream);
             CsdlExporter.Export(outFile, doc);
-
             return 0;
         }
 

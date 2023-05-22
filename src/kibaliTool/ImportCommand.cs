@@ -1,11 +1,9 @@
 ﻿using Kibali;
-using KibaliTool;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -21,7 +19,6 @@ namespace KibaliTool
 
     internal class ImportCommand
     {
-
         public static async Task<int> Execute(ImportCommandParameters commandOptions)
         {
             var doc = new PermissionsDocument();
@@ -39,36 +36,16 @@ namespace KibaliTool
             return 0;
         } 
 
-
-        public static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputfile, string permissionsFile)
+        public static async Task ParseFromGEPermissions(PermissionsDocument doc, string inputFile, string permissionsFile)
         {
-            Stream input = null;
-            if (inputfile.StartsWith("http"))
-            {
-                var client = new HttpClient();
-                input = await client.GetStreamAsync(inputfile);
-            }
-            else
-            {
-                input = new FileStream(inputfile, FileMode.Open);
-            }
+            JsonElement rootObject;
+            JsonElement permissionsObject;
 
-            var jsonDoc = await JsonDocument.ParseAsync(input);
-            var rootObject = jsonDoc.RootElement;
-
-
-            Stream permissionsInput = null;
-            if (permissionsFile.StartsWith("http"))
+            using (var client = new HttpClient())
             {
-                var client = new HttpClient();
-                permissionsInput = await client.GetStreamAsync(permissionsFile);
+                rootObject = await FetchAndParseJsonAsync(inputFile, client);
+                permissionsObject = await FetchAndParseJsonAsync(permissionsFile, client);
             }
-            else
-            {
-                permissionsInput = new FileStream(permissionsFile, FileMode.Open);
-            }
-            var permissionsDoc = await JsonDocument.ParseAsync(permissionsInput);
-            var permissionsObject = permissionsDoc.RootElement;
 
             var apiPermissions = rootObject.GetProperty("ApiPermissions");
 
@@ -155,13 +132,10 @@ namespace KibaliTool
 
         private static PathSet GetOrCreatePathSet(Permission perm, SortedSet<string> methods, SortedSet<string> schemes)
         {
-            foreach (var pathSet in perm.PathSets)
-            {
-                if (pathSet.SchemeKeys.SetEquals(schemes) && pathSet.Methods.SetEquals(methods))
-                {
-                    return pathSet;
-                }
-            }
+            var pathSet = perm.PathSets.FirstOrDefault(x => x.SchemeKeys.SetEquals(schemes) && x.Methods.SetEquals(methods));
+            if (pathSet != null)
+                return pathSet;
+
             var newPathSet = new PathSet()
             {
                 Methods = methods,
@@ -170,6 +144,7 @@ namespace KibaliTool
             perm.PathSets.Add(newPathSet);
             return newPathSet;
         }
+
         public static async Task WriteSingleDocument(PermissionsDocument doc, string outputPath)
         {
             doc.Permissions = new SortedDictionary<string, Permission>(doc.Permissions.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value));
@@ -189,7 +164,7 @@ namespace KibaliTool
             foreach (var permPair in doc.Permissions.OrderBy(p => p.Key))
             {
                 var resource = permPair.Key.Split('.').Take(1).FirstOrDefault();
-                if (String.IsNullOrEmpty(currentResource))
+                if (string.IsNullOrEmpty(currentResource))
                 {
                     currentResource = resource;
                 }
@@ -235,6 +210,26 @@ namespace KibaliTool
                 }
             }
             return entries;
+        }
+
+        private static async Task<JsonElement> FetchAndParseJsonAsync(string path, HttpClient client)
+        {
+            Stream inputStream;
+
+            if (path.StartsWith("http"))
+            {
+                inputStream = await client.GetStreamAsync(path);
+            }
+            else
+            {
+                inputStream = new FileStream(path, FileMode.Open);
+            }
+
+            using (inputStream)
+            {
+                var jsonDoc = await JsonDocument.ParseAsync(inputStream);
+                return jsonDoc.RootElement;
+            }
         }
 
         //private static void ProcessPermissionsSchemes(string schemeType, JsonElement schemes, PermissionsDocument doc)

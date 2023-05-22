@@ -15,7 +15,6 @@ namespace Kibali
 {
     public class AuthZChecker
     {
-        private readonly List<PermissionsDocument> permissionsDocuments = new List<PermissionsDocument>();
         private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
         private OpenApiUrlTreeNode urlTree;
 
@@ -28,7 +27,6 @@ namespace Kibali
         public bool LenientMatch { get; set; }
         public void Load(PermissionsDocument permissionsDocument)
         {
-            this.permissionsDocuments.Add(permissionsDocument);
             InvertPermissionsDocument(permissionsDocument);
         }
 
@@ -87,13 +85,11 @@ namespace Kibali
                 return AccessRequestResult.UnsupportedScheme;
             }
 
-            foreach (var claim in acceptableClaims)
+            if (acceptableClaims.Any(claim => claim.IsAuthorized(providedPermissions)))
             {
-                if (claim.IsAuthorized(providedPermissions))
-                {
-                    return AccessRequestResult.Success;
-                }
+                return AccessRequestResult.Success;
             }
+
             return AccessRequestResult.InsufficientPermissions;
         }
 
@@ -112,14 +108,8 @@ namespace Kibali
                 {
                     foreach (var path in pathSet.Paths)
                     {
-                        ProtectedResource resource;
                         var pathKey = this.LenientMatch ? CleanRequestUrl(path.Key) : path.Key;
-                        if (resources.ContainsKey(pathKey))
-                        {
-                            resource = resources[pathKey];
-
-                        }
-                        else
+                        if (!resources.TryGetValue(pathKey, out var resource))
                         {
                             resource = new ProtectedResource(pathKey);
                             resources.Add(pathKey, resource);
@@ -145,9 +135,9 @@ namespace Kibali
                 return (urlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
             }
 
-            if (urlTree.Children.ContainsKey(segment))
+            if (urlTree.Children.TryGetValue(segment, out var urlTreeNode))
             {
-                return Find(urlTree.Children[segment], segments: segments.Skip(1));
+                return Find(urlTreeNode, segments.Skip(1));
             }
             else
             {
