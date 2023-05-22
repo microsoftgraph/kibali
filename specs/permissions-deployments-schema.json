@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema for OAuth Permissions Deployment",
+  "type": "object",
+  "properties": {
+    "additionalProperties": false,
+    "permissionDeployments": {
+      "title": "Map of permission deployment names to permission deployment objects",
+      "additionalProperties": false,
+      "type": "object",
+      "patternProperties": {
+        "[\\w]+\\.[\\w]+[\\.[\\w]+]?": {
+          "$ref": "#/definitions/permission"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "permission": {
+      "type": "object",
+      "title": "Permission Deployment",
+      "additionalProperties": false,
+      "properties": {
+        "resourceAppId": {
+          "type": "string",
+          "title": "Resource App ID",
+          "description": "The App ID of the resource application to which the permission applies"
+        },
+        "environments": {
+          "type": "object",
+          "title": "Map of environment permissions will be present in",
+          "patternProperties": {
+            "\\w+": {
+              "$ref": "#/definitions/environment"
+            }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "title": "Environment",
+      "additionalProperties": false,
+      "properties": {
+        "versions": {
+          "type": "array",
+          "title": "Environment versions",
+          "items": {
+            "$ref": "#/definitions/version"
+          }
+        }
+      }
+    },
+    "version": {
+      "type": "object",
+      "title": "Version",
+      "additionalProperties": false,
+      "properties": {
+        "schemes": {
+          "type": "array",
+          "title": "Permission scheme",
+          "patternProperties": {
+            "\\Application|DelegatedPersonal|DelegatedWork": {
+              "$ref": "#/definitions/scheme"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/scheme"
+          }
+        }
+      }
+    },
+    "scheme": {
+      "type": "object",
+      "title": "Scheme",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "permission id for scheme"
+        },
+        "isHidden": {
+          "type": "boolean",
+          "title": "Hidden state of permission in this scheme"
+        },
+        "isDisabled": {
+          "type": "boolean",
+          "title": "Disabled state of permission in this scheme"
+        }
+      }
+    }
+  }
+}
