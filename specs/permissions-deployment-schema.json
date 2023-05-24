@@ -17,7 +17,11 @@
                             "type": "string"
                         },
                         "scheme": {
-                            "type": "string"
+                            "enum": [
+                                "Application",
+                                "DelegatePersonal",
+                                "DelegatedWork"
+                            ]
                         },
                         "isHidden": {
                             "type": "boolean"
