@@ -1,39 +1,46 @@
 {
-    "type": "object",
-    "properties": {
-        "permissionDeployments": {
-            "type": "object",
-            "patternProperties": {
-                "[\\w]+\\.[\\w]+[\\.[\\w]+]?": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string"
-                        },
-                        "resourceAppId": {
-                            "type": "string"
-                        },
-                        "environment": {
-                            "type": "string"
-                        },
-                        "scheme": {
-                            "type": "string"
-                        },
-                        "isHidden": {
-                            "type": "boolean"
-                        },
-                        "isDisabled": {
-                            "type": "boolean"
-                        }
-                    },
-                    "required": [
-                        "id",
-                        "environment",
-                        "scheme"
-                    ]
-                }
-            }
-            
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema for Permission Deployment Environments",
+  "type": "object",
+  "properties": {
+    "permissionDeployments": {
+      "type": "object",
+      "patternProperties": {
+        "[\\w]+\\.[\\w]+[\\.[\\w]+]?": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/permissionEnvironment"
+          }
         }
+      }
     }
+  },
+  "definitions": {
+    "permissionEnvironment": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "resourceAppId": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "scheme": {
+            "enum": ["Application", "DelegatePersonal", "DelegatedWork"]
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "isDisabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["id", "environment", "scheme"]
+      }
+    }
+  }
 }
