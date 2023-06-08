@@ -11,7 +11,7 @@ configuration:
 
   # The following GitHub PolicyService properties are not yet supported: whoCanDismissReviews
   - branchNamePattern: main
-    # This branch pattern applies to the following branches:
+    # This branch pattern applies to the following branches as of 06/08/2023 16:42:13:
     # main
 
     # Specifies whether this branch can be deleted. boolean
@@ -40,7 +40,6 @@ configuration:
     requiresStrictStatusChecks: true
     # Indicates whether there are restrictions on who can push. boolean. Requires whoCanPush.
     restrictsPushes: false
-    # Restrict who can dismiss pull request reviews
+    # Restrict who can dismiss pull request reviews. boolean
     restrictsReviewDismissals: false
-
 
