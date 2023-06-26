@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -55,9 +56,17 @@ namespace Kibali
             var mergedPermissions = new Dictionary<string, Permission>();
             foreach (var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))
             {
-                using var stream = new FileStream(permissionsFile, FileMode.Open);
-                var doc = Load(stream);
-                mergedPermissions = mergedPermissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
+                try
+                {
+                    using var stream = new FileStream(permissionsFile, FileMode.Open);
+                    var doc = Load(stream);
+                    mergedPermissions = mergedPermissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    Console.WriteLine($"Unable to parse json file {permissionsFile}. {ex.Message}");
+                }
+                
             }
 
             mergedDoc.Permissions = new SortedDictionary<string, Permission>(mergedPermissions);
@@ -67,9 +76,7 @@ namespace Kibali
         public static PermissionsDocument Load(JsonElement value)
         {
             var permissionsDocument = new PermissionsDocument();
-
             ParsingHelpers.ParseMap(value, permissionsDocument, handlers);
-
             return permissionsDocument;
         }
 
