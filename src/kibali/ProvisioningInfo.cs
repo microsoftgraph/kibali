@@ -35,8 +35,8 @@ namespace Kibali
                 writer.WriteEndArray();
             }
 
-            if (!String.IsNullOrWhiteSpace(ResourceAppId)) writer.WriteString("resourceAppId", ResourceAppId);
-            if (!String.IsNullOrWhiteSpace(OwnerSecurityGroup)) writer.WriteString("ownerSecurityGroup", OwnerSecurityGroup);
+            if (!string.IsNullOrWhiteSpace(ResourceAppId)) writer.WriteString("resourceAppId", ResourceAppId);
+            if (!string.IsNullOrWhiteSpace(OwnerSecurityGroup)) writer.WriteString("ownerSecurityGroup", OwnerSecurityGroup);
 
             writer.WriteEndObject();
         }

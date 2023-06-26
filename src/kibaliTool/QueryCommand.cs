@@ -20,7 +20,8 @@ namespace KibaliTool
         
         public static async Task<int> Execute(QueryCommandParameters queryCommandParameters)
         {
-            var doc = PermissionsDocument.Load(new FileStream(queryCommandParameters.SourcePermissionsFile, FileMode.Open));
+            using var fileStream = new FileStream(queryCommandParameters.SourcePermissionsFile, FileMode.Open);
+            var doc = PermissionsDocument.Load(fileStream);
 
             var authZChecker = new AuthZChecker() { LenientMatch = queryCommandParameters.LenientMatch };
             authZChecker.Load(doc);
@@ -35,9 +36,9 @@ namespace KibaliTool
 
             var writer = new Utf8JsonWriter(Console.OpenStandardOutput(), new JsonWriterOptions() { Indented= true });
 
-            if (!String.IsNullOrEmpty(queryCommandParameters.Scheme))
+            if (!string.IsNullOrEmpty(queryCommandParameters.Scheme))
             {
-                if (String.IsNullOrEmpty(queryCommandParameters.Method))
+                if (string.IsNullOrEmpty(queryCommandParameters.Method))
                 {
                     throw new ArgumentException("Missing method");
                 }
@@ -49,7 +50,7 @@ namespace KibaliTool
                     throw new ArgumentException("Unknown scheme");
                 }
             }
-            else if (!String.IsNullOrEmpty(queryCommandParameters.Method))
+            else if (!string.IsNullOrEmpty(queryCommandParameters.Method))
             {
                 if (resource.SupportedMethods.TryGetValue(queryCommandParameters.Method, out var supportedSchemes))
                 {
