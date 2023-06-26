@@ -32,7 +32,7 @@ namespace Kibali
         {
             writer.WriteStartObject();
 
-            if (!String.IsNullOrEmpty(AlsoRequires))
+            if (!string.IsNullOrEmpty(AlsoRequires))
             {
                 writer.WriteString("alsoRequires", AlsoRequires);
             }
