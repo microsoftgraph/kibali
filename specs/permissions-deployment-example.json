@@ -1,22 +1,40 @@
 
 {
     "permissionDeployments": {
-        "Sites.Read.All": [
+        "AccessReview.Read.All": [
             {
-                "id": "234324-3424-234234-23424",
+                "id": "ebfcd32b-babb-40f4-a14b-42706e83bd28",
                 "scheme": "DelegatedWork",
-                "environment": "public"
+                "environment": "public",
+                "isHidden": false,
+                "isEnabled": true,
+                "resourceAppId": ""
             },
             {
-                "id": "678768-3424-234234-23424",
-                "scheme": "DelegatedPersonal",
-                "environment": "public"
-            },
-            {
-                "id": "678768-3424-234234-23424",
+                "id": "d07a8cc0-3d51-4b77-b3b0-32704d1f69fa",
                 "scheme": "Application",
                 "environment": "public",
-                "isHidden": true
+                "isHidden": false,
+                "isEnabled": true,
+                "resourceAppId": ""
+            }
+        ],
+        "AccessReview.ReadWrite.All": [
+            {
+                "id": "e4aa47b9-9a69-4109-82ed-36ec70d85ff1",
+                "scheme": "DelegatedWork",
+                "environment": "public",
+                "isHidden": false,
+                "isEnabled": true,
+                "resourceAppId": ""
+            },
+            {
+                "id": "ef5f7d5c-338f-44b0-86c3-351f46c8bb5f",
+                "scheme": "Application",
+                "environment": "public",
+                "isHidden": false,
+                "isEnabled": true,
+                "resourceAppId": ""
             }
         ]
     } 
