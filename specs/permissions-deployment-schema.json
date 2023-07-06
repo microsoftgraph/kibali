@@ -30,7 +30,7 @@
             "type": "string"
           },
           "scheme": {
-            "enum": ["Application", "DelegatePersonal", "DelegatedWork"]
+            "enum": ["Application", "DelegatedPersonal", "DelegatedWork"]
           },
           "isHidden": {
             "type": "boolean"
