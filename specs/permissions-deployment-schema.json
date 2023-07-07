@@ -1,0 +1,39 @@
+{
+    "type": "object",
+    "properties": {
+        "permissionDeployments": {
+            "type": "object",
+            "patternProperties": {
+                "[\\w]+\\.[\\w]+[\\.[\\w]+]?": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "resourceAppId": {
+                            "type": "string"
+                        },
+                        "environment": {
+                            "type": "string"
+                        },
+                        "scheme": {
+                            "type": "string"
+                        },
+                        "isHidden": {
+                            "type": "boolean"
+                        },
+                        "isDisabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "environment",
+                        "scheme"
+                    ]
+                }
+            }
+            
+        }
+    }
+}
