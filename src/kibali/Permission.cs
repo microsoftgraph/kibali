@@ -11,7 +11,7 @@ namespace Kibali
         public string PrivilegeLevel { get; set; }
         public SortedDictionary<string, Scheme> Schemes { get; set; } = new SortedDictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
-        public ProvisioningInfo ProvisioningInfo { get; set; } = new();
+        public OwnerInfo OwnerInfo { get; set; } = new();
 
         public void Write(Utf8JsonWriter writer)
         {
@@ -37,8 +37,8 @@ namespace Kibali
             }
             writer.WriteEndArray();
 
-            writer.WritePropertyName("provisioningInfo");
-            ProvisioningInfo.Write(writer);
+            writer.WritePropertyName("ownerInfo");
+            OwnerInfo.Write(writer);
 
             writer.WriteEndObject();
         }
@@ -57,7 +57,7 @@ namespace Kibali
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
             { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
             { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetOrderedMap(v, Scheme.Load);  } },
-            { "provisioningInfo", (o,v) => {o.ProvisioningInfo = ProvisioningInfo.Load(v);  } },
+            { "ownerInfo", (o,v) => {o.OwnerInfo = OwnerInfo.Load(v);  } },
         };
     }
 

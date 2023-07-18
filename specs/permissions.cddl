@@ -15,7 +15,7 @@ permission = {
     pathSets: [+ pathSet]  ; List of pathSets
 }
 
-provisioningInfo = {
+ownerInfo = {
     ownerSecurityGroup: tstr,
 }
 

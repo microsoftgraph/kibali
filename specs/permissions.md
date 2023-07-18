@@ -66,9 +66,6 @@ The "schemes" member is a REQUIRED JSON object whose members are [Scheme objects
 ### pathSets
 The "pathSets" member is a REQUIRED JSON Array. Each element of the array is a [pathSet object](#pathSetObject). 
 
-### provisioningInfo
-The "provisioningInfo" member value provides a set of information related to the provisioning of the permission.
-
 ## <a name="ownerInfo"></a>Owner Info Object
 
 The owner info object contains information related to the ownership of the permission. This object should only contain information that is not required by a consumer of the API and can safely be removed in any public projection of the permissions information.

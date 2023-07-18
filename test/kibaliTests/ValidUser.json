@@ -42,7 +42,7 @@
                     }
                 }
             ],
-            "provisioningInfo": {
+            "ownerInfo": {
                 "ownerSecurityGroup": ""
             }
         },
