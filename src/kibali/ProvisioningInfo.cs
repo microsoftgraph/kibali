@@ -15,8 +15,6 @@ namespace Kibali
 
         public string ResourceAppId { get; set; }
 
-        public string OwnerSecurityGroup { get; set; }
-
 
         public void Write(Utf8JsonWriter writer)
         {
@@ -36,7 +34,6 @@ namespace Kibali
             }
 
             if (!string.IsNullOrWhiteSpace(ResourceAppId)) writer.WriteString("resourceAppId", ResourceAppId);
-            if (!string.IsNullOrWhiteSpace(OwnerSecurityGroup)) writer.WriteString("ownerSecurityGroup", OwnerSecurityGroup);
 
             writer.WriteEndObject();
         }
@@ -53,7 +50,6 @@ namespace Kibali
             { "isHidden", (o,v) => {o.IsHidden = v.GetBoolean();  } },
             { "requiredEnvironments", (o,v) => {o.RequiredEnvironments= ParsingHelpers.GetListOfString(v); } },
             { "resourceAppId", (o,v) => {o.ResourceAppId= v.GetString();  } },
-            { "ownerSecurityGroup", (o,v) => {o.OwnerSecurityGroup= v.GetString();  } },
         };
     }
 }

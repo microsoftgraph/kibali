@@ -90,7 +90,6 @@ namespace KibaliTool
                 {
                     permission = new Permission();
                 }
-                permission.ProvisioningInfo.IsHidden = !entry.GetProperty("isEnabled").GetBoolean();
 
                 var scheme = new Scheme
                 {
@@ -116,7 +115,6 @@ namespace KibaliTool
                     permission = new Permission();
                     doc.Permissions.Add(name, permission);
                 }
-                permission.ProvisioningInfo.IsHidden = !entry.GetProperty("isEnabled").GetBoolean();
 
                 var scheme = new Scheme
                 {
