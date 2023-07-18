@@ -110,7 +110,8 @@
             }
         },
         "path": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^([\\w]+=[\\w]+;)*([\\w]+=[\\w]+)?$"
         },
         "scheme": {
             "type": "object",
