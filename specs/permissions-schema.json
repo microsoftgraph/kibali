@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema",
     "title": "Schema for OAuth Permissions",
     "type": "object",
     "properties": {
@@ -29,8 +29,8 @@
                     "type": "boolean"
                 },
 
-                "provisioningInfo": {
-                    "$ref": "#/definitions/provisioningInfo"
+                "ownerInfo": {
+                    "$ref": "#/definitions/ownerInfo"
                 },
                 
                 "schemes": {
@@ -111,7 +111,7 @@
         },
         "path": {
             "type": "string",
-            "pattern": "^([\\w]+=[\\w]+;)*([\\w]+=[\\w]+)?$"
+            "pattern": "^([\\w]+=[\\w]+(?:[,.]*[\\w]*)*;)*([\\w]+=[\\w]+(?:[,.]*[\\w]+)+)?$"
         },
         "scheme": {
             "type": "object",
