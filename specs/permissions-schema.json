@@ -111,7 +111,7 @@
         },
         "path": {
             "type": "string",
-            "pattern": "^([\\w]+=[\\w]+;)*([\\w]+=[\\w]+)?$"
+            "pattern": "^([\\S]+=[\\S]+;)*([\\S]+=[\\S]+)?$"
         },
         "scheme": {
             "type": "object",
