@@ -110,7 +110,7 @@
             }
         },
         "path": {
-            "type": "string",
+            "type": "string"
         },
         "scheme": {
             "type": "object",
