@@ -36,7 +36,7 @@
                 "schemes": {
                     "type": "object",
                     "patternProperties": {
-                        ".*": {
+                        "\\w+": {
                             "$ref": "#/definitions/scheme"
                         }
                     }
@@ -64,7 +64,12 @@
                 "schemeKeys": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "Application",
+                            "DelegatedWork",
+                            "DelegatedPersonal"
+                        ]
                     }
                 },
                 "methods": {
