@@ -29,7 +29,6 @@
                             }
                         },
                         "required": [
-                            "id",
                             "environment",
                             "scheme"
                         ]
