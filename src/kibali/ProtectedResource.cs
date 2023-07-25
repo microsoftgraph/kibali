@@ -27,8 +27,9 @@ namespace Kibali
             Url = url;
         }
 
-        public void AddRequiredClaims(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes)
+        public void AddRequiredClaims(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes, List<ProvisioningInfo> provisioningData)
         {
+            Dictionary<string, ProvisioningInfo> schemeProvisioning = provisioningData?.ToDictionary(info => info.Scheme, info => info) ?? new();
             foreach (var supportedMethod in pathSet.Methods)
             {
                 var supportedSchemes = new Dictionary<string, List<AcceptableClaim>>();
@@ -47,7 +48,14 @@ namespace Kibali
                     }
 
                     var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(schemeKey);
-                    acceptableClaims.Add(new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege));
+                    var claim = new AcceptableClaim(permission, pathSet.AlsoRequires, isLeastPrivilege);
+                    if (schemeProvisioning.TryGetValue(schemeKey, out ProvisioningInfo provisioningInfo))
+                    {
+                        claim.IsHidden = provisioningInfo.IsHidden;
+                        claim.SupportedEnvironments = provisioningInfo.Environment?.Split(";").ToList();
+                        claim.IsEnabled = provisioningInfo.IsEnabled;
+                    }
+                    acceptableClaims.Add(claim);
                 }
 
                 if (!this.SupportedMethods.TryGetValue(supportedMethod, out var existingSupportedSchemes))

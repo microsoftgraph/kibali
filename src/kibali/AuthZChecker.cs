@@ -25,6 +25,15 @@ namespace Kibali
         }
 
         public bool LenientMatch { get; set; }
+
+        public PermissionsDeployment PermissionsDeployment { get; set; }
+
+        public void Load(PermissionsDocument permissionsDocument, PermissionsDeployment deployment)
+        {
+            this.PermissionsDeployment = deployment;
+            InvertPermissionsDocument(permissionsDocument);
+        }
+
         public void Load(PermissionsDocument permissionsDocument)
         {
             InvertPermissionsDocument(permissionsDocument);
@@ -104,6 +113,8 @@ namespace Kibali
             var errors = new HashSet<PermissionsError>();
             foreach (var permission in permissionsDocument.Permissions)
             {
+                var provisioningData = new List<ProvisioningInfo>();
+                this.PermissionsDeployment?.Deployments?.TryGetValue(permission.Key, out provisioningData);
                 foreach (var pathSet in permission.Value.PathSets)
                 {
                     foreach (var path in pathSet.Paths)
@@ -115,7 +126,7 @@ namespace Kibali
                             resources.Add(pathKey, resource);
                         }
                         var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(path.Value);
-                        resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes);
+                        resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData);
                         if (validate)
                         {
                             errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, leastPrivilegedPermissionSchemes));

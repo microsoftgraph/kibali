@@ -25,6 +25,7 @@ namespace KibaliTool
 
             Command queryCommand = new Command("query") {
                 QueryCommandBinder.PermissionFileOption,
+                QueryCommandBinder.DeploymentsFileOption,
                 QueryCommandBinder.UrlOption,
                 QueryCommandBinder.MethodOption,
                 QueryCommandBinder.SchemeOption,
@@ -102,6 +103,7 @@ namespace KibaliTool
     internal class QueryCommandBinder : BinderBase<QueryCommandParameters>
     {
         public static Option<string> PermissionFileOption = new (new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
+        public static Option<string> DeploymentsFileOption = new(new[] { "--deploymentsFile", "--df" }, "Deployments File");
         public static Option<string> UrlOption = new (new[] { "--url", "-u" }, "Test Url");
         public static Option<string> MethodOption = new (new[] { "--method", "-m" }, "Method");
         public static Option<string> SchemeOption = new( new[] { "--scheme", "-s" }, "Scheme");
@@ -113,6 +115,7 @@ namespace KibaliTool
             return new QueryCommandParameters()
             {
                 SourcePermissionsFile = bindingContext.ParseResult.GetValueForOption(PermissionFileOption),
+                DeploymentsFile = bindingContext.ParseResult.GetValueForOption(DeploymentsFileOption),
                 Url = bindingContext.ParseResult.GetValueForOption(UrlOption),
                 Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
                 Scheme = bindingContext.ParseResult.GetValueForOption(SchemeOption),

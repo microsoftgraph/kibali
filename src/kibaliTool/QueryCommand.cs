@@ -8,6 +8,7 @@ namespace KibaliTool
 {
     internal class QueryCommandParameters {
         public string SourcePermissionsFile;
+        public string DeploymentsFile;
         public string Url;
         public string Method;
         public string Scheme;

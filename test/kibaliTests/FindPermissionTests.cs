@@ -50,6 +50,21 @@ namespace KibaliTests
         }
 
         [Fact]
+        public void FindProvisionedItem()
+        {
+            var authZChecker = new AuthZChecker();
+            authZChecker.Load(CreatePermissionsDocument(), CreatePermissionsDeployment());
+
+            var resource = authZChecker.FindResource("/bar/asdasd");
+
+            Assert.Equal("/bar/{id}", resource.Url);
+            var barClaims = resource.SupportedMethods["GET"]["DelegatedPersonal"].Where(c => c.Permission == "Bar.Read").FirstOrDefault();
+            Assert.True(barClaims?.IsEnabled);
+            var fooClaims = resource.SupportedMethods["GET"]["Application"].Where(c => c.Permission == "Foo.Read").FirstOrDefault();
+            Assert.True(fooClaims?.IsHidden);
+        }
+
+        [Fact]
         public void FindRelated()
         {
             var authZChecker = new AuthZChecker();
@@ -182,6 +197,49 @@ namespace KibaliTests
             };
             permissionsDocument.Permissions.Add("Bar.Read", barRead);
             return permissionsDocument;
+        }
+
+        private PermissionsDeployment CreatePermissionsDeployment()
+        {
+            var permissionsDeployment = new PermissionsDeployment();
+
+            var deployments = new Dictionary<string, List<ProvisioningInfo>>();
+
+            var fooProvisioning = new List<ProvisioningInfo> {
+                new ProvisioningInfo
+                {
+                    Scheme = "DelegatedWork",
+                    IsEnabled = true,
+                    IsHidden = false,
+                },
+                new ProvisioningInfo
+                {
+                    Scheme = "Application",
+                    IsEnabled = true,
+                    IsHidden = true,
+                },
+                new ProvisioningInfo
+                {
+                    Scheme = "DelegatedPersonal",
+                    IsEnabled = false,
+                    IsHidden = false,
+                },
+            };
+
+            var barProvisioning = new List<ProvisioningInfo> {
+                new ProvisioningInfo
+                {
+                    Scheme = "DelegatedPersonal",
+                    IsEnabled = true,
+                    IsHidden = false,
+                }
+            };
+
+            deployments.Add("Foo.Read", fooProvisioning);
+            deployments.Add("Bar.Read", barProvisioning);
+            permissionsDeployment.Deployments = deployments;
+
+            return permissionsDeployment;
         }
     }
 }

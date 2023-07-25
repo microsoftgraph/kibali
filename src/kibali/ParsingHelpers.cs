@@ -1,10 +1,6 @@
-﻿using Kibali;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Kibali
 {
@@ -76,6 +72,22 @@ namespace Kibali
                 sortedSet.Add(item.GetString());
             }
             return sortedSet;
+        }
+
+        internal static Dictionary<string, List<T>> GetMapOfLists<T>(JsonElement v, Func<JsonElement, T> load)
+        {
+            var map = new Dictionary<string, List<T>>();
+            foreach (var item in v.EnumerateObject())
+            {
+                var entries = new List<T>();
+                foreach (var entry in item.Value.EnumerateArray())
+                {
+                    entries.Add(load(entry));
+                }
+
+                map.Add(item.Name,  entries);
+            }
+            return map;
         }
 
         /// <summary>
