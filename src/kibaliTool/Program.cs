@@ -75,10 +75,10 @@ namespace KibaliTool
 
     internal class ImportCommandBinder : BinderBase<ImportCommandParameters>
     {
-        public static Option<string> PermissionDescriptionOption = new (new[] { "--permissionDescription", "--pd" }, "GE Permission Description File");
-        public static Option<string> PermissionFileOption = new (new[] { "--permissionFile", "--pf" }, "GE Permissions File");
-        public static Option<string> OutFolderOption = new (new[] { "--outFolder", "--of" }, "Output folder");
-        public static Option<bool> SingleFileOption = new (new[] { "--singleFile", "--sf" }, "Single file");
+        public static readonly Option<string> PermissionDescriptionOption = new (new[] { "--permissionDescription", "--pd" }, "GE Permission Description File");
+        public static readonly Option<string> PermissionFileOption = new (new[] { "--permissionFile", "--pf" }, "GE Permissions File");
+        public static readonly Option<string> OutFolderOption = new (new[] { "--outFolder", "--of" }, "Output folder");
+        public static readonly Option<bool> SingleFileOption = new (new[] { "--singleFile", "--sf" }, "Single file");
 
         public ImportCommandBinder()
         {
@@ -102,13 +102,13 @@ namespace KibaliTool
 
     internal class QueryCommandBinder : BinderBase<QueryCommandParameters>
     {
-        public static Option<string> PermissionFileOption = new (new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
-        public static Option<string> DeploymentsFileOption = new(new[] { "--deploymentsFile", "--df" }, "Deployments File");
-        public static Option<string> UrlOption = new (new[] { "--url", "-u" }, "Test Url");
-        public static Option<string> MethodOption = new (new[] { "--method", "-m" }, "Method");
-        public static Option<string> SchemeOption = new( new[] { "--scheme", "-s" }, "Scheme");
-        public static Option<bool> LeastPrivilegeOption = new(new[] { "--least", "-l" }, "LeastPrivilege");
-        public static Option<bool> LenientMatchOption = new(new[] { "--lenient", "--lm" }, "LenientMatch");
+        public static readonly Option<string> PermissionFileOption = new (new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
+        public static readonly Option<string> DeploymentsFileOption = new(new[] { "--deploymentsFile", "--df" }, "Deployments File");
+        public static readonly Option<string> UrlOption = new (new[] { "--url", "-u" }, "Test Url");
+        public static readonly Option<string> MethodOption = new (new[] { "--method", "-m" }, "Method");
+        public static readonly Option<string> SchemeOption = new( new[] { "--scheme", "-s" }, "Scheme");
+        public static readonly Option<bool> LeastPrivilegeOption = new(new[] { "--least", "-l" }, "LeastPrivilege");
+        public static readonly Option<bool> LenientMatchOption = new(new[] { "--lenient", "--lm" }, "LenientMatch");
 
         protected override QueryCommandParameters GetBoundValue(BindingContext bindingContext)
         {
