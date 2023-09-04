@@ -43,7 +43,7 @@ namespace Kibali
             return provisioningInfo;
         }
 
-        private static FixedFieldMap<ProvisioningInfo> handlers = new()
+        private static readonly FixedFieldMap<ProvisioningInfo> handlers = new()
         {
             { "id", (o,v) => { o.Id = v.GetString(); } },
             { "scheme", (o,v) => { o.Scheme = v.GetString(); } },
