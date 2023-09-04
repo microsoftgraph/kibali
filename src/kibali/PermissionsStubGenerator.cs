@@ -36,12 +36,9 @@ public class PermissionsStubGenerator
             return table;
         }
         
-        if (!string.IsNullOrEmpty(this.method))
+        if (!string.IsNullOrEmpty(this.method) && resource.SupportedMethods.TryGetValue(this.method, out var supportedSchemes))
         {
-            if (resource.SupportedMethods.TryGetValue(this.method, out var supportedSchemes))
-            {
-                  table = resource.GeneratePermissionsTable(this.method, supportedSchemes);
-            }
+            table = resource.GeneratePermissionsTable(this.method, supportedSchemes);
         }
         return table;
     }
