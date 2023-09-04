@@ -15,7 +15,7 @@ namespace Kibali
 {
     public class AuthZChecker
     {
-        private readonly Dictionary<string, ProtectedResource> resources = new Dictionary<string, ProtectedResource>();
+        private readonly Dictionary<string, ProtectedResource> resources = new();
         private OpenApiUrlTreeNode urlTree;
 
         public Dictionary<string, ProtectedResource> Resources { get
@@ -137,22 +137,22 @@ namespace Kibali
             return errors;
         }
 
-        private ProtectedResource Find(OpenApiUrlTreeNode urlTree, IEnumerable<string> segments)
+        private ProtectedResource Find(OpenApiUrlTreeNode openApiUrlTree, IEnumerable<string> segments)
         {
             
             var segment = segments.FirstOrDefault();
             if (string.IsNullOrEmpty(segment))
             {
-                return (urlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
+                return (openApiUrlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
             }
 
-            if (urlTree.Children.TryGetValue(segment, out var urlTreeNode))
+            if (openApiUrlTree.Children.TryGetValue(segment, out var urlTreeNode))
             {
                 return Find(urlTreeNode, segments.Skip(1));
             }
             else
             {
-                var parameterSegment = urlTree.Children.Where(k => k.Key.StartsWith("{")).FirstOrDefault();
+                var parameterSegment = openApiUrlTree.Children.Where(k => k.Key.StartsWith("{")).FirstOrDefault();
                 if (parameterSegment.Key == null) return null;
                 return Find(parameterSegment.Value, segments: segments.Skip(1));
             }
@@ -162,39 +162,21 @@ namespace Kibali
         {
             get
             {
-                if (urlTree == null)
-                {
-                    urlTree = CreateUrlTree(this.resources);
-                }
+                urlTree ??= CreateUrlTree(this.resources);
                 return urlTree;
             }
         }
 
-        private OpenApiUrlTreeNode CreateUrlTree(Dictionary<string, ProtectedResource> resources)
+        private static OpenApiUrlTreeNode CreateUrlTree(Dictionary<string, ProtectedResource> resourcesMap)
         {
             var tree = OpenApiUrlTreeNode.Create();
 
-            foreach (var resource in resources)
+            foreach (var resource in resourcesMap)
             {
                 var pathItem = new OpenApiPathItem();
 
                 var openApiResource = new OpenApiProtectedResource(resource.Value);
                 pathItem.AddExtension("x-permissions", openApiResource);
-                
-                //foreach (var method in resource.Value.SupportedMethods)
-                //{
-                //    var op = new OpenApiOperation();
-                //    var sr = new OpenApiSecurityRequirement();
-
-                //    foreach (var scheme in method.Value)
-                //    {
-                //        sr[new OpenApiSecurityScheme() { Name = scheme.Key }] = scheme.Value.Select(ac => ac.Permission).ToArray();
-
-                //    }
-                //    op.Security = new List<OpenApiSecurityRequirement>() { sr };
-
-                //    pathItem.Operations.Add(GetOperationTypeFromMethod(method.Key), new OpenApiOperation());
-                //}
                 tree.Attach(resource.Key, pathItem, "!");
             }
 

@@ -27,7 +27,7 @@ namespace Kibali
             return ownerInfo;
         }
 
-        private static FixedFieldMap<OwnerInfo> handlers = new()
+        private static readonly FixedFieldMap<OwnerInfo> handlers = new()
         {
             { "ownerSecurityGroup", (o,v) => { o.OwnerSecurityGroup= v.GetString(); } },
         };

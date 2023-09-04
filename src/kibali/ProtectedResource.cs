@@ -194,12 +194,11 @@ namespace Kibali
 
         public Dictionary<string, Dictionary<string, HashSet<string>>> FetchLeastPrivilege(string method = null, string scheme = null)
         {
-            var output = string.Empty;
             var leastPrivilege = new Dictionary<string, Dictionary<string, HashSet<string>>>();
             if (method != null && scheme != null)
             {
                 leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
-                var permissions = this.SupportedMethods[method][scheme].Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                var permissions = this.SupportedMethods[method][scheme].Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                 PopulateLeastPrivilege(leastPrivilege, method, scheme, permissions);
             }
             if (method != null && scheme == null)
@@ -212,7 +211,7 @@ namespace Kibali
                 foreach (var supportedScheme in supportedSchemes.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
                 {
                     leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
-                    var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    var permissions = supportedScheme.Value.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                     PopulateLeastPrivilege(leastPrivilege, method, supportedScheme.Key, permissions);
                 }
             }
@@ -226,7 +225,7 @@ namespace Kibali
                         continue;
                     }
                     leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
-                    var permissions = supportedSchemeClaims.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    var permissions = supportedSchemeClaims.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                     PopulateLeastPrivilege(leastPrivilege, supportedMethod.Key, scheme, permissions);
                 }
             }
@@ -237,7 +236,7 @@ namespace Kibali
                     foreach (var supportedScheme in supportedMethod.Value.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
                     {
                         leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
-                        var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                        var permissions = supportedScheme.Value.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                         PopulateLeastPrivilege(leastPrivilege, supportedMethod.Key, supportedScheme.Key, permissions);
                     }
                 }
@@ -267,10 +266,9 @@ namespace Kibali
         private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilege)
         {
             var permissionsStub = new List<string>();
-            var scopes = new HashSet<string>();
 
             var delegatedWorkScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            var leastPrivilegeScheme = leastPrivilege.TryGetValue(scheme, out scopes);
+            leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
             (var least, var higher) = ExtractScopes(delegatedWorkScopes, scopes);
             return (least, higher);
         }
@@ -289,14 +287,10 @@ namespace Kibali
             // If more than one permission exists as the least privilege due to grouping of the methods
             if (permissions.Count > 1)
             {
-                var exclusivePrivilegeCount = 0;
-                foreach (var perm in permissions)
-                {
-                    if ((this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) && supportedMethods.Count == 1))
-                    {
-                        exclusivePrivilegeCount++;
-                    }
-                }
+                var exclusivePrivilegeCount = permissions.Count(perm => 
+                    this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) &&
+                    supportedMethods.Count == 1);
+
                 if (exclusivePrivilegeCount > 1)
                 {
                     return permissions;
