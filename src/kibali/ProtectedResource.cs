@@ -194,7 +194,6 @@ namespace Kibali
 
         public Dictionary<string, Dictionary<string, HashSet<string>>> FetchLeastPrivilege(string method = null, string scheme = null)
         {
-            var output = string.Empty;
             var leastPrivilege = new Dictionary<string, Dictionary<string, HashSet<string>>>();
             if (method != null && scheme != null)
             {
@@ -267,10 +266,9 @@ namespace Kibali
         private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilege)
         {
             var permissionsStub = new List<string>();
-            var scopes = new HashSet<string>();
 
             var delegatedWorkScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            var leastPrivilegeScheme = leastPrivilege.TryGetValue(scheme, out scopes);
+            leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
             (var least, var higher) = ExtractScopes(delegatedWorkScopes, scopes);
             return (least, higher);
         }
