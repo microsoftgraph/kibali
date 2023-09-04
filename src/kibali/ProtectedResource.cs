@@ -198,7 +198,7 @@ namespace Kibali
             if (method != null && scheme != null)
             {
                 leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
-                var permissions = this.SupportedMethods[method][scheme].Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                var permissions = this.SupportedMethods[method][scheme].Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                 PopulateLeastPrivilege(leastPrivilege, method, scheme, permissions);
             }
             if (method != null && scheme == null)
@@ -211,7 +211,7 @@ namespace Kibali
                 foreach (var supportedScheme in supportedSchemes.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
                 {
                     leastPrivilege.TryAdd(method, new Dictionary<string, HashSet<string>>());
-                    var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    var permissions = supportedScheme.Value.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                     PopulateLeastPrivilege(leastPrivilege, method, supportedScheme.Key, permissions);
                 }
             }
@@ -225,7 +225,7 @@ namespace Kibali
                         continue;
                     }
                     leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
-                    var permissions = supportedSchemeClaims.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                    var permissions = supportedSchemeClaims.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                     PopulateLeastPrivilege(leastPrivilege, supportedMethod.Key, scheme, permissions);
                 }
             }
@@ -236,7 +236,7 @@ namespace Kibali
                     foreach (var supportedScheme in supportedMethod.Value.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
                     {
                         leastPrivilege.TryAdd(supportedMethod.Key, new Dictionary<string, HashSet<string>>());
-                        var permissions = supportedScheme.Value.Where(p => p.Least == true).Select(p => p.Permission).ToHashSet();
+                        var permissions = supportedScheme.Value.Where(p => p.Least).Select(p => p.Permission).ToHashSet();
                         PopulateLeastPrivilege(leastPrivilege, supportedMethod.Key, supportedScheme.Key, permissions);
                     }
                 }
