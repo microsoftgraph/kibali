@@ -287,14 +287,10 @@ namespace Kibali
             // If more than one permission exists as the least privilege due to grouping of the methods
             if (permissions.Count > 1)
             {
-                var exclusivePrivilegeCount = 0;
-                foreach (var perm in permissions)
-                {
-                    if ((this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) && supportedMethods.Count == 1))
-                    {
-                        exclusivePrivilegeCount++;
-                    }
-                }
+                var exclusivePrivilegeCount = permissions.Count(perm => 
+                    this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) &&
+                    supportedMethods.Count == 1);
+
                 if (exclusivePrivilegeCount > 1)
                 {
                     return permissions;
