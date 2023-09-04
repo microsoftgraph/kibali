@@ -212,16 +212,9 @@ namespace KibaliTool
 
         private static async Task<JsonElement> FetchAndParseJsonAsync(string path, HttpClient client)
         {
-            Stream inputStream;
-
-            if (path.StartsWith("http"))
-            {
-                inputStream = await client.GetStreamAsync(path);
-            }
-            else
-            {
-                inputStream = new FileStream(path, FileMode.Open);
-            }
+            Stream inputStream = path.StartsWith("http") 
+                ? await client.GetStreamAsync(path) 
+                : new FileStream(path, FileMode.Open);
 
             using (inputStream)
             {
