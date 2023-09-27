@@ -94,8 +94,9 @@
                 },
                 "paths": {
                     "type": "object",
+                    "additionalProperties": false,
                     "patternProperties": {
-                        ".*": {
+                        "^/": {
                             "$ref": "#/definitions/path"
                         }
                     }
