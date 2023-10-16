@@ -291,6 +291,10 @@ namespace Kibali
                     this.PermissionMethods.TryGetValue((perm, scheme), out HashSet<string> supportedMethods) &&
                     supportedMethods.Count == 1);
 
+                if (exclusivePrivilegeCount > 1)
+                {
+                    return permissions;
+                }
 
                 // Check for the permission supports the provided method only as the least privilege
                 foreach (var perm in permissions)
