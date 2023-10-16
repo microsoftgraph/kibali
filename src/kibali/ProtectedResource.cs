@@ -296,7 +296,6 @@ namespace Kibali
                     return permissions;
                 }
 
-
                 // Check for the permission supports the provided method only as the least privilege
                 foreach (var perm in permissions)
                 {

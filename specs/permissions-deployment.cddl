@@ -10,7 +10,7 @@ permissionDeployment = {
     environment: tstr
     scheme: tstr
     ? isHidden: bool .default false,
-    ? isDisabled: bool .default false,
+    ? isEnabled: bool .default false,
 }
 
 

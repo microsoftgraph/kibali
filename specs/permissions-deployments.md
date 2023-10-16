@@ -27,7 +27,7 @@ This is the top level object in the provisioning info file. It contains a "permi
                 "environment": "global",
                 "scheme": "DelegatedWork",
                 "isHidden": false,
-                "isDisabled": false,
+                "isEnabled": true,
                 "resourceAppId": "00000003-0000-0000-c000-000000000000"
             },
             {
@@ -35,7 +35,7 @@ This is the top level object in the provisioning info file. It contains a "permi
                 "environment": "global",
                 "scheme": "Application",
                 "isHidden": false,
-                "isDisabled": false
+                "isEnabled": true
             }
         ]
     }
@@ -65,8 +65,8 @@ The "scheme" member is a JSON string that idenfies the type of authorization sch
 #### isHidden
 The "isHidden" member is a boolean value that indicates if a permission should be publicly usable in the API.
 
-#### isDisabled
-The "isDisabled" member is a boolean value that indicates if a permission is disabled in the environment.
+#### isEnabled
+The "isEnabled" member is a boolean value that indicates if a permission is enabled (provisioned) in the environment.
 
 #### resourceAppId
 The "resourceAppId" member value provides an identifier of the resource server that is used to enforce Conditional Access checks for this permission.

@@ -24,7 +24,7 @@
                             "isHidden": {
                                 "type": "boolean"
                             },
-                            "isDisabled": {
+                            "isEnabled": {
                                 "type": "boolean"
                             }
                         },

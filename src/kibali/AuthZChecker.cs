@@ -143,7 +143,7 @@ namespace Kibali
             var segment = segments.FirstOrDefault();
             if (string.IsNullOrEmpty(segment))
             {
-                return (openApiUrlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource;  // Can the root have a permission?
+                return openApiUrlTree.PathItems.Any() ? (openApiUrlTree.PathItems.First().Value.Extensions["x-permissions"] as OpenApiProtectedResource).Resource : null;  // Can the root have a permission?
             }
 
             if (openApiUrlTree.Children.TryGetValue(segment, out var urlTreeNode))

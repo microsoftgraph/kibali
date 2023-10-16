@@ -37,7 +37,7 @@ internal class DocumentCommand
             throw new ArgumentException("Please provide a method");
         }
 
-        var generator = new PermissionsStubGenerator(doc, documentCommandParameters.Url, documentCommandParameters.Method);
+        var generator = new PermissionsStubGenerator(doc, documentCommandParameters.Url, documentCommandParameters.Method, lenientMatch: true);
         var table = generator.GenerateTable();
         Console.WriteLine(table);
 
