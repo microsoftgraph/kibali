@@ -177,7 +177,11 @@ namespace Kibali
 
                 var openApiResource = new OpenApiProtectedResource(resource.Value);
                 pathItem.AddExtension("x-permissions", openApiResource);
-                tree.Attach(resource.Key, pathItem, "!");
+                try {
+                    tree.Attach(resource.Key.ToLower(), pathItem, "!");
+                } catch (Exception e) {
+                    Console.WriteLine("Failed to add resource to tree: " + resource.Key + " " + e.Message);
+                }
             }
 
             return tree;

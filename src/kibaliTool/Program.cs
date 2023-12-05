@@ -53,13 +53,23 @@ namespace KibaliTool
 
             documentCommand.SetHandler(DocumentCommand.Execute, new DocumentCommandBinder());
 
+            Command replayLogCommand = new Command("replay-log") {
+                ReplayLogCommandBinder.LogFileOption,
+                ReplayLogCommandBinder.SourcePermissionsFolderOption,
+                ReplayLogCommandBinder.LenientMatchOption,
+                ReplayLogCommandBinder.CountOption,
+            };
+
+            replayLogCommand.SetHandler(ReplayLogCommand.Execute, new ReplayLogCommandBinder());
+
             var rootCommand = new RootCommand()
             {
                 importCommand,
                 queryCommand,
                 exportCommand,
                 validateCommand,
-                documentCommand
+                documentCommand,
+                replayLogCommand
             };
             
 
@@ -157,5 +167,24 @@ namespace KibaliTool
                 Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
             };
         }
+    }
+
+    internal class ReplayLogCommandBinder : BinderBase<ReplayLogCommandParameters> {
+        public static readonly Option<string> LogFileOption = new(new[] { "--logFile", "--lf" }, "Log File");
+        public static readonly Option<string> SourcePermissionsFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
+        public static readonly Option<bool> LenientMatchOption = new(new[] { "--lenient", "--lm" }, "LenientMatch");
+        public static readonly Option<int> CountOption = new(new[] { "--count", "--c" }, "Count");
+
+        protected override ReplayLogCommandParameters GetBoundValue(BindingContext bindingContext)
+        {
+            return new ReplayLogCommandParameters()
+            {
+                LogFile = bindingContext.ParseResult.GetValueForOption(LogFileOption),
+                SourcePermissionsFolder = bindingContext.ParseResult.GetValueForOption(SourcePermissionsFolderOption),
+                LenientMatch = bindingContext.ParseResult.GetValueForOption(LenientMatchOption),
+                Count = bindingContext.ParseResult.GetValueForOption(CountOption),
+            };
+        }
+
     }
 }
