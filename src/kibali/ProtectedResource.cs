@@ -89,8 +89,8 @@ namespace Kibali
                             Message = string.Format(StringConstants.DuplicateLeastPrivilegeSchemeErrorMessage, string.Join(", ", schemePrivs.Value), scheme, method),
                         });
                     }
+                    }
                 }
-            }
             
             return mismatchedSchemes.Union(duplicateErrors);
         }

@@ -74,5 +74,35 @@ public class ValidationTests
         Assert.Contains("/me", errors.Select(e => e.Path));
         Assert.Contains("/users/{id}/licensedetails", errors.Select(e => e.Path));
     }
-   
+
+    [Fact]
+    public void ValdiateInvalidScheme()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application" } }
+            }
+            }
+        };
+        doc.Permissions.Add("Foo.Read", fooRead);
+        // Act
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(doc);
+
+        // Assert
+        Assert.True(errors.Any());
+        Assert.Contains(PermissionsErrorCode.InvalidPathsetScheme, errors.Select(e => e.ErrorCode));
+
+    }
+
 }
