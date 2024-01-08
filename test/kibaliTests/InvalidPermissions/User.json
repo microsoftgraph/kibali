@@ -362,7 +362,6 @@
                         "GET"
                     ],
                     "schemeKeys": [
-                        "Application",
                         "DelegatedWork"
                     ],
                     "paths": {
@@ -556,8 +555,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/notes/{id}": "",
@@ -649,8 +647,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile": "",
@@ -738,8 +735,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/names": "",
@@ -885,14 +881,12 @@
                         "PATCH"
                     ],
                     "schemeKeys": [
-                        "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
-                        "/me/profile/notes/{id}": "least=Application",
+                        "/me/profile/notes/{id}": "",
                         "/me/responsibilities/{id}": "",
-                        "/users/{id}/profile/notes/{id}": "least=Application",
+                        "/users/{id}/profile/notes/{id}": "",
                         "/users/{id}/responsibilities/{id}": ""
                     }
                 },
@@ -901,7 +895,6 @@
                         "GET"
                     ],
                     "schemeKeys": [
-                        "Application",
                         "DelegatedWork",
                         "DelegatedPersonal"
                     ],

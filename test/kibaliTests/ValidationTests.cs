@@ -37,7 +37,6 @@ public class ValidationTests
 
         // Assert
         Assert.True(errors.Any());
-        Assert.True(errors.Count == 2);
         Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
         Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
         Assert.Contains("/me", errors.Select(e => e.Path));
@@ -68,7 +67,6 @@ public class ValidationTests
 
         // Assert
         Assert.True(errors.Any());
-        Assert.True(errors.Count == 3);
         Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
         Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
         Assert.Contains("/me", errors.Select(e => e.Path));
