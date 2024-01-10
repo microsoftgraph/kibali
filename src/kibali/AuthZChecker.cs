@@ -115,8 +115,15 @@ namespace Kibali
             {
                 var provisioningData = new List<ProvisioningInfo>();
                 this.PermissionsDeployment?.Deployments?.TryGetValue(permission.Key, out provisioningData);
+                var permissionSchemes = permission.Value.Schemes.Keys;
                 foreach (var pathSet in permission.Value.PathSets)
                 {
+                    var pathsetSchemes = pathSet.SchemeKeys;
+                    var unsupportedSchemes = pathsetSchemes.Except(permissionSchemes);
+                    if (unsupportedSchemes.Any() && validate)
+                    {
+                        errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidPathsetScheme, Message = $"Pathset contains schemes that the permission does not support - {string.Join(',', unsupportedSchemes)}", Path = permission.Key });
+                    }
                     foreach (var path in pathSet.Paths)
                     {
                         var pathKey = this.LenientMatch ? CleanRequestUrl(path.Key) : path.Key;
@@ -237,5 +244,6 @@ namespace Kibali
     {
         DuplicateLeastPrivilegeScopes,
         InvalidLeastPrivilegeScheme,
+        InvalidPathsetScheme
     }
 }

@@ -365,7 +365,6 @@
                         "GET"
                     ],
                     "schemeKeys": [
-                        "Application",
                         "DelegatedWork"
                     ],
                     "paths": {
@@ -559,8 +558,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/notes/{id}": "",
@@ -652,8 +650,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile": "",
@@ -741,8 +738,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/names": "",
@@ -888,14 +884,12 @@
                         "PATCH"
                     ],
                     "schemeKeys": [
-                        "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
-                        "/me/profile/notes/{id}": "least=Application",
+                        "/me/profile/notes/{id}": "",
                         "/me/responsibilities/{id}": "",
-                        "/users/{id}/profile/notes/{id}": "least=Application",
+                        "/users/{id}/profile/notes/{id}": "",
                         "/users/{id}/responsibilities/{id}": ""
                     }
                 },
@@ -904,15 +898,13 @@
                         "GET"
                     ],
                     "schemeKeys": [
-                        "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
-                        "/me/profile": "least=Application",
-                        "/me/profile/account": "least=Application",
+                        "/me/profile": "",
+                        "/me/profile/account": "",
                         "/me/profile/account/{id}": "",
-                        "/me/profile/addresses": "least=Application",
+                        "/me/profile/addresses": "",
                         "/me/profile/addresses/{id}": "",
                         "/me/profile/anniversaries": "",
                         "/me/profile/anniversaries/{id}": "",
@@ -927,7 +919,7 @@
                         "/me/profile/interests": "",
                         "/me/profile/interests/{id}": "",
                         "/me/profile/languages": "",
-                        "/me/profile/languages/{id}": "least=Application",
+                        "/me/profile/languages/{id}": "",
                         "/me/profile/names/{id}": "",
                         "/me/profile/notes": "",
                         "/me/profile/patents": "",
@@ -940,17 +932,17 @@
                         "/me/profile/projects/{id}": "",
                         "/me/profile/publications": "",
                         "/me/profile/publications/{id}": "",
-                        "/me/profile/skills": "least=Application",
+                        "/me/profile/skills": "",
                         "/me/profile/skills/{id}": "",
-                        "/me/profile/webaccounts": "least=Application",
-                        "/me/profile/webaccounts/{id}": "least=Application",
-                        "/me/profile/websites": "least=Application",
+                        "/me/profile/webaccounts": "",
+                        "/me/profile/webaccounts/{id}": "",
+                        "/me/profile/websites": "",
                         "/me/profile/websites/{id}": "",
                         "/me/responsibilities": "",
-                        "/users/{id}/profile": "least=Application",
-                        "/users/{id}/profile/account": "least=Application",
+                        "/users/{id}/profile": "",
+                        "/users/{id}/profile/account": "",
                         "/users/{id}/profile/account/{id}": "",
-                        "/users/{id}/profile/addresses": "least=Application",
+                        "/users/{id}/profile/addresses": "",
                         "/users/{id}/profile/addresses/{id}": "",
                         "/users/{id}/profile/anniversaries": "",
                         "/users/{id}/profile/anniversaries/{id}": "",
@@ -965,7 +957,7 @@
                         "/users/{id}/profile/interests": "",
                         "/users/{id}/profile/interests/{id}": "",
                         "/users/{id}/profile/languages": "",
-                        "/users/{id}/profile/languages/{id}": "least=Application",
+                        "/users/{id}/profile/languages/{id}": "",
                         "/users/{id}/profile/names/{id}": "",
                         "/users/{id}/profile/notes": "",
                         "/users/{id}/profile/patents": "",
@@ -978,11 +970,11 @@
                         "/users/{id}/profile/projects/{id}": "",
                         "/users/{id}/profile/publications": "",
                         "/users/{id}/profile/publications/{id}": "",
-                        "/users/{id}/profile/skills": "least=Application",
+                        "/users/{id}/profile/skills": "",
                         "/users/{id}/profile/skills/{id}": "",
-                        "/users/{id}/profile/webaccounts": "least=Application",
-                        "/users/{id}/profile/webaccounts/{id}": "least=Application",
-                        "/users/{id}/profile/websites": "least=Application",
+                        "/users/{id}/profile/webaccounts": "",
+                        "/users/{id}/profile/webaccounts/{id}": "",
+                        "/users/{id}/profile/websites": "",
                         "/users/{id}/profile/websites/{id}": "",
                         "/users/{id}/responsibilities": ""
                     }
@@ -993,13 +985,11 @@
                         "POST"
                     ],
                     "schemeKeys": [
-                        "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
-                        "/me/profile/names": "least=Application",
-                        "/users/{id}/profile/names": "least=Application"
+                        "/me/profile/names": "",
+                        "/users/{id}/profile/names": ""
                     }
                 },
                 {
@@ -1007,12 +997,11 @@
                         "POST"
                     ],
                     "schemeKeys": [
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
-                        "/me/translateexchangeids": "least=DelegatedWork,DelegatedPersonal",
-                        "/users/{id}/translateexchangeids": "least=DelegatedWork,DelegatedPersonal"
+                        "/me/translateexchangeids": "least=DelegatedWork",
+                        "/users/{id}/translateexchangeids": "least=DelegatedWork"
                     }
                 }
             ]
@@ -1108,11 +1097,10 @@
                         "PUT"
                     ],
                     "schemeKeys": [
-                        "Application",
                         "DelegatedWork"
                     ],
                     "paths": {
-                        "/settings/regionalandlanguagesettings": "least=Application,DelegatedWork"
+                        "/settings/regionalandlanguagesettings": "least=DelegatedWork"
                     }
                 },
                 {
@@ -1484,8 +1472,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/notes/{id}": "",
@@ -1537,8 +1524,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile": "",
@@ -1552,8 +1538,7 @@
                     ],
                     "schemeKeys": [
                         "Application",
-                        "DelegatedWork",
-                        "DelegatedPersonal"
+                        "DelegatedWork"
                     ],
                     "paths": {
                         "/me/profile/account": "",

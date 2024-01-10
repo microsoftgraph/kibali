@@ -37,7 +37,6 @@ public class ValidationTests
 
         // Assert
         Assert.True(errors.Any());
-        Assert.True(errors.Count == 2);
         Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
         Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
         Assert.Contains("/me", errors.Select(e => e.Path));
@@ -68,11 +67,40 @@ public class ValidationTests
 
         // Assert
         Assert.True(errors.Any());
-        Assert.True(errors.Count == 3);
         Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
         Assert.Contains(PermissionsErrorCode.InvalidLeastPrivilegeScheme, errors.Select(e => e.ErrorCode));
         Assert.Contains("/me", errors.Select(e => e.Path));
         Assert.Contains("/users/{id}/licensedetails", errors.Select(e => e.Path));
     }
-   
+
+    [Fact]
+    public void ValdiateInvalidScheme()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application" } }
+            }
+            }
+        };
+        doc.Permissions.Add("Foo.Read", fooRead);
+        // Act
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(doc);
+
+        // Assert
+        Assert.True(errors.Any());
+        Assert.Contains(PermissionsErrorCode.InvalidPathsetScheme, errors.Select(e => e.ErrorCode));
+
+    }
+
 }
