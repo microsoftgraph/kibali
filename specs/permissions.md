@@ -129,7 +129,8 @@ The scheme object has members that describe the permission within the context of
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
         "userConsentDisplayName": "Read and write app activity to users'activity feed",
         "userConsentDescription": "Allows the app to read and report the signed-in user's activity in the app.",
-        "requiresAdminConsent": true
+        "requiresAdminConsent": true,
+	"isPreauthorizationOnly": true
     },
     "DelegatedPersonal": {
         "userConsentDisplayName": "Read and write app activity to users'activity feed",
@@ -138,6 +139,7 @@ The scheme object has members that describe the permission within the context of
     "Application": {
         "adminDisplayName": "Read and write app activity to users' activity feed",
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
+	"isPreauthorizationOnly": true
     }
 ```
 
@@ -155,6 +157,9 @@ The "userConsentDescription" member is a REQUIRED string that describes the perm
 
 ### requiresAdminConsent
 The "requiresAdminConsent" member is a boolean value with a default value of false. When true, this permission can only be consented by an adminstrator.
+
+### isPreauthorizationOnly
+The "isPreauthorizationOnly" member is a boolean value with a default value of false. When true, the permission is preauthorized by the resource owner and does not prompt the user to consent.
 
 ### privilegeLevel
 The "privilegeLevel" member is an integer value that provides a hint as to the risks of consenting to the permissions. Valid values range from 1 (least privileged) to 5 (most privileged). The value is arrived at by considering the breadth of access that a permission will give access to and the sensitivity of the operations allowed by the permission. The same permission can have different privilege levels when used with different schemes.
@@ -221,6 +226,7 @@ classDiagram
         userConsentDisplayName: string
         userConsentDescription: string
         requiresAdminConsent: string
+	isPreauthorizationOnly: string
         privilegeLevel: string
     }
 
