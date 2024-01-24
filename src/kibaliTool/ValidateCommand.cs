@@ -12,6 +12,7 @@ internal class ValidateCommandParameters
 {
     public string SourcePermissionsFile;
     public string SourcePermissionsFolder;
+    public bool LenientMatch;
 }
 
 internal class ValidateCommand
@@ -33,7 +34,7 @@ internal class ValidateCommand
             throw new ArgumentException("Please provide a source permissions file or folder");
         }
 
-        var authZChecker = new AuthZChecker();
+        var authZChecker = new AuthZChecker() { LenientMatch = validateCommandParameters.LenientMatch };
         var errors = authZChecker.Validate(doc);
         if (errors.Any())
         {
