@@ -141,6 +141,29 @@ namespace Kibali
                     }
                 }
             }
+            if (validate) 
+            { 
+                foreach (var resource in this.Resources)
+                {
+                    var url = resource.Key;
+                    foreach (var methodEntry in resource.Value.SupportedMethods)
+                    {
+                        var method = methodEntry.Key;
+                        foreach (var schemeEntry in methodEntry.Value)
+                        {
+                            var scheme = schemeEntry.Key;
+                            var least = schemeEntry.Value.Where(s => s.Least == true);
+                            var perms = schemeEntry.Value.Select(e => e.Permission).Distinct();
+                            var supportedPermissions = string.Join(",", perms);
+                            
+                            if (!least.Any())
+                            {
+                                errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.MissingLeastPrivilegePermission, Message = $"Missing least privilege permission entry for url {url} method {method} scheme {scheme}. Supported permissions are {supportedPermissions}", Path=url });
+                            }
+                        }
+                    }
+                }
+            }
             return errors;
         }
 
@@ -244,6 +267,7 @@ namespace Kibali
     {
         DuplicateLeastPrivilegeScopes,
         InvalidLeastPrivilegeScheme,
-        InvalidPathsetScheme
+        InvalidPathsetScheme,
+        MissingLeastPrivilegePermission
     }
 }
