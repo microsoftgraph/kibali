@@ -152,7 +152,7 @@ namespace Kibali
                         foreach (var schemeEntry in methodEntry.Value)
                         {
                             var scheme = schemeEntry.Key;
-                            var least = schemeEntry.Value.Where(s => s.Least == true);
+                            var least = schemeEntry.Value.Where(s => s.Least);
                             var perms = schemeEntry.Value.Select(e => e.Permission).Distinct();
                             var supportedPermissions = string.Join(",", perms);
                             
