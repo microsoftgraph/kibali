@@ -142,6 +142,16 @@ public class DocumentationTests
         
     }
 
+    [Fact]
+    public void DocumentationTableNotGeneratedInvalidRow()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", "GET", true);
+        var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = string.Empty;
+        Assert.Equal(expectedTable, table);
+    }
 
     private static PermissionsDocument CreatePermissionsDocument()
     {
