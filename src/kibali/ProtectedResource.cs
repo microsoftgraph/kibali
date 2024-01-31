@@ -346,7 +346,7 @@ namespace Kibali
         private bool TableRowIsValid(string least, string higher)
         {
             // Row is invalid if we don't have least privilege permissions but have higher privileged permissions.
-            if (least == StringConstants.PermissionNotSupported && (higher != StringConstants.PermissionNotSupported && higher != StringConstants.PermissionNotAvailable))
+            if (least.Equals(StringConstants.PermissionNotSupported,StringComparison.OrdinalIgnoreCase) && (!higher.Equals(StringConstants.PermissionNotSupported, StringComparison.OrdinalIgnoreCase) && !higher.Equals(StringConstants.PermissionNotAvailable, StringComparison.OrdinalIgnoreCase)))
             {
                 return false;
             }
