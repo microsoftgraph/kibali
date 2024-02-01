@@ -70,3 +70,6 @@ The "isEnabled" member is a boolean value that indicates if a permission is enab
 
 #### resourceAppId
 The "resourceAppId" member value provides an identifier of the resource server that is used to enforce Conditional Access checks for this permission.
+
+#### supportsMSA
+The "supportsMSA" member is a boolean value that indicates if a permission is deployed in the MSA environment.
