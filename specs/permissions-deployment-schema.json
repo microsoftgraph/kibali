@@ -26,6 +26,9 @@
                             },
                             "isEnabled": {
                                 "type": "boolean"
+                            },
+                            "supportsMSA": {
+                                "type": "boolean"
                             }
                         },
                         "required": [
