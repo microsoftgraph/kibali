@@ -13,12 +13,12 @@ dotnet build
 You can create the Kibali permissions file from the Graph Explorer permissions metadata data using the following command:
 
 ```shell
-.\kibaliTool\bin\Debug\net6.0\KibaliTool.exe import
+.\kibaliTool\bin\Debug\net8.0\KibaliTool.exe import
 ```
 
 This command will output a file called GraphPermissions.json in the `.\output` folder. Once you have this file you
 can query the file for permissions using the following command:
 
 ```shell
-.\kibaliTool\bin\Debug\net6.0\KibaliTool.exe query --pf .\output\GraphPermissions.json --url "/me/messages"
+.\kibaliTool\bin\Debug\net8.0\KibaliTool.exe query --pf .\output\GraphPermissions.json --url "/me/messages"
 ```
