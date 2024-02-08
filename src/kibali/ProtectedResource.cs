@@ -176,20 +176,24 @@ namespace Kibali
         public string GeneratePermissionsTable(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
         {
             var leastPrivilege = this.FetchLeastPrivilege(method);
+            var allRowsAreValid = true;
             var markdownBuilder = new MarkDownBuilder();
             markdownBuilder.StartTable("Permission type", "Least privileged permissions", "Higher privileged permissions");
  
             (var least, var higher) = GetTableScopes("DelegatedWork", methodClaims, leastPrivilege[method]);
             markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
+            allRowsAreValid &= TableRowIsValid(least, higher);
 
             (least, higher) = GetTableScopes("DelegatedPersonal", methodClaims, leastPrivilege[method]);
             markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", least, higher);
+            allRowsAreValid &= TableRowIsValid(least, higher);
 
             (least, higher) = GetTableScopes("Application", methodClaims, leastPrivilege[method]);
             markdownBuilder.AddTableRow("Application", least, higher);
-            
+            allRowsAreValid &= TableRowIsValid(least, higher);
+
             markdownBuilder.EndTable();
-            return markdownBuilder.ToString();
+            return allRowsAreValid ? markdownBuilder.ToString() : string.Empty;
         }
 
         public Dictionary<string, Dictionary<string, HashSet<string>>> FetchLeastPrivilege(string method = null, string scheme = null)
@@ -267,9 +271,9 @@ namespace Kibali
         {
             var permissionsStub = new List<string>();
 
-            var delegatedWorkScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
+            var schemeScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
             leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
-            (var least, var higher) = ExtractScopes(delegatedWorkScopes, scopes);
+            (var least, var higher) = ExtractScopes(schemeScopes, scopes);
             return (least, higher);
         }
 
@@ -333,11 +337,20 @@ namespace Kibali
         
         private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
         {
-            var least = leastPrivilege != null && leastPrivilege.Any() ? leastPrivilege.First() : "Not supported.";
+            var least = leastPrivilege != null && leastPrivilege.Any() ? leastPrivilege.First() : StringConstants.PermissionNotSupported;
             var filteredScopes = orderedScopes.Where(s => s!= least);
-            var higher = filteredScopes.Any() ? string.Join(", ", filteredScopes) : leastPrivilege != null && leastPrivilege.Any() ? "Not available." : "Not supported.";
+            var higher = filteredScopes.Any() ? string.Join(", ", filteredScopes) : leastPrivilege != null && leastPrivilege.Any() ? StringConstants.PermissionNotAvailable : StringConstants.PermissionNotSupported;
             return (least, higher);
         }
-    }
 
+        private bool TableRowIsValid(string least, string higher)
+        {
+            // Row is invalid if we don't have least privilege permissions but have higher privileged permissions.
+            if (least.Equals(StringConstants.PermissionNotSupported,StringComparison.OrdinalIgnoreCase) && (!higher.Equals(StringConstants.PermissionNotSupported, StringComparison.OrdinalIgnoreCase) && !higher.Equals(StringConstants.PermissionNotAvailable, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
 }
