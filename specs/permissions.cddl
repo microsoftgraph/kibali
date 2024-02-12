@@ -23,6 +23,7 @@ schemeKeys = DelegatedWork / DelegatedPersonal / Application
 
 scheme = {
     ? requiresAdminConsent: bool .default true,
+    ? isPreauthorizationOnly: bool .default false,
     adminDisplayName: tstr,
     adminDescription: tstr,
     ? userConsentDisplayName: tstr,
