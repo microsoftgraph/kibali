@@ -44,7 +44,7 @@ public class PermissionsStubGenerator
     }
 
     private string UnsupportedPermissionsStub(){
-        var permissionsStub = "Not supported.";
+        var permissionsStub = StringConstants.PermissionNotSupported;
         var markdownBuilder = new MarkDownBuilder();
         markdownBuilder.StartTable("Permission type", "Least privileged permissions", "Higher privileged permissions");
 

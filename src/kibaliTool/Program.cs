@@ -40,6 +40,7 @@ namespace KibaliTool
             Command validateCommand = new Command("validate") {
                 ValidateCommandBinder.PermissionFileOption,
                 ValidateCommandBinder.PermissionFolderOption,
+                ValidateCommandBinder.LenientMatchOption,
             };
 
             validateCommand.SetHandler(ValidateCommand.Execute, new ValidateCommandBinder());
@@ -130,6 +131,7 @@ namespace KibaliTool
     {
         public static readonly Option<string> PermissionFileOption = new(new[] { "--sourcePermissionFile", "--pf" }, "Permission File");
         public static readonly Option<string> PermissionFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
+        public static readonly Option<bool> LenientMatchOption = new(new[] { "--lenient", "--lm" }, "Lenient Match");
 
         protected override ValidateCommandParameters GetBoundValue(BindingContext bindingContext)
         {
@@ -137,6 +139,7 @@ namespace KibaliTool
             {
                 SourcePermissionsFile = bindingContext.ParseResult.GetValueForOption(PermissionFileOption),
                 SourcePermissionsFolder = bindingContext.ParseResult.GetValueForOption(PermissionFolderOption),
+                LenientMatch = bindingContext.ParseResult.GetValueForOption(LenientMatchOption),
             };
         }
     }
