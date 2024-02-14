@@ -129,8 +129,7 @@ The scheme object has members that describe the permission within the context of
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
         "userConsentDisplayName": "Read and write app activity to users'activity feed",
         "userConsentDescription": "Allows the app to read and report the signed-in user's activity in the app.",
-        "requiresAdminConsent": true,
-	"isPreauthorizationOnly": true
+        "requiresAdminConsent": true
     },
     "DelegatedPersonal": {
         "userConsentDisplayName": "Read and write app activity to users'activity feed",
