@@ -140,7 +140,19 @@ The scheme object has members that describe the permission within the context of
         "adminDisplayName": "Read and write app activity to users' activity feed",
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
 	"isPreauthorizationOnly": true
+    },
+    "RSC-DelegatedWork": {
+        "adminDisplayName": "Read and write app activity to users'activity feed",
+        "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
+        "userConsentDisplayName": "Read and write app activity to users'activity feed",
+        "userConsentDescription": "Allows the app to read and report the signed-in user's activity in the app.",
+        "requiresAdminConsent": true
+    },
+    "RSC-Application": {
+        "adminDisplayName": "Read and write app activity to users' activity feed",
+        "adminDescription": "Allows the app to read and report the signed-in user's activity in the app."
     }
+}
 ```
 
 ### adminDisplayName
