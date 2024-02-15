@@ -11,6 +11,10 @@ jobs:
   analyze:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        actions: read
+        security-events: write
     steps:
       - name: Checkout repository
         id: checkout_repo
@@ -23,7 +27,7 @@ jobs:
 
       - name: Initialize CodeQL
         id: init_codeql
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           queries: security-and-quality
 
@@ -43,6 +47,6 @@ jobs:
 
       - name: Perform CodeQL Analysis
         id: analyze_codeql
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
 
 # Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
