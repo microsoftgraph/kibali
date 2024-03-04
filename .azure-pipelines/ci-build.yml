@@ -243,12 +243,13 @@ extends:
                   echo "$artifactName"
                   echo "$artifactVersion"
                 displayName: 'Fetch Artifact Name'
-              - task: NuGetCommand@2
+              - task: 1ES.PublishNuget@1
                 displayName: 'NuGet push'
                 inputs:
-                  command: push
+                  useDotNetTask: true
                   packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
                   nuGetFeedType: external
+                  publishPackageMetadata: true
                   publishFeedCredentials: 'microsoftgraph NuGet connection'
               - task: GitHubRelease@1
                 displayName: 'GitHub release (KibaliTool v$(artifactVersion))'
