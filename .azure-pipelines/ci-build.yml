@@ -2,29 +2,24 @@
 # Licensed under the MIT License.
 
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
-
 trigger:
   branches:
     include:
     - main
-
 pr:
   branches:
     include:
     - dev
-
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   ProductBinPath: '$(Build.SourcesDirectory)\src\kibali\bin\$(BuildConfiguration)'
-
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
-
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
@@ -35,7 +30,6 @@ extends:
     customBuildTags:
     - ES365AIMigrationTooling
     stages:
-
     - stage: build
       jobs:
       - job: build
@@ -51,6 +45,10 @@ extends:
             targetPath: '$(Build.ArtifactStagingDirectory)/Microsoft.Graph.Kibali-v$(kibaliToolversion)'
         steps:
         - task: UseDotNet@2
+          displayName: 'Use .NET 6'
+          inputs:
+            version: 6.x
+        - task: UseDotNet@2
           displayName: 'Use .NET 8'
           inputs:
             version: 8.x
@@ -64,22 +62,16 @@ extends:
           inputs:
             inputType: CmdLine
             cmdLineArgs: '/F:$(Build.SourcesDirectory)/test /T:9 /Sev:"1|2" /PE:2 /O:poli_result_test.xml'
-
-        # Install the nuget tool.
         - task: NuGetToolInstaller@0
           displayName: 'Use NuGet >=5.2.0'
           inputs:
             versionSpec: '>=5.2.0'
             checkLatest: true
-
-        # Build the Product project
         - task: DotNetCoreCLI@2
           displayName: 'build'
           inputs:
             projects: '$(Build.SourcesDirectory)\kibali.sln'
             arguments: '--configuration $(BuildConfiguration) --no-incremental'
-
-        # Run the Unit test
         - task: DotNetCoreCLI@2
           displayName: 'test'
           inputs:
@@ -110,7 +102,7 @@ extends:
             BinSkim: true
             CredScan: false
             PoliCheck: true
-        - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        - task: EsrpCodeSigning@2
           displayName: 'ESRP CodeSigning'
           inputs:
             ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
@@ -155,14 +147,11 @@ extends:
                   }
               ]
             SessionTimeout: 20
-        # Pack
         - pwsh: dotnet pack $(Build.SourcesDirectory)/src/kibali/Kibali.csproj -o $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration) --no-build --include-symbols --include-source /p:SymbolPackageFormat=snupkg
           displayName: 'pack Kibali'
-
-        # Pack
         - pwsh: dotnet pack $(Build.SourcesDirectory)/src/kibaliTool/KibaliTool.csproj -o $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration) --no-build --include-symbols --include-source /p:SymbolPackageFormat=snupkg
           displayName: 'pack KibaliTool'
-        - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        - task: EsrpCodeSigning@2
           displayName: 'ESRP CodeSigning Nuget Packages'
           inputs:
             ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
@@ -196,8 +185,6 @@ extends:
               $version = $xml.Project.PropertyGroup.Version
               echo $version
               echo "##vso[task.setvariable variable=kibaliToolversion]$version"  
-
-         # publish kibali as an .exe
         - task: DotNetCoreCLI@2
           displayName: publish kibalitool as executable
           inputs:
