@@ -58,6 +58,10 @@ namespace Kibali
             {
                 try
                 {
+                    if(permissionsFile.EndsWith("provisioningInfo.json"))
+                    {
+                        continue;
+                    }
                     using var stream = new FileStream(permissionsFile, FileMode.Open);
                     var doc = Load(stream);
                     mergedPermissions = mergedPermissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
