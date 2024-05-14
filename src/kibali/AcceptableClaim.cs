@@ -7,7 +7,7 @@ namespace Kibali
 {
     public class AcceptableClaim
     {
-        public AcceptableClaim(string permission, string alsoRequires, bool least)
+        public AcceptableClaim(string permission, string[] alsoRequires, bool least)
         {
             this.Permission = permission;
             this.AlsoRequires = alsoRequires;
@@ -15,7 +15,7 @@ namespace Kibali
         }
         public string Permission { get; }
 
-        public string AlsoRequires { get; }
+        public string[] AlsoRequires { get; }
 
         public bool Least { get; }
 
@@ -35,10 +35,10 @@ namespace Kibali
             writer.WriteStartObject();
             writer.WritePropertyName("permission");
             writer.WriteStringValue(this.Permission);
-            if (!string.IsNullOrEmpty(this.AlsoRequires))
+            if (this.AlsoRequires.Any())
             {
                 writer.WritePropertyName("alsoRequires");
-                writer.WriteStringValue(this.AlsoRequires);
+                writer.WriteStringValue(string.Join(",", this.AlsoRequires));
             }
             writer.WriteEndObject();
         }

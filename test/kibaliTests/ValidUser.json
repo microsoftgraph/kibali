@@ -28,7 +28,42 @@
             "PATCH"
           ],
           "paths": {
-            "/users/{id}": "least=DelegatedWork,Application"
+            "/users/{id}": "least=DelegatedWork,Application;AlsoRequires=User.Read.All"
+          }
+        }
+      ],
+      "ownerInfo": {
+        "ownerSecurityGroup": "IdentityReq"
+      }
+    },
+    "User.Read.All": {
+      "schemes": {
+        "DelegatedWork": {
+          "adminDisplayName": "Enable and disable user accounts",
+          "adminDescription": "Allows the app to enable and disable users' accounts, on behalf of the signed-in user.",
+          "userDisplayName": "Enable and disable user accounts",
+          "userDescription": "Allows the app to enable and disable users' accounts, on your behalf.",
+          "requiresAdminConsent": true,
+          "privilegeLevel": 4
+        },
+        "Application": {
+          "adminDisplayName": "Enable and disable user accounts",
+          "adminDescription": "Allows the app to enable and disable users' accounts, without a signed-in user.",
+          "requiresAdminConsent": true,
+          "privilegeLevel": 4
+        }
+      },
+      "pathSets": [
+        {
+          "schemeKeys": [
+            "DelegatedWork",
+            "Application"
+          ],
+          "methods": [
+            "PATCH"
+          ],
+          "paths": {
+            "/users/{id}": ""
           }
         }
       ],
