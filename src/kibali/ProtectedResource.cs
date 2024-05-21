@@ -179,7 +179,7 @@ namespace Kibali
             var allRowsAreValid = true;
             var markdownBuilder = new MarkDownBuilder();
             markdownBuilder.StartTable("Permission type", "Least privileged permissions", "Higher privileged permissions");
- 
+
             (var least, var higher) = GetTableScopes("DelegatedWork", methodClaims, leastPrivilege[method]);
             markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
             allRowsAreValid &= TableRowIsValid(least, higher);
@@ -267,14 +267,158 @@ namespace Kibali
             return output;
         }
  
-        private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilege)
+        private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilegeScopesPerScheme)
         {
-            var permissionsStub = new List<string>();
+            IEnumerable<AcceptableClaim> orderedClaims = Enumerable.Empty<AcceptableClaim>();
+            var schemeScopes = new List<string>();
+            if (methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims))
+            {
+                orderedClaims = claims.OrderByDescending(c => c.Least);
+                schemeScopes = orderedClaims.Select(c => c.Permission).ToList();
+            }
+            if (leastPrivilegeScopesPerScheme.TryGetValue(scheme, out HashSet<string> leastPrivilegeScopes))
+            {
+                (var least, var higherScopes) = ExtractScopes(schemeScopes, leastPrivilegeScopes);
+                string higher = ProcessMultipleRequiredPermissions(orderedClaims, ref least, ref higherScopes);
+                return (least, higher);
+            }
+            
+            return (StringConstants.PermissionNotSupported, schemeScopes.Any() ? string.Join(", ", schemeScopes) : StringConstants.PermissionNotSupported);
+        }
 
-            var schemeScopes = methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims) ? claims.OrderByDescending(c => c.Least).Select(c => c.Permission) : permissionsStub;
-            leastPrivilege.TryGetValue(scheme, out HashSet<string> scopes);
-            (var least, var higher) = ExtractScopes(schemeScopes, scopes);
-            return (least, higher);
+        private string ProcessMultipleRequiredPermissions(IEnumerable<AcceptableClaim> orderedClaims, ref string least, ref IEnumerable<string> higherScopes)
+        {
+            var permissionPairs = new SortedSet<(string, string)>();
+            if (orderedClaims.Any())
+            {
+                foreach (var claim in orderedClaims)
+                {
+                    PairPermissions(claim, permissionPairs);
+                }
+            }
+
+            var leastPrivilegedPermissionPair = GetRequiredLeastPrivileged(orderedClaims);
+            var invalidHigherPrivilegedEntries = new HashSet<(string, string)>();
+            // The least privileged permission requires another permission
+            if (leastPrivilegedPermissionPair != null && leastPrivilegedPermissionPair.Any())
+            {
+                least = string.Join(" and ", leastPrivilegedPermissionPair);
+                // Since the least privileged permission requires another permission, we can't have either of those permissions or the least privileged pair as higher privileged permissions.
+                invalidHigherPrivilegedEntries = new()
+                    {
+                        (leastPrivilegedPermissionPair.First(), leastPrivilegedPermissionPair.Last()),
+                        (leastPrivilegedPermissionPair.Last(), leastPrivilegedPermissionPair.First()),
+                        (leastPrivilegedPermissionPair.First(), string.Empty),
+                        (leastPrivilegedPermissionPair.Last(), string.Empty),
+                        (string.Empty, leastPrivilegedPermissionPair.First()),
+                        (string.Empty, leastPrivilegedPermissionPair.Last()),
+                    };
+
+                // Filter out least privilege entries from the permission pairs to process
+                permissionPairs = new SortedSet<(string, string)>(permissionPairs.Where(p => !invalidHigherPrivilegedEntries.Contains(p)));
+
+                // Filter out least privilege entries from the higher privileged permissions to process
+                higherScopes = higherScopes.Where(p => !invalidHigherPrivilegedEntries.Contains((p, string.Empty)));
+            }
+
+            var higher = StringConstants.PermissionNotAvailable;
+            if (permissionPairs.Any())
+            {
+                ProcessPermissionPairs(permissionPairs, leastPrivilegedPermissionPair, higherScopes, ref higher);
+            }
+            else
+            {
+                higher = higherScopes.Any() ? string.Join(", ", higherScopes) : leastPrivilegedPermissionPair.Any() ? StringConstants.PermissionNotAvailable : StringConstants.PermissionNotSupported;
+            }
+
+            return higher;
+        }
+
+        private IEnumerable<string> GetRequiredLeastPrivileged(IEnumerable<AcceptableClaim> claims)
+        {
+            var leastPrivilegedClaims = claims?.Where(c => c.Least && c.AlsoRequires.Length > 0);
+            if (leastPrivilegedClaims?.Count() > 2)
+            {
+                throw new Exception($"Too many Least Privilege Entries {string.Join(",", leastPrivilegedClaims.Select(c => c.Permission))}");
+            }
+            if (leastPrivilegedClaims?.Count() == 1)
+            {
+                var claim = leastPrivilegedClaims.First();
+                throw new Exception($"The permissions that the least privilege scope {claim.Permission} requires must also be set as the least privileged");
+            }
+
+            return leastPrivilegedClaims?.Select(c => c.Permission);
+        }
+
+        private static void ProcessPermissionPairs(SortedSet<(string, string)> permissionPairs, IEnumerable<string> leastRequired, IEnumerable<string> higherScopes, ref string higher)
+        {
+            var higherPrivilegedPairs = new List<string>();
+            var found = new HashSet<(string, string)>();
+            foreach (var pair in permissionPairs)
+            {
+                var inverse = (pair.Item2, pair.Item1);
+                if (found.Contains(pair))
+                {
+                    continue;
+                }
+                // Check if any of the pair items is also a least privileged permission and display it as the first permission
+                if (leastRequired.Contains(pair.Item1) || leastRequired.Contains(pair.Item2))
+                {
+                    var toAdd = leastRequired.Contains(pair.Item1) ? $"{pair.Item1} and {pair.Item2}" : $"{pair.Item2} and {pair.Item1}";
+                    higherPrivilegedPairs.Add(toAdd);
+                    found.Add(pair);
+                    found.Add(inverse);
+                    found.Add((pair.Item1, string.Empty));
+                    found.Add((pair.Item2, string.Empty));
+                }
+                else if ((pair.Item1 == string.Empty && higherScopes.Contains(pair.Item2))|| (pair.Item2 == string.Empty && higherScopes.Contains(pair.Item1)))
+                {
+                    higherPrivilegedPairs.Add(string.Join(string.Empty, new[] { pair.Item1, pair.Item2 }));
+                    found.Add(pair);
+                    found.Add(inverse);
+                    continue;
+                }
+                else if (higherScopes.Contains(pair.Item1) && higherScopes.Contains(pair.Item2))
+                {
+                    higherPrivilegedPairs.Add($"{pair.Item1} and {pair.Item2}");
+                    found.Add(pair);
+                    found.Add(inverse);
+                    continue;
+                }
+            }
+
+            // Remaining higher privileged permissions that don't require any other permission e.g. Directory.ReadWrite.All
+            var remainingHigher = higherScopes.Where(c => !found.Contains((c, string.Empty)));
+            if (remainingHigher.Any())
+            {
+                higherPrivilegedPairs.AddRange(remainingHigher);
+            }
+            if (higherPrivilegedPairs.Any())
+            {
+                higher = string.Join(", ", higherPrivilegedPairs.OrderByDescending(x => x.Length));
+            }
+            else
+            {
+                higher = leastRequired != null ? StringConstants.PermissionNotAvailable : StringConstants.PermissionNotSupported;
+            }
+            
+        }
+
+        private void PairPermissions(AcceptableClaim claim, SortedSet<(string, string)> permissionPairs)
+        {
+            if (claim.AlsoRequires.Any())
+            {
+                foreach (var alsoRequired in claim.AlsoRequires)
+                {
+                    permissionPairs.Add((claim.Permission, alsoRequired));
+                    permissionPairs.Add((alsoRequired, claim.Permission));
+                }
+            }
+            else
+            {
+                permissionPairs.Add((claim.Permission, string.Empty));
+                permissionPairs.Add((string.Empty, claim.Permission));
+            }
         }
 
         private void PopulateLeastPrivilege(Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilege, string method, string scheme, HashSet<string> permissions)
@@ -335,12 +479,12 @@ namespace Kibali
             return permissions;
         }
         
-        private (string least, string higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
+        private (string least, IEnumerable<string> higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
         {
             var least = leastPrivilege != null && leastPrivilege.Any() ? leastPrivilege.First() : StringConstants.PermissionNotSupported;
             var filteredScopes = orderedScopes.Where(s => s!= least);
-            var higher = filteredScopes.Any() ? string.Join(", ", filteredScopes) : leastPrivilege != null && leastPrivilege.Any() ? StringConstants.PermissionNotAvailable : StringConstants.PermissionNotSupported;
-            return (least, higher);
+            var higher = filteredScopes.Any() ? filteredScopes : leastPrivilege != null && leastPrivilege.Any() ? new[] { StringConstants.PermissionNotAvailable } : new[] { StringConstants.PermissionNotSupported };
+            return (least, higher.ToHashSet());
         }
 
         private bool TableRowIsValid(string least, string higher)

@@ -153,6 +153,26 @@ public class DocumentationTests
         Assert.Equal(expectedTable, table);
     }
 
+    [Fact]
+    public void DocumentationTableGeneratedMultiplePermissions()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "DELETE", true, true);
+        var generatedTable = generator.GenerateTable();
+        var table = generatedTable.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Not available.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Bar.ReadWrite.OwnedBy and Baz.ReadWrite, Bar.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+
+    }
+
     private static PermissionsDocument CreatePermissionsDocument()
     {
         var permissionsDocument = new PermissionsDocument();
@@ -189,11 +209,77 @@ public class DocumentationTests
                                 { "/foo",  "least=Application" },
                                 { "/fooNoPrivilege",  "" }
                             }
+                        },
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                            }
+                        }
+                    }
+        };
+
+        var barReadWriteOwnedBy = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Foo.ReadWrite" },
+                            }
+                        }
+                    }
+        };
+        var barReadWrite = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                            },
+                            Paths = {
+                                { "/foo",  "" },
+                            }
+                        }
+                    }
+        };
+
+        var bazReadWrite = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                            },
+                            Paths = {
+                                { "/foo",  "AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                            }
                         }
                     }
         };
         permissionsDocument.Permissions.Add("Foo.Read", fooRead);
         permissionsDocument.Permissions.Add("Foo.ReadWrite", fooReadWrite);
+        permissionsDocument.Permissions.Add("Bar.ReadWrite.OwnedBy", barReadWriteOwnedBy);
+        permissionsDocument.Permissions.Add("Bar.ReadWrite", barReadWrite);
+        permissionsDocument.Permissions.Add("Baz.ReadWrite", bazReadWrite);
         return permissionsDocument;
     }
 }
