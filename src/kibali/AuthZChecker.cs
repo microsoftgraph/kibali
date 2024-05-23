@@ -132,9 +132,8 @@ namespace Kibali
                             resource = new ProtectedResource(pathKey);
                             resources.Add(pathKey, resource);
                         }
-                        var parsedPathValue = ParsingHelpers.ParseProperties(path.Value);
-                        var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(parsedPathValue);
-                        var alsoRequires = ParseAlsoRequiresPermissions(parsedPathValue);
+                        var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(path.Value);
+                        var alsoRequires = ParseAlsoRequiresPermissions(path.Value);
                         resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData, alsoRequires);
                         if (validate)
                         {
@@ -214,17 +213,27 @@ namespace Kibali
 
             return tree;
         }
-        private static string[] ParseLeastPrivilegeSchemes(Dictionary<string, string> parsedPathValue)
+        private static string[] ParseLeastPrivilegeSchemes(string pathValue)
         {
             var defaultLeastPrivilege = Array.Empty<string>();
+            if (string.IsNullOrEmpty(pathValue))
+            {
+                return defaultLeastPrivilege;
+            }
+            var parsedPathValue = ParsingHelpers.ParseProperties(pathValue);
             parsedPathValue.TryGetValue("least", out var privilegeString);
             var leastPrivilegedPermissionSchemes = privilegeString != null ? privilegeString.Split(",") : defaultLeastPrivilege;
             return leastPrivilegedPermissionSchemes;
         }
 
-        private static string[] ParseAlsoRequiresPermissions(Dictionary<string, string> parsedPathValue)
+        private static string[] ParseAlsoRequiresPermissions(string pathValue)
         {
             var alsoRequired = Array.Empty<string>();
+            if (string.IsNullOrEmpty(pathValue))
+            {
+                return alsoRequired;
+            }
+            var parsedPathValue = ParsingHelpers.ParseProperties(pathValue);
             parsedPathValue.TryGetValue("AlsoRequires", out var permissions);
             var additionalPermissions = permissions != null ? permissions.Split(",") : alsoRequired;
             return additionalPermissions;
