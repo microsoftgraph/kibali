@@ -133,4 +133,81 @@ public class ValidationTests
 
     }
 
+    ////[Fact]
+    ////public void ValidateAlsoRequiresFailsNoReciprocity()
+    ////{
+    ////    // Arrange
+    ////    var doc = new PermissionsDocument();
+    ////    var fooRead = new Permission
+    ////    {
+    ////        Schemes = new SortedDictionary<string, Scheme>()
+    ////        {
+    ////            { "Application", new Scheme() }
+    ////        },
+    ////        PathSets = {
+    ////        new PathSet() {
+    ////            SchemeKeys = { "Application" },
+    ////            Methods = { "GET" },
+    ////            Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+    ////        }
+    ////        }
+    ////    };
+
+    ////    var barRead = new Permission
+    ////    {
+    ////        Schemes = new SortedDictionary<string, Scheme>()
+    ////        {
+    ////            { "Application", new Scheme() }
+    ////        },
+    ////        PathSets = {
+    ////        new PathSet() {
+    ////            SchemeKeys = { "Application" },
+    ////            Methods = { "GET" },
+    ////            Paths = { { "/foo",  "" } }
+    ////        }
+    ////        }
+    ////    };
+
+    ////    doc.Permissions.Add("Foo.Read", fooRead);
+    ////    doc.Permissions.Add("Bar.Read", fooRead);
+    ////    // Act
+    ////    var authZChecker = new AuthZChecker();
+    ////    var errors = authZChecker.Validate(doc);
+
+    ////    // Assert
+    ////    Assert.True(errors.Any());
+    ////    Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
+
+    ////}
+
+    ////[Fact]
+    ////public void ValidateAlsoRequiresSucceedsWithReciprocity()
+    ////{
+    ////    // Arrange
+    ////    var doc = new PermissionsDocument();
+    ////    var fooRead = new Permission
+    ////    {
+    ////        Schemes = new SortedDictionary<string, Scheme>()
+    ////        {
+    ////            { "Application", new Scheme() }
+    ////        },
+    ////        PathSets = {
+    ////        new PathSet() {
+    ////            SchemeKeys = { "Application" },
+    ////            Methods = { "GET" },
+    ////            Paths = { { "/foo",  "" } }
+    ////        }
+    ////        }
+    ////    };
+    ////    doc.Permissions.Add("Foo.Read", fooRead);
+    ////    // Act
+    ////    var authZChecker = new AuthZChecker();
+    ////    var errors = authZChecker.Validate(doc);
+
+    ////    // Assert
+    ////    Assert.True(errors.Any());
+    ////    Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
+
+    ////}
+
 }

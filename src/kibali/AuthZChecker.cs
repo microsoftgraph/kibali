@@ -137,7 +137,7 @@ namespace Kibali
                         resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData, alsoRequires);
                         if (validate)
                         {
-                            errors.UnionWith(resource.ValidateLeastPrivilegePermissions(permission.Key, pathSet, leastPrivilegedPermissionSchemes));
+                            errors.UnionWith(resource.ValidateMismatchedSchemes(permission.Key, pathSet, leastPrivilegedPermissionSchemes));
                         }
                     }
                 }
@@ -146,6 +146,7 @@ namespace Kibali
             { 
                 foreach (var resource in this.Resources)
                 {
+                    errors.UnionWith(resource.Value.ValidateLeastPrivilegePermissions());
                     var url = resource.Key;
                     foreach (var methodEntry in resource.Value.SupportedMethods)
                     {

@@ -69,9 +69,8 @@ namespace Kibali
             }
         }
 
-        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes)
+        public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions()
         {
-            var mismatchedSchemes = ValidateMismatchedSchemes(permission, pathSet, leastPrivilegedPermissionSchemes);
             var duplicateErrors = new HashSet<PermissionsError> ();
             var privs = this.FetchLeastPrivilege();
             foreach (var methodPrivs in privs)
@@ -92,11 +91,11 @@ namespace Kibali
                 }
             }
             
-            return mismatchedSchemes.Union(duplicateErrors);
+            return duplicateErrors;
         }
 
         
-        private HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegePermissionSchemes)
+        public HashSet<PermissionsError> ValidateMismatchedSchemes(string permission, PathSet pathSet, IEnumerable<string> leastPrivilegePermissionSchemes)
         {
             var mismatchedPrivilegeSchemes = leastPrivilegePermissionSchemes.Except(pathSet.SchemeKeys);
             var errors = new HashSet<PermissionsError>();
