@@ -50,6 +50,7 @@ namespace KibaliTool
                 DocumentCommandBinder.PermissionFolderOption,
                 DocumentCommandBinder.UrlOption,
                 DocumentCommandBinder.MethodOption,
+                DocumentCommandBinder.CombineMultipleOption,
             };
 
             documentCommand.SetHandler(DocumentCommand.Execute, new DocumentCommandBinder());
@@ -150,6 +151,7 @@ namespace KibaliTool
         public static readonly Option<string> PermissionFolderOption = new(new[] { "--sourcePermissionsFolder", "--fo" }, "Permission Folder");
         public static readonly Option<string> UrlOption = new(new[] { "--url", "-u" }, "Test Url");
         public static readonly Option<string> MethodOption = new(new[] { "--method", "-m" }, "Method");
+        public static readonly Option<bool> CombineMultipleOption = new(new[] { "--combine", "-c" }, "Combine Multiple Paths");
         protected override DocumentCommandParameters GetBoundValue(BindingContext bindingContext)
         {
             return new DocumentCommandParameters()
@@ -158,6 +160,7 @@ namespace KibaliTool
                 SourcePermissionsFolder = bindingContext.ParseResult.GetValueForOption(PermissionFolderOption),
                 Url = bindingContext.ParseResult.GetValueForOption(UrlOption),
                 Method = bindingContext.ParseResult.GetValueForOption(MethodOption),
+                CombineMultiple = bindingContext.ParseResult.GetValueForOption(CombineMultipleOption)
             };
         }
     }
