@@ -167,14 +167,7 @@ public class PermissionsStubGenerator
                 var filtered = higher.Concat(least).Except(toSkip);
                 if (filtered.Any())
                 {
-                    if (filtered.Count() > 1)
-                    {
-                        mergedHigher = string.Join(", ", filtered);
-                    }
-                    else
-                    {
-                        mergedHigher = filtered.First();
-                    }
+                    mergedHigher = string.Join(", ", filtered);
                 }
                 else
                 {
