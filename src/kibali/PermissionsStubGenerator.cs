@@ -35,10 +35,7 @@ public class PermissionsStubGenerator
         {
             return GenerateMultiplePathsTable();
         }
-        else
-        {
-            return GenerateSinglePathTable();
-        }
+        return GenerateSinglePathTable();
         
     }
 
