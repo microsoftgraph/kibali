@@ -122,10 +122,9 @@ public class PermissionsStubGenerator
     {
         var notPresent = new[] { StringConstants.PermissionNotSupported, StringConstants.PermissionNotAvailable };
         var groupedSchemePermissions = new Dictionary<string, (string, string)>();
-        foreach (var schemeEntry in mergedTableScopes)
+        foreach (var (scheme, value) in mergedTableScopes)
         {
-            var scheme = schemeEntry.Key;
-            var least = schemeEntry.Value["least"];
+            var least = value["least"];
             string mergedLeast;
             if (least.Count == 1)
             {
@@ -153,7 +152,7 @@ public class PermissionsStubGenerator
                 }
             }
 
-            var higher = schemeEntry.Value["higher"];
+            var higher = value["higher"];
             string mergedHigher;
             if (higher.Count == 1)
             {
