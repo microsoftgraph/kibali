@@ -106,7 +106,7 @@ public class PermissionsStubGenerator
         {
             var least = scheme.Value.Item1;
             var higher = scheme.Value.Item2.Split(',').Select(k => k.Trim());
-            if (mergedTableScopes.TryGetValue(scheme.Key, out Dictionary<string, SortedSet<string>> mergedScopes))
+            if (mergedTableScopes.TryGetValue(scheme.Key, out var mergedScopes))
             {
                 mergedScopes["least"].Add(least);
                 mergedScopes["higher"].UnionWith(higher);
