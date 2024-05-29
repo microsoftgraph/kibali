@@ -161,7 +161,7 @@ public class PermissionsStubGenerator
             }
             else
             {
-                least.Remove(mergedLeast); // Remove least privileged permission and add the rest to the least
+                least.Remove(mergedLeast); // Remove least privileged permission and add the rest to the higher privileged permissions.
                 var toSkip = notPresent.Append(mergedLeast);
                 var filtered = higher.Concat(least).Except(toSkip);
                 if (filtered.Any())
