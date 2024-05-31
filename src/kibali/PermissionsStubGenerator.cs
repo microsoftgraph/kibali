@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Kibali;
@@ -137,9 +138,7 @@ public class PermissionsStubGenerator
                 {
                     if (filtered.Count() > 1)
                     {
-                        mergedLeast = filtered.OrderBy(m => m).First();
-                        // TODO: Track these cases
-                        ////throw new ArgumentException("Unable to merge least privilege permissions.");
+                        throw new ArgumentException($"Differing least privilege permissions {string.Join(",", filtered)} for the scheme {scheme}.");
                     }
                     else
                     {
