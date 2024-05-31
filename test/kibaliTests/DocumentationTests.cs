@@ -193,22 +193,14 @@ public class DocumentationTests
     }
 
     [Fact]
-    public void DocumentationTableGeneratedMultiplePathsMultipleLPP()
+    public void DocumentationTableThrowsExceptionMultiplePathsMultipleLPP()
     {
         var permissionsDocument = CreatePermissionsDocument();
 
         var generator = new PermissionsStubGenerator(permissionsDocument, "/fooOther;/fooBar", "GET", true, true) { MergeMultiplePaths = true };
-        var table = generator.GenerateTable();
-        var actualTable = table.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-
-        var expectedTable = @"
-|Permission type|Least privileged permissions|Higher privileged permissions|
-|:---|:---|:---|
-|Delegated (work or school account)|Bar.ReadWrite|Foo.ReadWrite|
-|Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Bar.ReadWrite|Not available.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-
-        Assert.Equal(expectedTable, actualTable);
+        var generateTable = () => generator.GenerateTable();
+        var exception = Assert.Throws<ArgumentException>(generateTable);
+        Assert.Equal("Differing least privilege permissions Bar.ReadWrite,Foo.ReadWrite for the scheme Application.", exception.Message);
 
     }
 
