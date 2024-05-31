@@ -1,4 +1,8 @@
-﻿namespace Kibali;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Kibali;
 
 public class PermissionsStubGenerator
 {
@@ -23,8 +27,20 @@ public class PermissionsStubGenerator
     public string Method { get; set; }
 
     public bool LenientMatch { get; set; }
+    
+    public bool MergeMultiplePaths { get; set; }
 
     public string GenerateTable()
+    {
+        if (this.MergeMultiplePaths)
+        {
+            return GenerateMultiplePathsTable();
+        }
+        return GenerateSinglePathTable();
+        
+    }
+
+    private string GenerateSinglePathTable()
     {
         var authZChecker = new AuthZChecker() { LenientMatch = this.lenientMatch };
         authZChecker.Load(this.document);
@@ -35,13 +51,134 @@ public class PermissionsStubGenerator
         {
             return table;
         }
-        
+
         if (!string.IsNullOrEmpty(this.method) && resource.SupportedMethods.TryGetValue(this.method, out var supportedSchemes))
         {
             table = resource.GeneratePermissionsTable(this.method, supportedSchemes);
         }
         return table;
     }
+
+    public string GenerateMultiplePathsTable()
+    {
+        var resources = new Dictionary<string, ProtectedResource>();
+        var authZChecker = new AuthZChecker() { LenientMatch = this.lenientMatch };
+        authZChecker.Load(this.document);
+        foreach (var path in this.path.Split(';'))
+        {
+            var resource = authZChecker.FindResource(path);
+            if (resource == null)
+            {
+                continue;
+            }
+            resources[path] = resource;
+        } 
+        
+        var table = this.generateDefault ? this.UnsupportedPermissionsStub() : string.Empty;
+        if (resources.Count == 0)
+        {
+            return table;
+        }
+
+        var mergedTableScopes = new Dictionary<string, Dictionary<string,SortedSet<string>>>();
+       
+        foreach (var resourceEntry in resources)
+        {
+            var resource = resourceEntry.Value;
+            if (!string.IsNullOrEmpty(this.method) && resource.SupportedMethods.TryGetValue(this.method, out var supportedSchemes))
+            {
+                var scopesByScheme = resource.FetchTableScopesByScheme(this.method, supportedSchemes);
+                MergeTableScopes(scopesByScheme, mergedTableScopes);
+            }
+        }
+        if (mergedTableScopes.Count == 0)
+        {
+            return table;
+        }
+
+        var groupedScopesByScheme = GroupAndCleanScopes(mergedTableScopes);
+        table = TableGenerator.GeneratePermissionsTable(groupedScopesByScheme);
+        return table;
+    }
+
+    void MergeTableScopes(Dictionary<string, (string, string)> scopesByName, Dictionary<string, Dictionary<string, SortedSet<string>>> mergedTableScopes)
+    {
+        foreach (var scheme in scopesByName)
+        {
+            var least = scheme.Value.Item1;
+            var higher = scheme.Value.Item2.Split(',').Select(k => k.Trim());
+            if (mergedTableScopes.TryGetValue(scheme.Key, out var mergedScopes))
+            {
+                mergedScopes["least"].Add(least);
+                mergedScopes["higher"].UnionWith(higher);
+            }
+            else
+            {
+                mergedTableScopes[scheme.Key] = new() { { "least", new() { least } }, { "higher", new SortedSet<string>(higher) } };
+            }
+        }
+    }
+
+    Dictionary<string, (string, string)> GroupAndCleanScopes(Dictionary<string, Dictionary<string, SortedSet<string>>> mergedTableScopes)
+    {
+        var notPresent = new[] { StringConstants.PermissionNotSupported, StringConstants.PermissionNotAvailable };
+        var groupedSchemePermissions = new Dictionary<string, (string, string)>();
+        foreach (var (scheme, value) in mergedTableScopes)
+        {
+            var least = value["least"];
+            string mergedLeast;
+            if (least.Count == 1)
+            {
+                mergedLeast = least.First();
+            }
+            else
+            {
+                var filtered = least.Except(notPresent);
+                if (filtered.Any())
+                {
+                    if (filtered.Count() > 1)
+                    {
+                        throw new ArgumentException($"Differing least privilege permissions {string.Join(",", filtered)} for the scheme {scheme}.");
+                    }
+                    else
+                    {
+                        mergedLeast = filtered.First();
+                    }
+                }
+                else
+                {
+                    mergedLeast = StringConstants.PermissionNotSupported;
+                }
+            }
+
+            var higher = value["higher"];
+            string mergedHigher;
+            if (higher.Count == 1)
+            {
+                var higherPerm = higher.First();
+                mergedHigher = (higherPerm == mergedLeast && higherPerm != StringConstants.PermissionNotSupported) ? StringConstants.PermissionNotAvailable : higherPerm;
+            }
+            else
+            {
+                least.Remove(mergedLeast); // Remove least privileged permission and add the rest to the higher privileged permissions.
+                var toSkip = notPresent.Append(mergedLeast);
+                var filtered = higher.Concat(least).Except(toSkip);
+                if (filtered.Any())
+                {
+                    mergedHigher = string.Join(", ", filtered);
+                }
+                else
+                {
+                    mergedHigher = mergedLeast != StringConstants.PermissionNotSupported ? StringConstants.PermissionNotAvailable : StringConstants.PermissionNotSupported;
+                }
+            }
+
+            groupedSchemePermissions[scheme] = (mergedLeast, mergedHigher);
+        }
+        return groupedSchemePermissions;
+    }
+
+
 
     private string UnsupportedPermissionsStub(){
         var permissionsStub = StringConstants.PermissionNotSupported;

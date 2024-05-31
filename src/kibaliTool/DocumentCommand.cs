@@ -11,6 +11,7 @@ internal class DocumentCommandParameters
     public string SourcePermissionsFolder;
     public string Url;
     public string Method;
+    public bool CombineMultiple;
 }
 
 internal class DocumentCommand
@@ -37,7 +38,10 @@ internal class DocumentCommand
             throw new ArgumentException("Please provide a method");
         }
 
-        var generator = new PermissionsStubGenerator(doc, documentCommandParameters.Url, documentCommandParameters.Method, lenientMatch: true);
+        var generator = new PermissionsStubGenerator(doc, documentCommandParameters.Url, documentCommandParameters.Method, lenientMatch: true) 
+        { 
+            MergeMultiplePaths = documentCommandParameters.CombineMultiple 
+        };
         var table = generator.GenerateTable();
         Console.WriteLine(table);
 
