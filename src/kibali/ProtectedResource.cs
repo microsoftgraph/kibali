@@ -174,25 +174,21 @@ namespace Kibali
 
         public string GeneratePermissionsTable(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
         {
+            var scopesByScheme = FetchTableScopesByScheme(method, methodClaims);
+
+            return TableGenerator.GeneratePermissionsTable(scopesByScheme);
+        }
+
+        public Dictionary<string, (string, string)> FetchTableScopesByScheme(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
+        {
+            var scopesByScheme = new Dictionary<string, (string, string)>();
             var leastPrivilege = this.FetchLeastPrivilege(method);
-            var allRowsAreValid = true;
-            var markdownBuilder = new MarkDownBuilder();
-            markdownBuilder.StartTable("Permission type", "Least privileged permissions", "Higher privileged permissions");
-
-            (var least, var higher) = GetTableScopes("DelegatedWork", methodClaims, leastPrivilege[method]);
-            markdownBuilder.AddTableRow("Delegated (work or school account)", least, higher);
-            allRowsAreValid &= TableRowIsValid(least, higher);
-
-            (least, higher) = GetTableScopes("DelegatedPersonal", methodClaims, leastPrivilege[method]);
-            markdownBuilder.AddTableRow("Delegated (personal Microsoft account)", least, higher);
-            allRowsAreValid &= TableRowIsValid(least, higher);
-
-            (least, higher) = GetTableScopes("Application", methodClaims, leastPrivilege[method]);
-            markdownBuilder.AddTableRow("Application", least, higher);
-            allRowsAreValid &= TableRowIsValid(least, higher);
-
-            markdownBuilder.EndTable();
-            return allRowsAreValid ? markdownBuilder.ToString() : string.Empty;
+            var schemeKeys = new[] { "DelegatedWork", "Application", "DelegatedPersonal" };
+            foreach (var scheme in schemeKeys)
+            {
+                scopesByScheme[scheme] = GetTableScopes(scheme, methodClaims, leastPrivilege[method]);
+            }
+            return scopesByScheme;
         }
 
         public Dictionary<string, Dictionary<string, HashSet<string>>> FetchLeastPrivilege(string method = null, string scheme = null)
@@ -484,16 +480,6 @@ namespace Kibali
             var filteredScopes = orderedScopes.Where(s => s!= least);
             var higher = filteredScopes.Any() ? filteredScopes : leastPrivilege != null && leastPrivilege.Any() ? new[] { StringConstants.PermissionNotAvailable } : new[] { StringConstants.PermissionNotSupported };
             return (least, higher.ToHashSet());
-        }
-
-        private bool TableRowIsValid(string least, string higher)
-        {
-            // Row is invalid if we don't have least privilege permissions but have higher privileged permissions.
-            if (least.Equals(StringConstants.PermissionNotSupported,StringComparison.OrdinalIgnoreCase) && (!higher.Equals(StringConstants.PermissionNotSupported, StringComparison.OrdinalIgnoreCase) && !higher.Equals(StringConstants.PermissionNotAvailable, StringComparison.OrdinalIgnoreCase)))
-            {
-                return false;
-            }
-            return true;
         }
     }
 }

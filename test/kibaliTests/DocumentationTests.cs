@@ -4,12 +4,14 @@ namespace KibaliTests;
 
 public class DocumentationTests
 {
-    [Fact]
-    public void DocumentationTableGenerated()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableGenerated(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true) { MergeMultiplePaths = mergeMultiplePaths};
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
@@ -24,12 +26,14 @@ public class DocumentationTests
     }
 
 
-    [Fact]
-    public void DocumentationTableGeneratedLenient()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableGeneratedLenient(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true, true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true, true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
@@ -43,12 +47,14 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedNotLenient()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedNotLenient(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value})", "GET", true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         var expectedTable = @"
@@ -62,12 +68,14 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedMissingPath()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedMissingPath(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET", true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/bar", "GET", true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
@@ -79,12 +87,14 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedNoMethod()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedNoMethod(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null, true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", null, true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
@@ -96,12 +106,14 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedUnsupportedMethod()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedUnsupportedMethod(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH", true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH", true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
@@ -113,12 +125,14 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedNoPrivilege()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedNoPrivilege(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", null, true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", null, true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
@@ -130,24 +144,28 @@ public class DocumentationTests
 
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedNoDefault()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedNoDefault(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH");
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "PATCH") { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = string.Empty;
         Assert.Equal(expectedTable, table);
         
     }
 
-    [Fact]
-    public void DocumentationTableNotGeneratedInvalidRow()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void DocumentationTableNotGeneratedInvalidRow(bool mergeMultiplePaths)
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", "GET", true);
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooNoPrivilege", "GET", true) { MergeMultiplePaths = mergeMultiplePaths };
         var table = generator.GenerateTable().Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         var expectedTable = string.Empty;
         Assert.Equal(expectedTable, table);
@@ -170,7 +188,57 @@ public class DocumentationTests
 |Application|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Bar.ReadWrite.OwnedBy and Baz.ReadWrite, Bar.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
+    }
 
+
+    [Fact]
+    public void DocumentationTableGeneratedMultiplePaths()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, " /foo/(value={value});/fooOther", "GET", true, true) { MergeMultiplePaths = true };
+        var table = generator.GenerateTable();
+        var actualTable = table.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Foo.Read|Foo.ReadWrite|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Foo.ReadWrite|Not available.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, actualTable);
+
+    }
+
+    [Fact]
+    public void DocumentationTableThrowsExceptionMultiplePathsMultipleLPP()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/fooOther;/fooBar", "GET", true, true) { MergeMultiplePaths = true };
+        var generateTable = () => generator.GenerateTable();
+        var exception = Assert.Throws<ArgumentException>(generateTable);
+        Assert.Equal("Differing least privilege permissions Bar.ReadWrite,Foo.ReadWrite for the scheme Application.", exception.Message);
+
+    }
+
+    [Fact]
+    public void DocumentationTableGeneratedMultiplePathsMultipleHPP()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/bar;/fooBar", "GET", true, true) { MergeMultiplePaths = true };
+        var table = generator.GenerateTable();
+        var actualTable = table.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Bar.ReadWrite|Foo.Read, Foo.ReadWrite|
+|Delegated (personal Microsoft account)|Foo.Read|Not available.|
+|Application|Bar.ReadWrite|Foo.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, actualTable);
     }
 
     private static PermissionsDocument CreatePermissionsDocument()
@@ -188,7 +256,19 @@ public class DocumentationTests
                                 "DelegatedWork"
                             },
                             Paths = {
-                                { "/foo",  "least=DelegatedWork" }
+                                { "/foo",  "least=DelegatedWork" },
+                                { "/bar",  "" }
+                            }
+                        },
+                        new PathSet() {
+                            Methods = {
+                                "GET"
+                            },
+                            SchemeKeys = {
+                                "DelegatedPersonal"
+                            },
+                            Paths = {
+                                { "/bar",  "least=DelegatedPersonal" }
                             }
                         }
                     }
@@ -207,7 +287,28 @@ public class DocumentationTests
                             },
                             Paths = {
                                 { "/foo",  "least=Application" },
-                                { "/fooNoPrivilege",  "" }
+                                { "/fooNoPrivilege",  "" },
+                                { "/fooOther",  "least=Application" },
+                                { "/bar",  "" }
+                            }
+                        }
+                    }
+        };
+        var barReadWrite = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "GET",
+                                "POST"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/fooBar",  "least=Application,DelegatedWork" },
+                                { "/bar",  "" }
                             }
                         },
                         new PathSet() {
@@ -238,22 +339,6 @@ public class DocumentationTests
                             },
                             Paths = {
                                 { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Foo.ReadWrite" },
-                            }
-                        }
-                    }
-        };
-        var barReadWrite = new Permission
-        {
-            PathSets = {
-                        new PathSet() {
-                            Methods = {
-                                "DELETE"
-                            },
-                            SchemeKeys = {
-                                "Application",
-                            },
-                            Paths = {
-                                { "/foo",  "" },
                             }
                         }
                     }
