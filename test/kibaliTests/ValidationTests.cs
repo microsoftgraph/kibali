@@ -133,81 +133,117 @@ public class ValidationTests
 
     }
 
-    ////[Fact]
-    ////public void ValidateAlsoRequiresFailsNoReciprocity()
-    ////{
-    ////    // Arrange
-    ////    var doc = new PermissionsDocument();
-    ////    var fooRead = new Permission
-    ////    {
-    ////        Schemes = new SortedDictionary<string, Scheme>()
-    ////        {
-    ////            { "Application", new Scheme() }
-    ////        },
-    ////        PathSets = {
-    ////        new PathSet() {
-    ////            SchemeKeys = { "Application" },
-    ////            Methods = { "GET" },
-    ////            Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
-    ////        }
-    ////        }
-    ////    };
+    [Fact]
+    public void ValidateAlsoRequiresFailsIfMoreThanOnePairMarkedAsLeast()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
 
-    ////    var barRead = new Permission
-    ////    {
-    ////        Schemes = new SortedDictionary<string, Scheme>()
-    ////        {
-    ////            { "Application", new Scheme() }
-    ////        },
-    ////        PathSets = {
-    ////        new PathSet() {
-    ////            SchemeKeys = { "Application" },
-    ////            Methods = { "GET" },
-    ////            Paths = { { "/foo",  "" } }
-    ////        }
-    ////        }
-    ////    };
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application,DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
 
-    ////    doc.Permissions.Add("Foo.Read", fooRead);
-    ////    doc.Permissions.Add("Bar.Read", fooRead);
-    ////    // Act
-    ////    var authZChecker = new AuthZChecker();
-    ////    var errors = authZChecker.Validate(doc);
+        var bazRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application,DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
 
-    ////    // Assert
-    ////    Assert.True(errors.Any());
-    ////    Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
 
-    ////}
+        doc.Permissions.Add("Foo.Read", fooRead);
+        doc.Permissions.Add("Bar.Read", barRead);
+        doc.Permissions.Add("Baz.Read", bazRead);
+        // Act
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(doc);
 
-    ////[Fact]
-    ////public void ValidateAlsoRequiresSucceedsWithReciprocity()
-    ////{
-    ////    // Arrange
-    ////    var doc = new PermissionsDocument();
-    ////    var fooRead = new Permission
-    ////    {
-    ////        Schemes = new SortedDictionary<string, Scheme>()
-    ////        {
-    ////            { "Application", new Scheme() }
-    ////        },
-    ////        PathSets = {
-    ////        new PathSet() {
-    ////            SchemeKeys = { "Application" },
-    ////            Methods = { "GET" },
-    ////            Paths = { { "/foo",  "" } }
-    ////        }
-    ////        }
-    ////    };
-    ////    doc.Permissions.Add("Foo.Read", fooRead);
-    ////    // Act
-    ////    var authZChecker = new AuthZChecker();
-    ////    var errors = authZChecker.Validate(doc);
+        // Assert
+        Assert.True(errors.Any());
+        Assert.Contains(PermissionsErrorCode.DuplicateLeastPrivilegeScopes, errors.Select(e => e.ErrorCode));
 
-    ////    // Assert
-    ////    Assert.True(errors.Any());
-    ////    Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
+    }
 
-    ////}
+    [Fact]
+    public void ValidateAlsoRequiresSucceedsWithReciprocity()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
+
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application,DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        doc.Permissions.Add("Foo.Read", fooRead);
+        doc.Permissions.Add("Bar.Read", barRead);
+        // Act
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(doc);
+
+        // Assert
+        Assert.True(errors.Any());
+        Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
+
+    }
 
 }

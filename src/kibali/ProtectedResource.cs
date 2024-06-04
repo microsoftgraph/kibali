@@ -48,7 +48,7 @@ namespace Kibali
                     }
 
                     var isLeastPrivilege = leastPrivilegedPermissionSchemes.Contains(schemeKey);
-                    var claim = new AcceptableClaim(permission, alsoRequires, isLeastPrivilege);
+                    var claim = new AcceptableClaim(permission, isLeastPrivilege, alsoRequires);
                     if (schemeProvisioning.TryGetValue(schemeKey, out ProvisioningInfo provisioningInfo))
                     {
                         claim.IsHidden = provisioningInfo.IsHidden;

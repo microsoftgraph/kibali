@@ -7,7 +7,7 @@ namespace Kibali
 {
     public class AcceptableClaim
     {
-        public AcceptableClaim(string permission, string[] alsoRequires, bool least)
+        public AcceptableClaim(string permission, bool least, string[] alsoRequires)
         {
             this.Permission = permission;
             this.AlsoRequires = alsoRequires;
