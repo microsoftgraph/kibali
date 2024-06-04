@@ -303,7 +303,7 @@ namespace Kibali
 
         private string ProcessMultipleRequiredPermissions(IEnumerable<AcceptableClaim> orderedClaims, ref string least, ref IEnumerable<string> higherScopes)
         {
-            var permissionPairs = new SortedSet<(string, string)>();
+            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
             if (orderedClaims.Any())
             {
                 foreach (var claim in orderedClaims)
@@ -330,7 +330,7 @@ namespace Kibali
                     };
 
                 // Filter out least privilege entries from the permission pairs to process
-                permissionPairs = new SortedSet<(string, string)>(permissionPairs.Where(p => !invalidHigherPrivilegedEntries.Contains(p)));
+                permissionPairs = permissionPairs.Where(p => !invalidHigherPrivilegedEntries.Contains(p)).ToHashSet();
 
                 // Filter out least privilege entries from the higher privileged permissions to process
                 higherScopes = higherScopes.Where(p => !invalidHigherPrivilegedEntries.Contains((p, string.Empty)));
@@ -365,14 +365,14 @@ namespace Kibali
             return leastPrivilegedClaims?.Select(c => c.Permission);
         }
 
-        private static void ProcessPermissionPairs(SortedSet<(string, string)> permissionPairs, IEnumerable<string> leastRequired, IEnumerable<string> higherScopes, ref string higher)
+        private static void ProcessPermissionPairs(HashSet<(string, string)> permissionPairs, IEnumerable<string> leastRequired, IEnumerable<string> higherScopes, ref string higher)
         {
             var higherPrivilegedPairs = new List<string>();
-            var found = new HashSet<(string, string)>();
+            var found = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
             foreach (var pair in permissionPairs)
             {
                 var inverse = (pair.Item2, pair.Item1);
-                if (found.Contains(pair))
+                if (found.Contains(pair) || found.Contains(inverse))
                 {
                     continue;
                 }
@@ -382,7 +382,6 @@ namespace Kibali
                     var toAdd = leastRequired.Contains(pair.Item1) ? $"{pair.Item1} and {pair.Item2}" : $"{pair.Item2} and {pair.Item1}";
                     higherPrivilegedPairs.Add(toAdd);
                     found.Add(pair);
-                    found.Add(inverse);
                     found.Add((pair.Item1, string.Empty));
                     found.Add((pair.Item2, string.Empty));
                 }
@@ -390,14 +389,12 @@ namespace Kibali
                 {
                     higherPrivilegedPairs.Add(string.Join(string.Empty, new[] { pair.Item1, pair.Item2 }));
                     found.Add(pair);
-                    found.Add(inverse);
                     continue;
                 }
                 else if (higherScopes.Contains(pair.Item1) && higherScopes.Contains(pair.Item2))
                 {
                     higherPrivilegedPairs.Add($"{pair.Item1} and {pair.Item2}");
                     found.Add(pair);
-                    found.Add(inverse);
                     continue;
                 }
             }
@@ -419,20 +416,18 @@ namespace Kibali
             
         }
 
-        private void PairPermissions(AcceptableClaim claim, SortedSet<(string, string)> permissionPairs)
+        private void PairPermissions(AcceptableClaim claim, HashSet<(string, string)> permissionPairs)
         {
             if (claim.AlsoRequires.Any())
             {
                 foreach (var alsoRequired in claim.AlsoRequires)
                 {
                     permissionPairs.Add((claim.Permission, alsoRequired));
-                    permissionPairs.Add((alsoRequired, claim.Permission));
                 }
             }
             else
             {
                 permissionPairs.Add((claim.Permission, string.Empty));
-                permissionPairs.Add((string.Empty, claim.Permission));
             }
         }
 
@@ -445,6 +440,21 @@ namespace Kibali
             leastPrivilege[method][scheme] = Disambiguate(method, scheme, permissions);
         }
 
+        private HashSet<string> FetchLeastPrivilegeMultiplePermissions(HashSet<AcceptableClaim> claims)
+        {
+            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
+            foreach (var claim in claims)
+            {
+                PairPermissions(claim, permissionPairs);
+            }
+            
+            if (permissionPairs.Any())
+            {
+                return permissionPairs.Select(p => $"{p.Item1} and {p.Item2}").ToHashSet();
+            }
+
+            return claims.Select(p => p.Permission).ToHashSet();
+        }
         private HashSet<string> Disambiguate(string method, string scheme, HashSet<AcceptableClaim> permissions)
         {
             // If more than one permission exists as the least privilege due to grouping of the methods
@@ -456,7 +466,7 @@ namespace Kibali
 
                 if (exclusivePrivilegeCount > 1)
                 {
-                    return permissions.Select(p => p.Permission).ToHashSet();
+                    return FetchLeastPrivilegeMultiplePermissions(permissions);
                 }
 
                 // Check for the permission supports the provided method only as the least privilege

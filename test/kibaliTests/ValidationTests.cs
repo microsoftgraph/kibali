@@ -241,9 +241,7 @@ public class ValidationTests
         var errors = authZChecker.Validate(doc);
 
         // Assert
-        Assert.True(errors.Any());
-        Assert.Contains(PermissionsErrorCode.MissingLeastPrivilegePermission, errors.Select(e => e.ErrorCode));
-
+        Assert.False(errors.Any());
     }
 
 }
