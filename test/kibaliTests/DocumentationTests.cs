@@ -291,6 +291,18 @@ public class DocumentationTests
                                 { "/fooOther",  "least=Application" },
                                 { "/bar",  "" }
                             }
+                        },
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                            }
                         }
                     }
         };
@@ -317,10 +329,9 @@ public class DocumentationTests
                             },
                             SchemeKeys = {
                                 "Application",
-                                "DelegatedWork"
                             },
                             Paths = {
-                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                                { "/foo",  "" },
                             }
                         }
                     }
