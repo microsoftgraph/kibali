@@ -456,7 +456,7 @@ namespace Kibali
 
                 if (exclusivePrivilegeCount > 1)
                 {
-                    return permissions;
+                    return permissions.Select(p => p.Permission).ToHashSet();
                 }
 
                 // Check for the permission supports the provided method only as the least privilege
@@ -491,7 +491,7 @@ namespace Kibali
 
                 return new HashSet<string> { leastPrivilegePermission.Permission };
             }
-            return permissions;
+            return permissions.Select(p => p.Permission).ToHashSet();
         }
         
         private (string least, IEnumerable<string> higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)
