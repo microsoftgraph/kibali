@@ -359,7 +359,11 @@ namespace Kibali
             if (leastPrivilegedClaims?.Count() == 1)
             {
                 var claim = leastPrivilegedClaims.First();
-                throw new Exception($"The permissions that the least privilege scope {claim.Permission} requires must also be set as the least privileged");
+                if (claim.AlsoRequires.Length > 1)
+                {
+                    throw new Exception($"The least privileged scope {claim.Permission} requires more than one other scope. Only one of {string.Join(", ", claim.AlsoRequires)} is allowed.");
+                }
+                return [claim.Permission, claim.AlsoRequires.First()];
             }
 
             return leastPrivilegedClaims?.Select(c => c.Permission);
@@ -394,7 +398,9 @@ namespace Kibali
                 else if (higherScopes.Contains(pair.Item1) && higherScopes.Contains(pair.Item2))
                 {
                     higherPrivilegedPairs.Add($"{pair.Item1} and {pair.Item2}");
-                    found.Add(pair);
+                    found.Add(pair); 
+                    found.Add((pair.Item1, string.Empty));
+                    found.Add((pair.Item2, string.Empty));
                     continue;
                 }
             }
@@ -478,7 +484,7 @@ namespace Kibali
                     }
                     if (supportedMethods.First() == method)
                     {
-                        return new HashSet<string> { perm.Permission };
+                        return [FormatPermissionString(perm)];
                     }
                 }
 
@@ -499,9 +505,18 @@ namespace Kibali
                     }
                 }
 
-                return new HashSet<string> { leastPrivilegePermission.Permission };
+                return [FormatPermissionString(leastPrivilegePermission)];
             }
-            return permissions.Select(p => p.Permission).ToHashSet();
+            return permissions.Select(p => FormatPermissionString(p)).ToHashSet();
+        }
+
+        private string FormatPermissionString(AcceptableClaim claim)
+        {
+            if (claim.AlsoRequires.Length > 0)
+            {
+                return $"{claim.Permission} and {claim.AlsoRequires.First()}";
+            }
+            return claim.Permission;
         }
         
         private (string least, IEnumerable<string> higher) ExtractScopes(IEnumerable<string> orderedScopes, HashSet<string> leastPrivilege)

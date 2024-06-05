@@ -244,4 +244,79 @@ public class ValidationTests
         Assert.False(errors.Any());
     }
 
+    public void ValidateAlsoRequiresSucceedsWithReciprocityMultipleRequired()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
+
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application,DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        var fooWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Read,Bar.Read,Bar.Write" } }
+            }
+            }
+        };
+        var barWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Write" } }
+            }
+            }
+        };
+        doc.Permissions.Add("Foo.Read", fooRead);
+        doc.Permissions.Add("Bar.Read", barRead);
+        doc.Permissions.Add("Foo.Write", fooWrite);
+        doc.Permissions.Add("Bar.Write", barWrite);
+        // Act
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(doc);
+
+        // Assert
+        Assert.False(errors.Any());
+    }
 }

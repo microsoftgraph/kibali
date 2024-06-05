@@ -108,7 +108,7 @@ POST
     }
 
     [Fact]
-    public void FindLeastPrivilegeAlsoRequires()
+    public void FindLeastPrivilegeAlsoRequiresPaired()
     {
         // Arrange
         var doc = new PermissionsDocument();
@@ -156,8 +156,63 @@ POST
         // Assert
         var expected = @"
 GET
-|DelegatedWork |Bar.Read|
+|DelegatedWork |Bar.Read and Foo.Read|
 |Application |Bar.Read and Foo.Read|
+".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void FindLeastPrivilegeAlsoRequiresSingleEntryMarked()
+    {
+        // Arrange
+        var doc = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
+
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=DelegatedWork" } }
+            }
+            }
+        };
+        doc.Permissions.Add("Foo.Read", fooRead);
+        doc.Permissions.Add("Bar.Read", barRead);
+        // Act
+        var authZChecker = new AuthZChecker();
+        authZChecker.Load(doc);
+        var resource = authZChecker.FindResource("/foo");
+        var leastPrivilege = resource.FetchLeastPrivilege("GET");
+        var table = resource.WriteLeastPrivilegeTable(leastPrivilege);
+        var actual = table.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+
+        // Assert
+        var expected = @"
+GET
+|DelegatedWork |Bar.Read|
+|Application |Foo.Read and Bar.Read|
 ".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
         Assert.Equal(expected, actual);
     }
