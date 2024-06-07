@@ -137,36 +137,57 @@ namespace Kibali
                         resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData, alsoRequires);
                         if (validate)
                         {
+                            foreach (var requiredPermission in alsoRequires)
+                            {
+                                if (!permissionsDocument.Permissions.TryGetValue(requiredPermission, out Permission value))
+                                {
+                                    errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"Url also requires permissions that don't exist - {requiredPermission}", Path = pathKey });
+                                }
+                                else
+                                {
+                                    var permissionPathSetSchemes = value.Schemes.Keys;
+                                    var invalidAlsoRequiresSchemes = pathsetSchemes.Where(c => !permissionPathSetSchemes.Contains(c));
+                                    if (invalidAlsoRequiresSchemes.Any())
+                                    {
+                                        errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"Url also requires permission {requiredPermission} that does not support schemes {string.Join(",", invalidAlsoRequiresSchemes)}", Path = pathKey });
+                                    }
+                                }
+                            }
                             errors.UnionWith(resource.ValidateMismatchedSchemes(permission.Key, pathSet, leastPrivilegedPermissionSchemes));
                         }
                     }
                 }
             }
-            if (validate) 
-            { 
-                foreach (var resource in this.Resources)
+            if (validate)
+            {
+                ValidateAllResources(errors);
+            }
+            return errors;
+        }
+
+        private void ValidateAllResources(HashSet<PermissionsError> errors)
+        {
+            foreach (var resource in this.Resources)
+            {
+                errors.UnionWith(resource.Value.ValidateLeastPrivilegePermissions());
+                var url = resource.Key;
+                foreach (var methodEntry in resource.Value.SupportedMethods)
                 {
-                    errors.UnionWith(resource.Value.ValidateLeastPrivilegePermissions());
-                    var url = resource.Key;
-                    foreach (var methodEntry in resource.Value.SupportedMethods)
+                    var method = methodEntry.Key;
+                    foreach (var schemeEntry in methodEntry.Value)
                     {
-                        var method = methodEntry.Key;
-                        foreach (var schemeEntry in methodEntry.Value)
+                        var scheme = schemeEntry.Key;
+                        var least = schemeEntry.Value.Where(s => s.Least);
+                        var perms = schemeEntry.Value.Select(e => e.Permission).Distinct();
+                        var supportedPermissions = string.Join(",", perms);
+
+                        if (!least.Any())
                         {
-                            var scheme = schemeEntry.Key;
-                            var least = schemeEntry.Value.Where(s => s.Least);
-                            var perms = schemeEntry.Value.Select(e => e.Permission).Distinct();
-                            var supportedPermissions = string.Join(",", perms);
-                            
-                            if (!least.Any())
-                            {
-                                errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.MissingLeastPrivilegePermission, Message = $"Missing least privilege permission entry for url {url} method {method} scheme {scheme}. Supported permissions are {supportedPermissions}", Path=url });
-                            }
+                            errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.MissingLeastPrivilegePermission, Message = $"Missing least privilege permission entry for url {url} method {method} scheme {scheme}. Supported permissions are {supportedPermissions}", Path = url });
                         }
                     }
                 }
             }
-            return errors;
         }
 
         private ProtectedResource Find(OpenApiUrlTreeNode openApiUrlTree, IEnumerable<string> segments)
@@ -209,7 +230,7 @@ namespace Kibali
 
                 var openApiResource = new OpenApiProtectedResource(resource.Value);
                 pathItem.AddExtension("x-permissions", openApiResource);
-                tree.Attach(resource.Key, pathItem, "!");
+                    tree.Attach(resource.Key, pathItem, "!");
             }
 
             return tree;
@@ -283,6 +304,7 @@ namespace Kibali
         DuplicateLeastPrivilegeScopes,
         InvalidLeastPrivilegeScheme,
         InvalidPathsetScheme,
-        MissingLeastPrivilegePermission
+        MissingLeastPrivilegePermission,
+        InvalidAlsoRequiresPermission,
     }
 }
