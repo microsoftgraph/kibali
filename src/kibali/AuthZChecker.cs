@@ -227,10 +227,9 @@ namespace Kibali
             foreach (var resource in resourcesMap)
             {
                 var pathItem = new OpenApiPathItem();
-
                 var openApiResource = new OpenApiProtectedResource(resource.Value);
                 pathItem.AddExtension("x-permissions", openApiResource);
-                    tree.Attach(resource.Key, pathItem, "!");
+                tree.Attach(resource.Key, pathItem, "!");
             }
 
             return tree;

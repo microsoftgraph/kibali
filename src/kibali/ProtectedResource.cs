@@ -294,14 +294,14 @@ namespace Kibali
             if (leastPrivilegeScopesPerScheme.TryGetValue(scheme, out HashSet<string> leastPrivilegeScopes))
             {
                 (var least, var higherScopes) = ExtractScopes(schemeScopes, leastPrivilegeScopes);
-                string higher = ProcessMultipleRequiredPermissions(orderedClaims, ref least, ref higherScopes);
+                string higher = ProcessMultipleRequiredPermissions(orderedClaims, ref higherScopes);
                 return (least, higher);
             }
             
             return (StringConstants.PermissionNotSupported, schemeScopes.Any() ? string.Join(", ", schemeScopes) : StringConstants.PermissionNotSupported);
         }
 
-        private string ProcessMultipleRequiredPermissions(IEnumerable<AcceptableClaim> orderedClaims, ref string least, ref IEnumerable<string> higherScopes)
+        private string ProcessMultipleRequiredPermissions(IEnumerable<AcceptableClaim> orderedClaims, ref IEnumerable<string> higherScopes)
         {
             var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
             if (orderedClaims.Any())
@@ -317,7 +317,6 @@ namespace Kibali
             // The least privileged permission requires another permission
             if (leastPrivilegedPermissionPair != null && leastPrivilegedPermissionPair.Any())
             {
-                least = string.Join(" and ", leastPrivilegedPermissionPair);
                 // Since the least privileged permission requires another permission, we can't have either of those permissions or the least privileged pair as higher privileged permissions.
                 invalidHigherPrivilegedEntries = new()
                     {
@@ -411,7 +410,7 @@ namespace Kibali
             {
                 higherPrivilegedPairs.AddRange(remainingHigher);
             }
-            if (higherPrivilegedPairs.Any())
+            if (higherPrivilegedPairs.Count != 0)
             {
                 higher = string.Join(", ", higherPrivilegedPairs.OrderByDescending(x => x.Length));
             }
