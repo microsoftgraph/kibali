@@ -141,7 +141,7 @@ namespace Kibali
                             {
                                 if (!permissionsDocument.Permissions.TryGetValue(requiredPermission, out Permission value))
                                 {
-                                    errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"Url also requires permissions that don't exist - {requiredPermission}", Path = pathKey });
+                                    errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"{pathKey} which has permission {permission.Key} also requires permissions that don't exist - {requiredPermission}", Path = pathKey });
                                 }
                                 else
                                 {
@@ -149,7 +149,7 @@ namespace Kibali
                                     var invalidAlsoRequiresSchemes = pathsetSchemes.Where(c => !permissionPathSetSchemes.Contains(c));
                                     if (invalidAlsoRequiresSchemes.Any())
                                     {
-                                        errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"Url also requires permission {requiredPermission} that does not support schemes {string.Join(",", invalidAlsoRequiresSchemes)}", Path = pathKey });
+                                        errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"{pathKey} which has permission {permission.Key} also requires permission {requiredPermission} that does not support schemes {string.Join(",", invalidAlsoRequiresSchemes)}", Path = pathKey });
                                     }
                                 }
                             }
