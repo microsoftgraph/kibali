@@ -139,7 +139,7 @@ namespace Kibali
                         {
                             foreach (var requiredPermission in alsoRequires)
                             {
-                                if (!permissionsDocument.Permissions.TryGetValue(requiredPermission, out Permission value))
+                                if (!permissionsDocument.Permissions.TryGetValue(requiredPermission, out var value))
                                 {
                                     errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"{pathKey} which has permission {permission.Key} also requires permissions that don't exist - {requiredPermission}", Path = pathKey });
                                 }
