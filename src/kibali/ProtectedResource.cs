@@ -374,8 +374,7 @@ namespace Kibali
             var found = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
             foreach (var pair in permissionPairs)
             {
-                var inverse = (pair.Item2, pair.Item1);
-                if (found.Contains(pair) || found.Contains(inverse))
+                if (found.Contains(pair))
                 {
                     continue;
                 }
@@ -399,7 +398,6 @@ namespace Kibali
                     found.Add(pair); 
                     found.Add((pair.Item1, string.Empty));
                     found.Add((pair.Item2, string.Empty));
-                    continue;
                 }
             }
 
