@@ -392,7 +392,6 @@ namespace Kibali
                 {
                     higherPrivilegedPairs.Add(string.Join(string.Empty, new[] { pair.Item1, pair.Item2 }));
                     found.Add(pair);
-                    continue;
                 }
                 else if (higherScopes.Contains(pair.Item1) && higherScopes.Contains(pair.Item2))
                 {
