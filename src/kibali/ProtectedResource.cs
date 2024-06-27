@@ -360,7 +360,7 @@ namespace Kibali
                 var claim = leastPrivilegedClaims.First();
                 if (claim.AlsoRequires.Length > 1)
                 {
-                    throw new Exception($"The least privileged scope {claim.Permission} requires more than one other scope. Only one of {string.Join(", ", claim.AlsoRequires)} is allowed.");
+                    throw new InvalidOperationException($"The least privileged scope {claim.Permission} requires more than one other scope. Only one of {string.Join(", ", claim.AlsoRequires)} is allowed.");
                 }
                 return [claim.Permission, claim.AlsoRequires.First()];
             }
