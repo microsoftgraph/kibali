@@ -146,7 +146,8 @@ namespace Kibali
                                 else
                                 {
                                     var permissionPathSetSchemes = value.Schemes.Keys;
-                                    if (pathsetSchemes.Any(c => !permissionPathSetSchemes.Contains(c)))
+                                    var invalidAlsoRequiresSchemes = pathsetSchemes.Where(c => !permissionPathSetSchemes.Contains(c));
+                                    if (invalidAlsoRequiresSchemes.Any())
                                     {
                                         errors.Add(new PermissionsError { ErrorCode = PermissionsErrorCode.InvalidAlsoRequiresPermission, Message = $"{pathKey} which has permission {permission.Key} also requires permission {requiredPermission} that does not support schemes {string.Join(",", invalidAlsoRequiresSchemes)}", Path = pathKey });
                                     }

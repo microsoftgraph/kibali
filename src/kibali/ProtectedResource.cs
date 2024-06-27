@@ -303,13 +303,10 @@ namespace Kibali
 
         private string ProcessMultipleRequiredPermissions(IEnumerable<AcceptableClaim> orderedClaims, ref IEnumerable<string> higherScopes)
         {
-            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
-            if (orderedClaims.Any())
+            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer(StringComparer.OrdinalIgnoreCase));
+            foreach (var claim in orderedClaims)
             {
-                foreach (var claim in orderedClaims)
-                {
-                    PairPermissions(claim, permissionPairs);
-                }
+                PairPermissions(claim, permissionPairs);
             }
 
             var leastPrivilegedPermissionPair = GetRequiredLeastPrivileged(orderedClaims);
@@ -371,7 +368,7 @@ namespace Kibali
         private static void ProcessPermissionPairs(HashSet<(string, string)> permissionPairs, IEnumerable<string> leastRequired, IEnumerable<string> higherScopes, ref string higher)
         {
             var higherPrivilegedPairs = new List<string>();
-            var found = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
+            var found = new HashSet<(string, string)>(new OrderedPairEqualityComparer(StringComparer.OrdinalIgnoreCase));
             foreach (var pair in permissionPairs)
             {
                 if (found.Contains(pair))
@@ -444,7 +441,7 @@ namespace Kibali
 
         private HashSet<string> FetchLeastPrivilegeMultiplePermissions(HashSet<AcceptableClaim> claims)
         {
-            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer());
+            var permissionPairs = new HashSet<(string, string)>(new OrderedPairEqualityComparer(StringComparer.OrdinalIgnoreCase));
             foreach (var claim in claims)
             {
                 PairPermissions(claim, permissionPairs);

@@ -333,7 +333,8 @@ public class ValidationTests
         {
             Schemes = new SortedDictionary<string, Scheme>()
             {
-                { "Application", new Scheme() }
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
             },
             PathSets = {
             new PathSet() {
