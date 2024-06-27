@@ -324,6 +324,7 @@ public class ValidationTests
         Assert.False(errors.Any());
     }
 
+    [Fact]
     public void ValidateAlsoRequiresSucceedsWithReciprocityMultipleRequired()
     {
         // Arrange
