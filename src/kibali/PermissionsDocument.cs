@@ -56,7 +56,7 @@ namespace Kibali
             var mergedPermissions = new Dictionary<string, Permission>();
             foreach (var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))
             {
-                if (Path.GetFileName(permissionsFile) == "provisioningInfo.json")
+                if (Path.GetFileName(permissionsFile).Equals("provisioningInfo.json",StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
