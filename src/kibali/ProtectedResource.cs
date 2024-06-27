@@ -353,7 +353,7 @@ namespace Kibali
             var leastPrivilegedClaims = claims?.Where(c => c.Least && c.AlsoRequires.Length > 0);
             if (leastPrivilegedClaims?.Count() > 2)
             {
-                throw new Exception($"Too many Least Privilege Entries {string.Join(",", leastPrivilegedClaims.Select(c => c.Permission))}");
+                throw new InvalidOperationException($"Too many Least Privilege Entries {string.Join(",", leastPrivilegedClaims.Select(c => c.Permission))}");
             }
             if (leastPrivilegedClaims?.Count() == 1)
             {
