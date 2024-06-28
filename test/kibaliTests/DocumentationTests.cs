@@ -171,16 +171,53 @@ public class DocumentationTests
         Assert.Equal(expectedTable, table);
     }
 
+    [Fact]
+    public void DocumentationTableGeneratedMultiplePermissions()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "DELETE", true, true);
+        var generatedTable = generator.GenerateTable();
+        var table = generatedTable.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Not available.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Bar.ReadWrite.OwnedBy and Baz.ReadWrite, Bar.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+    }
+
+    [Fact]
+    public void DocumentationTableGeneratedLeastAlsoRequires()
+    {
+        var permissionsDocument = CreatePermissionsDocument();
+
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/leastAlsoRequires", "GET", true, true);
+        var generatedTable = generator.GenerateTable();
+        var table = generatedTable.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Foo.Read and Bar.Read|Not available.|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Not supported.|Not supported.|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+    }
+
 
     [Fact]
     public void DocumentationTableGeneratedMultiplePaths()
     {
         var permissionsDocument = CreatePermissionsDocument();
 
-        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo/(value={value});/fooOther", "GET", true, true) { MergeMultiplePaths = true };
+        var generator = new PermissionsStubGenerator(permissionsDocument, " /foo/(value={value});/fooOther", "GET", true, true) { MergeMultiplePaths = true };
         var table = generator.GenerateTable();
         var actualTable = table.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
-
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
@@ -221,7 +258,190 @@ public class DocumentationTests
 |Application|Bar.ReadWrite|Foo.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, actualTable);
+    }
 
+    [Fact]
+    public void DocumentAlsoRequiresSucceedsWithMultipleRequiredInline()
+    {
+        // Arrange
+        var permissionsDocument = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
+
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application,DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        var fooWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Read,Bar.Read,Bar.Write" } }
+            }
+            }
+        };
+        var barWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Write" } }
+            }
+            }
+        };
+        permissionsDocument.Permissions.Add("Foo.Read", fooRead);
+        permissionsDocument.Permissions.Add("Bar.Read", barRead);
+        permissionsDocument.Permissions.Add("Foo.Write", fooWrite);
+        permissionsDocument.Permissions.Add("Bar.Write", barWrite);
+        // Act
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true, true);
+        var generatedTable = generator.GenerateTable();
+        var table = generatedTable.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
+    }
+
+    [Fact]
+    public void DocumentAlsoRequiresSucceedsWithMultipleRequired()
+    {
+        // Arrange
+        var permissionsDocument = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Bar.Read" } }
+            }
+            }
+        };
+
+        var barRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=Application;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        var bazRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "least=DelegatedWork;AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        var fooWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        var barWrite = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+            new PathSet() {
+                SchemeKeys = { "Application", "DelegatedWork" },
+                Methods = { "GET" },
+                Paths = { { "/foo",  "AlsoRequires=Foo.Read" } }
+            }
+            }
+        };
+        permissionsDocument.Permissions.Add("Foo.Read", fooRead);
+        permissionsDocument.Permissions.Add("Bar.Read", barRead);
+        permissionsDocument.Permissions.Add("Baz.Read", bazRead);
+        permissionsDocument.Permissions.Add("Foo.Write", fooWrite);
+        permissionsDocument.Permissions.Add("Bar.Write", barWrite);
+        // Act
+        var generator = new PermissionsStubGenerator(permissionsDocument, "/foo", "GET", true, true);
+        var generatedTable = generator.GenerateTable();
+        var table = generatedTable.Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        var expectedTable = @"
+|Permission type|Least privileged permissions|Higher privileged permissions|
+|:---|:---|:---|
+|Delegated (work or school account)|Baz.Read and Foo.Read|Foo.Read and Bar.Write, Foo.Read and Foo.Write, Foo.Read and Bar.Read|
+|Delegated (personal Microsoft account)|Not supported.|Not supported.|
+|Application|Bar.Read and Foo.Read|Foo.Read and Bar.Write, Foo.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+
+        Assert.Equal(expectedTable, table);
     }
 
     private static PermissionsDocument CreatePermissionsDocument()
@@ -240,7 +460,8 @@ public class DocumentationTests
                             },
                             Paths = {
                                 { "/foo",  "least=DelegatedWork" },
-                                { "/bar",  "" }
+                                { "/bar",  "" },
+                                { "/leastAlsoRequires",  "least=DelegatedWork;AlsoRequires=Bar.Read" }
                             }
                         },
                         new PathSet() {
@@ -274,6 +495,18 @@ public class DocumentationTests
                                 { "/fooOther",  "least=Application" },
                                 { "/bar",  "" }
                             }
+                        },
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                            }
                         }
                     }
         };
@@ -293,12 +526,60 @@ public class DocumentationTests
                                 { "/fooBar",  "least=Application,DelegatedWork" },
                                 { "/bar",  "" }
                             }
+                        },
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                            },
+                            Paths = {
+                                { "/foo",  "" },
+                            }
+                        }
+                    }
+        };
+
+        var barReadWriteOwnedBy = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                                "DelegatedWork"
+                            },
+                            Paths = {
+                                { "/foo",  "least=DelegatedWork,Application;AlsoRequires=Foo.ReadWrite" },
+                            }
+                        }
+                    }
+        };
+
+        var bazReadWrite = new Permission
+        {
+            PathSets = {
+                        new PathSet() {
+                            Methods = {
+                                "DELETE"
+                            },
+                            SchemeKeys = {
+                                "Application",
+                            },
+                            Paths = {
+                                { "/foo",  "AlsoRequires=Bar.ReadWrite.OwnedBy" },
+                            }
                         }
                     }
         };
         permissionsDocument.Permissions.Add("Foo.Read", fooRead);
         permissionsDocument.Permissions.Add("Foo.ReadWrite", fooReadWrite);
+        permissionsDocument.Permissions.Add("Bar.ReadWrite.OwnedBy", barReadWriteOwnedBy);
         permissionsDocument.Permissions.Add("Bar.ReadWrite", barReadWrite);
+        permissionsDocument.Permissions.Add("Baz.ReadWrite", bazReadWrite);
         return permissionsDocument;
     }
 }

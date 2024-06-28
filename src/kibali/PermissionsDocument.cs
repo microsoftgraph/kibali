@@ -56,13 +56,17 @@ namespace Kibali
             var mergedPermissions = new Dictionary<string, Permission>();
             foreach (var permissionsFile in Directory.EnumerateFiles(documentPath, "*.json"))
             {
+                if (Path.GetFileName(permissionsFile).Equals("provisioningInfo.json",StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 try
                 {
                     using var stream = new FileStream(permissionsFile, FileMode.Open);
                     var doc = Load(stream);
                     mergedPermissions = mergedPermissions.Concat(doc.Permissions).ToDictionary(x => x.Key, x => x.Value);
                 }
-                catch (KeyNotFoundException ex)
+                catch (JsonException ex)
                 {
                     Console.WriteLine($"Unable to parse json file {permissionsFile}. {ex.Message}");
                 }
