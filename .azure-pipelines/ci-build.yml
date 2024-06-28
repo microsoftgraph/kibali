@@ -255,7 +255,7 @@ extends:
               - task: 1ES.PublishNuget@1
                 displayName: 'NuGet push'
                 inputs:
-                  useDotNetTask: true
+                  packageParentPath: '$(Pipeline.Workspace)'
                   packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
                   nuGetFeedType: external
                   publishPackageMetadata: true
