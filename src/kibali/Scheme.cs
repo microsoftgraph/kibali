@@ -10,7 +10,7 @@ namespace Kibali
         public string UserDisplayName { get; set; }
         public string UserDescription { get; set; }
         public bool RequiresAdminConsent { get; set; }
-
+        public bool IsPreauthorizationOnly { get; set; }
         public int PrivilegeLevel { get; set; }
 
         public void Write(Utf8JsonWriter writer)
@@ -23,6 +23,7 @@ namespace Kibali
             if (!string.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
             if (RequiresAdminConsent) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
             if (PrivilegeLevel != 0) writer.WriteNumber("privilegeLevel", PrivilegeLevel);
+            if (IsPreauthorizationOnly) writer.WriteBoolean("isPreauthorizationOnly", IsPreauthorizationOnly);
           
             writer.WriteEndObject();
         }
@@ -43,6 +44,7 @@ namespace Kibali
             { "userDescription", (o,v) => {o.UserDescription = v.GetString();  } },
             { "requiresAdminConsent", (o,v) => {o.RequiresAdminConsent = v.GetBoolean();  } },
             { "privilegeLevel", (o,v) => {o.PrivilegeLevel = v.GetInt32();  } },
+            { "isPreauthorizationOnly", (o,v) => { o.IsPreauthorizationOnly = v.GetBoolean(); } },
         };
     }
 
