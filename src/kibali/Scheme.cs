@@ -23,7 +23,7 @@ namespace Kibali
             if (!string.IsNullOrEmpty(UserDescription)) writer.WriteString("userDescription", UserDescription);
             if (RequiresAdminConsent) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
             if (PrivilegeLevel != 0) writer.WriteNumber("privilegeLevel", PrivilegeLevel);
-            if (IsPreauthorizationOnly) writer.WriteBoolean("isPreauthorizationOnly", IsPreauthorizationOnly);
+            if (IsPreauthorizationOnly) writer.WriteBoolean("isPreauthorizationOnly", true);
           
             writer.WriteEndObject();
         }
