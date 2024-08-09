@@ -185,7 +185,7 @@ public class DocumentationTests
 |:---|:---|:---|
 |Delegated (work or school account)|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Not available.|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Bar.ReadWrite.OwnedBy and Baz.ReadWrite, Bar.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Application|Bar.ReadWrite.OwnedBy and Foo.ReadWrite|Bar.ReadWrite, Bar.ReadWrite.OwnedBy and Baz.ReadWrite|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
     }
@@ -337,9 +337,9 @@ public class DocumentationTests
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
-|Delegated (work or school account)|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|
+|Delegated (work or school account)|Bar.Read and Foo.Read|Bar.Read and Foo.Write, Bar.Write and Foo.Write, Foo.Read and Foo.Write|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Application|Bar.Read and Foo.Read|Bar.Read and Foo.Write, Bar.Write and Foo.Write, Foo.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
     }
@@ -437,7 +437,7 @@ public class DocumentationTests
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
-|Delegated (work or school account)|Baz.Read and Foo.Read|Foo.Read and Bar.Write, Foo.Read and Foo.Write, Foo.Read and Bar.Read|
+|Delegated (work or school account)|Baz.Read and Foo.Read|Foo.Read and Bar.Read, Foo.Read and Bar.Write, Foo.Read and Foo.Write|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
 |Application|Bar.Read and Foo.Read|Foo.Read and Bar.Write, Foo.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
