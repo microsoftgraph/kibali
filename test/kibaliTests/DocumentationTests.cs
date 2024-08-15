@@ -337,9 +337,9 @@ public class DocumentationTests
         var expectedTable = @"
 |Permission type|Least privileged permissions|Higher privileged permissions|
 |:---|:---|:---|
-|Delegated (work or school account)|Bar.Read and Foo.Read|Bar.Read and Foo.Write, Bar.Write and Foo.Write, Foo.Read and Foo.Write|
+|Delegated (work or school account)|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|
 |Delegated (personal Microsoft account)|Not supported.|Not supported.|
-|Application|Bar.Read and Foo.Read|Bar.Read and Foo.Write, Bar.Write and Foo.Write, Foo.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
+|Application|Bar.Read and Foo.Read|Bar.Write and Foo.Write, Foo.Read and Foo.Write, Bar.Read and Foo.Write|".Replace("\r\n", string.Empty).Replace("\n", string.Empty);
 
         Assert.Equal(expectedTable, table);
     }

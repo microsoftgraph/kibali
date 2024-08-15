@@ -428,7 +428,7 @@ namespace Kibali
             }
             if (higherPrivilegedPairs.Count != 0)
             {
-                higher = string.Join(", ", higherPrivilegedPairs.OrderBy(x => x));
+                higher = string.Join(", ", higherPrivilegedPairs);
             }
             else
             {
