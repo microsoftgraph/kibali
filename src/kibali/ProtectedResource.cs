@@ -59,9 +59,9 @@ namespace Kibali
                     {
                         errors.Add(new PermissionsError
                         {
-                            Path = this.Url,
+                            Path = Url,
                             ErrorCode = PermissionsErrorCode.DuplicatePathsetEntry,
-                            Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, this.Url, schemeKey, supportedMethod),
+                            Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, Url, schemeKey, supportedMethod),
                         });
                     }
                 }
@@ -135,9 +135,9 @@ namespace Kibali
                         {
                             duplicateErrors.Add(new PermissionsError
                             {
-                                Path = this.Url,
+                                Path = Url,
                                 ErrorCode = PermissionsErrorCode.DuplicatePathsetEntry,
-                                Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, this.Url, newScheme.Key, supportedMethod),
+                                Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, Url, newScheme.Key, supportedMethod),
                             });
                         }
                     }

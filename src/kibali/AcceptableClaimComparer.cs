@@ -1,8 +1,5 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kibali
 {
@@ -30,7 +27,7 @@ namespace Kibali
 
         public int GetHashCode(AcceptableClaim obj)
         {
-            if (obj == null || obj.Permission == null)
+            if (obj?.Permission == null)
                 return 0;
 
             int hash = obj.Permission.GetHashCode();
@@ -39,7 +36,7 @@ namespace Kibali
             {
                 foreach (var item in obj.AlsoRequires)
                 {
-                    hash = hash ^ item.GetHashCode();
+                    hash ^= item.GetHashCode();
                 }
             }
 
