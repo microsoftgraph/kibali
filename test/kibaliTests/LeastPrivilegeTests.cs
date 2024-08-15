@@ -233,7 +233,6 @@ GET
                             },
                             Paths = {
                                 { "/foo",  "least=DelegatedWork,Application" },
-                                { "/bar",  null },
                                 { "/bar/{id}",  null },
                                 { "/bar/{id}/schmo",  null }
                             }

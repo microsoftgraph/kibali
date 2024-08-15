@@ -64,16 +64,16 @@ namespace Kibali
             var resource = FindResource(url);
             if (resource == null)
             {
-                return new List<AcceptableClaim>();
+                return new HashSet<AcceptableClaim>(new AcceptableClaimComparer());
             }
             if (!resource.SupportedMethods.TryGetValue(method, out var supportedSchemes))
             {
-                return new List<AcceptableClaim>();
+                return new HashSet<AcceptableClaim>(new AcceptableClaimComparer());
             }
 
             if (!supportedSchemes.TryGetValue(scheme, out var acceptableClaims))
             {
-                return new List<AcceptableClaim>();
+                return new HashSet<AcceptableClaim>(new AcceptableClaimComparer());
             }
 
             return acceptableClaims;
@@ -134,7 +134,7 @@ namespace Kibali
                         }
                         var leastPrivilegedPermissionSchemes = ParseLeastPrivilegeSchemes(path.Value);
                         var alsoRequires = ParseAlsoRequiresPermissions(path.Value);
-                        resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData, alsoRequires);
+                        errors.UnionWith(resource.AddRequiredClaims(permission.Key, pathSet, leastPrivilegedPermissionSchemes, provisioningData, alsoRequires));
                         if (validate)
                         {
                             foreach (var requiredPermission in alsoRequires)
@@ -305,5 +305,6 @@ namespace Kibali
         InvalidPathsetScheme,
         MissingLeastPrivilegePermission,
         InvalidAlsoRequiresPermission,
+        DuplicatePathsetEntry,
     }
 }

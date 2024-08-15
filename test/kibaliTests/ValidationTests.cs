@@ -401,4 +401,39 @@ public class ValidationTests
         // Assert
         Assert.False(errors.Any());
     }
+
+    [Fact]
+    public void ValidateDuplicatePathsets()
+    {
+        var permissionsDocument = new PermissionsDocument();
+        var fooRead = new Permission
+        {
+            Schemes = new SortedDictionary<string, Scheme>()
+            {
+                { "Application", new Scheme() },
+                { "DelegatedWork", new Scheme() }
+            },
+            PathSets = {
+                new PathSet() {
+                    SchemeKeys = { "Application" },
+                    Methods = { "GET" },
+                    Paths = { { "/foo",  "" } }
+                },
+                new PathSet() {
+                    SchemeKeys = { "Application", "DelegatedWork" },
+                    Methods = { "GET" },
+                    Paths = { { "/foo",  "least=DelegatedWork,Application" } }
+                }
+            }
+        };
+
+        permissionsDocument.Permissions.Add("Foo.Read", fooRead);
+
+        var authZChecker = new AuthZChecker();
+        var errors = authZChecker.Validate(permissionsDocument);
+
+        // Assert
+        Assert.True(errors.Any());
+        Assert.Contains(PermissionsErrorCode.DuplicatePathsetEntry, errors.Select(e => e.ErrorCode));
+    }
 }

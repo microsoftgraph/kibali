@@ -19,25 +19,25 @@ namespace Kibali
         // Permissions(delegated) (Graph Explorer Permissions List)
         // Schemas -> Permissions ( AAD Onboarding)
         public string Url { get; set; }
-        public Dictionary<string, Dictionary<string, List<AcceptableClaim>>> SupportedMethods { get; set; } = new Dictionary<string, Dictionary<string, List<AcceptableClaim>>>();
-
+        public Dictionary<string, Dictionary<string, HashSet<AcceptableClaim>>> SupportedMethods { get; set; } = new();
         public Dictionary<(string, string), HashSet<string>> PermissionMethods {get; set;} = new();
         public ProtectedResource(string url)
         {
             Url = url;
         }
 
-        public void AddRequiredClaims(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes, List<ProvisioningInfo> provisioningData, string[] alsoRequires)
+        public HashSet<PermissionsError> AddRequiredClaims(string permission, PathSet pathSet, string[] leastPrivilegedPermissionSchemes, List<ProvisioningInfo> provisioningData, string[] alsoRequires)
         {
+            var errors = new HashSet<PermissionsError>();
             Dictionary<string, ProvisioningInfo> schemeProvisioning = provisioningData?.ToDictionary(info => info.Scheme, info => info) ?? new();
             foreach (var supportedMethod in pathSet.Methods)
             {
-                var supportedSchemes = new Dictionary<string, List<AcceptableClaim>>();
+                var supportedSchemes = new Dictionary<string, HashSet<AcceptableClaim>>();
                 foreach (var schemeKey in pathSet.SchemeKeys)
                 {
                     if(!supportedSchemes.TryGetValue(schemeKey, out var acceptableClaims))
                     {
-                        acceptableClaims = new List<AcceptableClaim>();
+                        acceptableClaims = new HashSet<AcceptableClaim>(new AcceptableClaimComparer());
                         supportedSchemes.Add(schemeKey, acceptableClaims);
                     }
 
@@ -55,7 +55,15 @@ namespace Kibali
                         claim.SupportedEnvironments = provisioningInfo.Environment?.Split(";").ToList();
                         claim.IsEnabled = provisioningInfo.IsEnabled;
                     }
-                    acceptableClaims.Add(claim);
+                    if (!acceptableClaims.Add(claim))
+                    {
+                        errors.Add(new PermissionsError
+                        {
+                            Path = Url,
+                            ErrorCode = PermissionsErrorCode.DuplicatePathsetEntry,
+                            Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, Url, schemeKey, supportedMethod),
+                        });
+                    }
                 }
 
                 if (!this.SupportedMethods.TryGetValue(supportedMethod, out var existingSupportedSchemes))
@@ -64,9 +72,10 @@ namespace Kibali
                 }
                 else
                 {
-                    Update(existingSupportedSchemes, supportedSchemes);
+                    errors.UnionWith(Update(existingSupportedSchemes, supportedSchemes, permission, supportedMethod));
                 }
             }
+            return errors;
         }
 
         public IEnumerable<PermissionsError> ValidateLeastPrivilegePermissions()
@@ -113,20 +122,33 @@ namespace Kibali
             return errors;
         }
 
-        private void Update(Dictionary<string, List<AcceptableClaim>> existingSchemes, Dictionary<string, List<AcceptableClaim>> newSchemes)
+        private HashSet<PermissionsError> Update(Dictionary<string, HashSet<AcceptableClaim>> existingSchemes, Dictionary<string, HashSet<AcceptableClaim>> newSchemes, string permission, string supportedMethod)
         {
-            
+            var duplicateErrors = new HashSet<PermissionsError>();
             foreach(var newScheme in newSchemes)
             {
                 if (existingSchemes.TryGetValue(newScheme.Key, out var existingScheme))
                 {
-                    existingScheme.AddRange(newScheme.Value);
+                    foreach (var entry in newScheme.Value)
+                    {
+                        if (!existingScheme.Add(entry))
+                        {
+                            duplicateErrors.Add(new PermissionsError
+                            {
+                                Path = Url,
+                                ErrorCode = PermissionsErrorCode.DuplicatePathsetEntry,
+                                Message = string.Format(StringConstants.DuplicatePathsetEntryErrorMessage, permission, Url, newScheme.Key, supportedMethod),
+                            });
+                        }
+                    }
                 } 
                 else
                 {
                     existingSchemes[newScheme.Key] = newScheme.Value;
                 }
             }
+
+            return duplicateErrors;
         }
 
         public void Write(Utf8JsonWriter writer)
@@ -140,7 +162,7 @@ namespace Kibali
             writer.WriteEndObject();
         }
 
-        private void WriteSupportedMethod(Utf8JsonWriter writer, Dictionary<string, Dictionary<string, List<AcceptableClaim>>> supportedMethods)
+        private void WriteSupportedMethod(Utf8JsonWriter writer, Dictionary<string, Dictionary<string, HashSet<AcceptableClaim>>> supportedMethods)
         {
             writer.WriteStartObject();
             foreach (var item in supportedMethods)
@@ -151,7 +173,7 @@ namespace Kibali
             writer.WriteEndObject();
         }
 
-        public void WriteSupportedSchemes(Utf8JsonWriter writer, Dictionary<string, List<AcceptableClaim>> methodClaims)
+        public void WriteSupportedSchemes(Utf8JsonWriter writer, Dictionary<string, HashSet<AcceptableClaim>> methodClaims)
         {
             writer.WriteStartObject();
             foreach (var item in methodClaims)
@@ -162,7 +184,7 @@ namespace Kibali
             writer.WriteEndObject();
         }
 
-        public void WriteAcceptableClaims(Utf8JsonWriter writer, List<AcceptableClaim> schemes)
+        public void WriteAcceptableClaims(Utf8JsonWriter writer, HashSet<AcceptableClaim> schemes)
         {
             writer.WriteStartArray();
             foreach (var item in schemes.OrderByDescending(c => c.Least))
@@ -172,14 +194,14 @@ namespace Kibali
             writer.WriteEndArray();
         }
 
-        public string GeneratePermissionsTable(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
+        public string GeneratePermissionsTable(string method, Dictionary<string, HashSet<AcceptableClaim>> methodClaims)
         {
             var scopesByScheme = FetchTableScopesByScheme(method, methodClaims);
 
             return TableGenerator.GeneratePermissionsTable(scopesByScheme);
         }
 
-        public Dictionary<string, (string, string)> FetchTableScopesByScheme(string method, Dictionary<string, List<AcceptableClaim>> methodClaims)
+        public Dictionary<string, (string, string)> FetchTableScopesByScheme(string method, Dictionary<string, HashSet<AcceptableClaim>> methodClaims)
         {
             var scopesByScheme = new Dictionary<string, (string, string)>();
             var leastPrivilege = this.FetchLeastPrivilege(method);
@@ -246,7 +268,7 @@ namespace Kibali
             }
         }
 
-        private void GetLeastPrivilegeForAllSchemesMappedToMethod(string method, Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilege, Dictionary<string, List<AcceptableClaim>> supportedSchemes)
+        private void GetLeastPrivilegeForAllSchemesMappedToMethod(string method, Dictionary<string, Dictionary<string, HashSet<string>>> leastPrivilege, Dictionary<string, HashSet<AcceptableClaim>> supportedSchemes)
         {
             foreach (var supportedScheme in supportedSchemes.OrderBy(s => Enum.Parse(typeof(SchemeType), s.Key)))
             {
@@ -282,11 +304,11 @@ namespace Kibali
             return output;
         }
  
-        private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, List<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilegeScopesPerScheme)
+        private (string least, string higher) GetTableScopes(string scheme, Dictionary<string, HashSet<AcceptableClaim>> methodClaims, Dictionary<string, HashSet<string>> leastPrivilegeScopesPerScheme)
         {
             IEnumerable<AcceptableClaim> orderedClaims = Enumerable.Empty<AcceptableClaim>();
             var schemeScopes = new List<string>();
-            if (methodClaims.TryGetValue(scheme, out List<AcceptableClaim> claims))
+            if (methodClaims.TryGetValue(scheme, out HashSet<AcceptableClaim> claims))
             {
                 orderedClaims = claims.OrderByDescending(c => c.Least);
                 schemeScopes = orderedClaims.Select(c => c.Permission).ToList();
@@ -406,7 +428,7 @@ namespace Kibali
             }
             if (higherPrivilegedPairs.Count != 0)
             {
-                higher = string.Join(", ", higherPrivilegedPairs.OrderByDescending(x => x.Length));
+                higher = string.Join(", ", higherPrivilegedPairs);
             }
             else
             {
@@ -449,7 +471,20 @@ namespace Kibali
             
             if (permissionPairs.Any())
             {
-                return permissionPairs.Select(p => $"{p.Item1} and {p.Item2}").ToHashSet();
+                var leastPrivilegePairs = new HashSet<string>();
+                foreach (var pair in permissionPairs)
+                {
+                    if (pair.Item1 != string.Empty && pair.Item2 != string.Empty)
+                    {
+                        leastPrivilegePairs.Add($"{pair.Item1} and {pair.Item2}");
+                    }
+                    else
+                    {
+                        var toAdd = pair.Item1 == string.Empty ? pair.Item2 : pair.Item1;
+                        leastPrivilegePairs.Add(toAdd);
+                    }
+                }
+                return leastPrivilegePairs;
             }
 
             return claims.Select(p => p.Permission).ToHashSet();

@@ -9,4 +9,6 @@ public class StringConstants
     internal const string PermissionNotSupported = "Not supported.";
 
     internal const string PermissionNotAvailable = "Not available.";
+    
+    internal const string DuplicatePathsetEntryErrorMessage = "Duplicate pathset entry. Permission: '{0}' Path: '{1}' Scheme: '{2}' Method: '{3}' ";
 }
