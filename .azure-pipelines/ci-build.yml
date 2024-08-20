@@ -116,10 +116,15 @@ extends:
             CredScan: false
             PoliCheck: true
         
-        - task: EsrpCodeSigning@2
+        - task: EsrpCodeSigning@5
           displayName: 'ESRP CodeSigning'
           inputs:
-            ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+            ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
+            AppRegistrationClientId: '65035b7f-7357-4f29-bf25-c5ee5c3949f8'
+            AppRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
+            AuthAKVName: 'akv-prod-eastus'
+            AuthCertName: 'ReferenceLibraryPrivateCert'
+            AuthSignCertName: 'ReferencePackagePublisherCertificate'
             FolderPath: src
             signConfigType: inlineSignParams
             inlineOperation: |
@@ -161,6 +166,9 @@ extends:
                   }
               ]
             SessionTimeout: 20
+            MaxConcurrency: 50
+            MaxRetryAttempts: 5
+            PendingAnalysisWaitTimeoutMinutes: 5
         
         # Pack
         - pwsh: dotnet pack $(Build.SourcesDirectory)/src/kibali/Kibali.csproj -o $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration) --no-build --include-symbols --include-source /p:SymbolPackageFormat=snupkg
@@ -170,10 +178,15 @@ extends:
         - pwsh: dotnet pack $(Build.SourcesDirectory)/src/kibaliTool/KibaliTool.csproj -o $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration) --no-build --include-symbols --include-source /p:SymbolPackageFormat=snupkg
           displayName: 'pack KibaliTool'
         
-        - task: EsrpCodeSigning@2
+        - task: EsrpCodeSigning@5
           displayName: 'ESRP CodeSigning Nuget Packages'
           inputs:
-            ConnectedServiceName: 'microsoftgraph ESRP CodeSign DLL and NuGet (AKV)'
+            ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
+            AppRegistrationClientId: '65035b7f-7357-4f29-bf25-c5ee5c3949f8'
+            AppRegistrationTenantId: 'cdc5aeea-15c5-4db6-b079-fcadd2505dc2'
+            AuthAKVName: 'akv-prod-eastus'
+            AuthCertName: 'ReferenceLibraryPrivateCert'
+            AuthSignCertName: 'ReferencePackagePublisherCertificate'
             FolderPath: '$(Build.ArtifactStagingDirectory)'
             Pattern: '*.nupkg'
             signConfigType: inlineSignParams
@@ -195,6 +208,9 @@ extends:
                   }
               ]
             SessionTimeout: 20
+            MaxConcurrency: 50
+            MaxRetryAttempts: 5
+            PendingAnalysisWaitTimeoutMinutes: 5
         
         - task: PowerShell@2
           displayName: "Get kibali's version-number from .csproj"
