@@ -3,6 +3,7 @@
     "properties": {
         "permissionDeployments": {
             "type": "object",
+            "additionalProperties": false,
             "patternProperties": {
                 "[\\w]+\\.[\\w]+[\\.[\\w]+]?": {
                     "type": "array",
