@@ -129,13 +129,15 @@
                     "type": "boolean"
                 },
                 "adminDisplayName": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 },
                 "adminDescription": {
                     "type": "string"
                 },
                 "userConsentDisplayName": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 },
                 "userConsentDescription": {
                     "type": "string"
