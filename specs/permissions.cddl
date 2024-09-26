@@ -19,7 +19,7 @@ ownerInfo = {
     ownerSecurityGroup: tstr,
 }
 
-schemeKeys = DelegatedWork / DelegatedPersonal / Application
+schemeKeys = DelegatedWork / DelegatedPersonal / Application / RSC-DelegatedWork / RSC-Application
 
 scheme = {
     ? requiresAdminConsent: bool .default true,

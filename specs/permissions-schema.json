@@ -68,7 +68,9 @@
                         "enum": [
                             "Application",
                             "DelegatedWork",
-                            "DelegatedPersonal"
+                            "DelegatedPersonal",
+                            "RSC-Application",
+                            "RSC-DelegatedWork"
                         ]
                     }
                 },
