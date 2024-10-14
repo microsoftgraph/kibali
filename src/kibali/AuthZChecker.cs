@@ -267,7 +267,8 @@ namespace Kibali
                 return requestUrl;
             }
 
-            var parensRemoved = Regex.Replace(requestUrl.ToLowerInvariant(), @"\/\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
+            var quotesRemoved = requestUrl.Replace("'", string.Empty);
+            var parensRemoved = Regex.Replace(quotesRemoved.ToLowerInvariant(), @"\/\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
             var braceValuesReplaced = Regex.Replace(parensRemoved, @"\{.*?\}", "{id}", RegexOptions.None, TimeSpan.FromSeconds(5));
             return braceValuesReplaced;
         }
