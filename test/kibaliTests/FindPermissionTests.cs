@@ -138,6 +138,18 @@ namespace KibaliTests
             Assert.Contains(resource.SupportedMethods["GET"]["DelegatedPersonal"], ac => ac.Permission == "Bar.Read");
         }
 
+        [Fact]
+        public void FindQuotedPathLenient()
+        {
+            var authZChecker = new AuthZChecker() { LenientMatch = true };
+            authZChecker.Load(CreatePermissionsDocument());
+
+            var resource = authZChecker.FindResource("/bar/Method(on='{parameterValue}')");
+
+            Assert.Equal("/bar/method(on={id})", resource.Url);
+            Assert.Contains(resource.SupportedMethods["GET"]["DelegatedPersonal"], ac => ac.Permission == "Bar.Read");
+        }
+
         private PermissionsDocument CreatePermissionsDocument()
         {
             var permissionsDocument = new PermissionsDocument();
@@ -191,6 +203,7 @@ namespace KibaliTests
                                 { "/bar/{id}",  null },
                                 { "/bar/{id}/({value})",  null },
                                 { "/bar/{id}:/{id}:/stuff",  null },
+                                { "/bar/method(on={value})", null}
                             }
                         }
                     }

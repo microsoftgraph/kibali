@@ -16,6 +16,8 @@ namespace Kibali
     public class AuthZChecker
     {
         private readonly Dictionary<string, ProtectedResource> resources = new();
+        private static readonly Regex RemoveBetweenParentheses = new Regex(@"\/\(.*?\)", RegexOptions.Compiled);
+        private static readonly Regex BracesRemoved = new Regex(@"\{.*?\}", RegexOptions.Compiled);
         private OpenApiUrlTreeNode urlTree;
 
         public Dictionary<string, ProtectedResource> Resources { get
@@ -267,8 +269,9 @@ namespace Kibali
                 return requestUrl;
             }
 
-            var parensRemoved = Regex.Replace(requestUrl.ToLowerInvariant(), @"\/\(.*?\)", string.Empty, RegexOptions.None, TimeSpan.FromSeconds(5)).Replace(@"//", "/");
-            var braceValuesReplaced = Regex.Replace(parensRemoved, @"\{.*?\}", "{id}", RegexOptions.None, TimeSpan.FromSeconds(5));
+            var quotesRemoved = requestUrl.Replace("'", string.Empty);
+            var parensRemoved = RemoveBetweenParentheses.Replace(quotesRemoved.ToLowerInvariant(), string.Empty).Replace(@"//", "/");
+            var braceValuesReplaced = BracesRemoved.Replace(parensRemoved, "{id}");
             return braceValuesReplaced;
         }
     }
