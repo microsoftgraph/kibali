@@ -21,6 +21,9 @@
             "title": "Permission definition",
             "additionalProperties": false,
             "properties": {
+                "authorizationType": {
+                    "$ref": "#/definitions/authType"
+                },
                 "note": {
                     "type": "string"
                 },
@@ -148,6 +151,21 @@
                     "maximum": 5
                 }
             }
+        },
+        "authType": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "oAuth2",
+                    "preAuthZOnly",
+                    "RSC",
+                    "entraRBAC",
+                    "exchangeRBAC",
+                    "sharePointACLs"
+                ]
+            },
+            "default": ["oAuth2"]
         }
     }
 }
