@@ -22,7 +22,11 @@
             "additionalProperties": false,
             "properties": {
                 "authorizationType": {
-                    "$ref": "#/definitions/authType"
+                    "type": "string",
+                    "default": "oAuth2"
+                },
+                "documentationWebUrl": {
+                    "type": "string"
                 },
                 "note": {
                     "type": "string"
@@ -151,21 +155,6 @@
                     "maximum": 5
                 }
             }
-        },
-        "authType": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "oAuth2",
-                    "preAuthZOnly",
-                    "RSC",
-                    "entraRBAC",
-                    "exchangeRBAC",
-                    "sharePointACLs"
-                ]
-            },
-            "default": ["oAuth2"]
         }
     }
 }
