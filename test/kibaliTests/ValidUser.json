@@ -1,5 +1,5 @@
 {
-  "$schema": "file:///C:/Users/swachanga/Automation/kibali/specs/permissions-schema.json",
+  "$schema": "https://raw.githubusercontent.com/microsoftgraph/kibali/main/specs/permissions-schema.json",
   "permissions": {
     "User.EnableDisableAccount.All": {
       "schemes": {
