@@ -24,6 +24,7 @@ namespace Kibali
             if (RequiresAdminConsent) writer.WriteBoolean("requiresAdminConsent", RequiresAdminConsent);
             if (PrivilegeLevel != 0) writer.WriteNumber("privilegeLevel", PrivilegeLevel);
             if (IsPreauthorizationOnly) writer.WriteBoolean("isPreauthorizationOnly", true);
+
             writer.WriteEndObject();
         }
 
