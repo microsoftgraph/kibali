@@ -30,8 +30,8 @@ public class ValidationTests
 
         // Assert
         Assert.False(errors.Any());
-        Assert.True(authType == "oAuth2");
-        Assert.True(docWebUrl == "https://test.microsoft.com");
+        Assert.Equal("oAuth2", authType);
+        Assert.Equal("https://test.microsoft.com", docWebUrl);
     }
     [Fact]
     public void ValidateSinglePermissionFileIsNotvalid()
