@@ -21,6 +21,13 @@
             "title": "Permission definition",
             "additionalProperties": false,
             "properties": {
+                "authorizationType": {
+                    "type": "string",
+                    "default": "oAuth2"
+                },
+                "documentationWebUrl": {
+                    "type": "string"
+                },
                 "note": {
                     "type": "string"
                 },

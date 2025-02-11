@@ -12,11 +12,14 @@ namespace Kibali
         public SortedDictionary<string, Scheme> Schemes { get; set; } = new SortedDictionary<string, Scheme>();
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
         public OwnerInfo OwnerInfo { get; set; } = new();
+        public string AuthorizationType { get; set; }
+        public string DocumentationWebUrl { get; set; }
 
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-
+            if (!string.IsNullOrEmpty(AuthorizationType)) writer.WriteString("authorizationType", AuthorizationType);
+            if (!string.IsNullOrEmpty(DocumentationWebUrl)) writer.WriteString("documentationWebUrl", DocumentationWebUrl);
             if (!string.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
             if (Implicit) writer.WriteBoolean("implicit", Implicit);
 
@@ -52,6 +55,8 @@ namespace Kibali
 
         private static FixedFieldMap<Permission> handlers = new()
         {
+            { "authorizationType", (o,v) => {o.AuthorizationType = v.GetString();  } },
+            { "documentationWebUrl", (o,v) => {o.DocumentationWebUrl = v.GetString();  } },
             { "note", (o,v) => {o.Note = v.GetString();  } },
             { "privilegeLevel", (o,v) => {o.PrivilegeLevel= v.GetString();  } },
             { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },

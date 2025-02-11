@@ -16,13 +16,22 @@ public class ValidationTests
         // Arrange
         using var stream = new FileStream("ValidUser.json", FileMode.Open);
         var doc = PermissionsDocument.Load(stream);
+        string authType = string.Empty;
+        string docWebUrl = string.Empty;
 
         // Act
         var authZChecker = new AuthZChecker();
         var errors = authZChecker.Validate(doc);
-        
+        if (doc.Permissions.TryGetValue("User.AuthType.All", out var perm))
+        {
+            authType = perm.AuthorizationType;
+            docWebUrl = perm.DocumentationWebUrl;
+        }
+
         // Assert
         Assert.False(errors.Any());
+        Assert.Equal("oAuth2", authType);
+        Assert.Equal("https://test.microsoft.com", docWebUrl);
     }
     [Fact]
     public void ValidateSinglePermissionFileIsNotvalid()
