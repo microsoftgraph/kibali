@@ -20,11 +20,13 @@
             "type": "object",
             "title": "Permission definition",
             "additionalProperties": false,
+            "required": ["authorizationType"],
             "properties": {
                 "authorizationType": {
                     "type": "string",
-                    "default": "oAuth2"
-                },
+                    "default": "oAuth2",
+                    "enum": ["oAuth2", "RSC", "preAuthZOnly", "entraRBAC", "exchangeRBAC", "sharePointACLs"]
+                },            
                 "documentationWebUrl": {
                     "type": "string"
                 },
