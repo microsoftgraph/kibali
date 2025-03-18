@@ -20,7 +20,6 @@
             "type": "object",
             "title": "Permission definition",
             "additionalProperties": false,
-            "required": ["authorizationType"],
             "properties": {
                 "authorizationType": {
                     "type": "string",
