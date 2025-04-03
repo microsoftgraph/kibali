@@ -152,11 +152,7 @@
                     "minimum": 1,
                     "maximum": 5
                 }
-            },
-            "required": [
-                "userDisplayName",
-                "userDescription"
-            ]
+            }
         }
     }
 }
