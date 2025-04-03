@@ -133,9 +133,6 @@
                 "requiresAdminConsent": {
                     "type": "boolean"
                 },
-                "isPreauthorizationOnly": {
-                    "type": "boolean"
-                },
                 "adminDisplayName": {
                     "type": "string",
                     "maxLength": 100
@@ -143,11 +140,11 @@
                 "adminDescription": {
                     "type": "string"
                 },
-                "userConsentDisplayName": {
+                "userDisplayName": {
                     "type": "string",
                     "maxLength": 100
                 },
-                "userConsentDescription": {
+                "userDescription": {
                     "type": "string"
                 },
                 "privilegeLevel": {
@@ -155,7 +152,11 @@
                     "minimum": 1,
                     "maximum": 5
                 }
-            }
+            },
+            "required": [
+                "userDisplayName",
+                "userDescription"
+            ]
         }
     }
 }
