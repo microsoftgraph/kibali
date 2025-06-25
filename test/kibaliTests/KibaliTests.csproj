@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\kibali\Kibali.csproj" />
+    <ProjectReference Include="..\..\src\kibaliTool\KibaliTool.csproj" />
   </ItemGroup>
 
   <ItemGroup>
