@@ -26,8 +26,8 @@ The canonical model for a permissions document is a JSON [JSON] object. When ser
 		"PrintSettings.Read.All": {
 			"schemes": {
 				"DelegatedWork": {
-					"userConsentDisplayName": "Read print settings",
-					"userConsentDescription": "Allow signed in user to read print settings"
+					"userDisplayName": "Read print settings",
+					"userDescription": "Allow signed in user to read print settings"
 				}
 			},
 			"pathSets": [{
@@ -127,19 +127,19 @@ The scheme object has members that describe the permission within the context of
     "DelegatedWork": {
         "adminDisplayName": "Read and write app activity to users'activity feed",
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
-        "userConsentDisplayName": "Read and write app activity to users'activity feed",
-        "userConsentDescription": "Allows the app to read and report the signed-in user's activity in the app.",
-        "requiresAdminConsent": true,
-	"isPreauthorizationOnly": true
+        "userDisplayName": "Read and write app activity to users'activity feed",
+        "userDescription": "Allows the app to read and report the signed-in user's activity in the app.",
+        "requiresAdminConsent": true
     },
     "DelegatedPersonal": {
-        "userConsentDisplayName": "Read and write app activity to users'activity feed",
-        "userConsentDescription": "Allows the app to read and report the signed-in user's activity in the app."
+        "userDisplayName": "Read and write app activity to users'activity feed",
+        "userDescription": "Allows the app to read and report the signed-in user's activity in the app."
     },
     "Application": {
         "adminDisplayName": "Read and write app activity to users' activity feed",
         "adminDescription": "Allows the app to read and report the signed-in user's activity in the app.",
-	"isPreauthorizationOnly": true
+        "userDisplayName": "Read and write app activity to users'activity feed",
+        "userDescription": "Allows the app to read and report the signed-in user's activity in the app."
     }
 ```
 
@@ -149,17 +149,14 @@ The "adminDisplayName" member is a string that provides a short permission name 
 ### adminDescription
 The "adminDescription" member is a string that describes the permission considering the current scheme from the perspective of a resource administrator.
 
-### userConsentDisplayName
-The "userConsentDisplayName" member is a REQUIRED string that provides a short permission name that considers the current scheme and the perspective of the user consenting an application.
+### userDisplayName
+The "userDisplayName" member is a REQUIRED string that provides a short permission name that considers the current scheme and the perspective of the user consenting an application.
 
-### userConsentDescription
-The "userConsentDescription" member is a REQUIRED string that describes the permission considering the current scheme from the perspective of the user consenting an application.
+### userDescription
+The "userDescription" member is a REQUIRED string that describes the permission considering the current scheme from the perspective of the user consenting an application.
 
 ### requiresAdminConsent
 The "requiresAdminConsent" member is a boolean value with a default value of false. When true, this permission can only be consented by an adminstrator.
-
-### isPreauthorizationOnly
-The "isPreauthorizationOnly" member is a boolean value with a default value of false. When true, the permission is preauthorized by the resource owner and does not prompt the user to consent.
 
 ### privilegeLevel
 The "privilegeLevel" member is an integer value that provides a hint as to the risks of consenting to the permissions. Valid values range from 1 (least privileged) to 5 (most privileged). The value is arrived at by considering the breadth of access that a permission will give access to and the sensitivity of the operations allowed by the permission. The same permission can have different privilege levels when used with different schemes.
@@ -223,10 +220,9 @@ classDiagram
     class Scheme{
         adminDisplayName: string
         adminDescription: string
-        userConsentDisplayName: string
-        userConsentDescription: string
+        userDisplayName: string
+        userDescription: string
         requiresAdminConsent: string
-	isPreauthorizationOnly: string
         privilegeLevel: string
     }
 
