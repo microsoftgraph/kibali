@@ -26,8 +26,8 @@ The canonical model for a permissions document is a JSON [JSON] object. When ser
 		"PrintSettings.Read.All": {
 			"schemes": {
 				"DelegatedWork": {
-					"userConsentDisplayName": "Read print settings",
-					"userConsentDescription": "Allow signed in user to read print settings"
+					"userDisplayName": "Read print settings",
+					"userDescription": "Allow signed in user to read print settings"
 				}
 			},
 			"pathSets": [{
@@ -220,8 +220,8 @@ classDiagram
     class Scheme{
         adminDisplayName: string
         adminDescription: string
-        userConsentDisplayName: string
-        userConsentDescription: string
+        userDisplayName: string
+        userDescription: string
         requiresAdminConsent: string
         privilegeLevel: string
     }
