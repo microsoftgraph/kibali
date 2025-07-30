@@ -1,69 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Kibali
 {
     public class Permission
     {
+        [JsonPropertyName("note")]
         public string Note { get; set; }
+        
+        [JsonPropertyName("implicit")]
         public bool Implicit { get; set; } = false;
+        
+        [JsonPropertyName("privilegeLevel")]
         public string PrivilegeLevel { get; set; }
+        
+        [JsonPropertyName("schemes")]
         public SortedDictionary<string, Scheme> Schemes { get; set; } = new SortedDictionary<string, Scheme>();
+        
+        [JsonPropertyName("pathSets")]
         public List<PathSet> PathSets { get; set; } = new List<PathSet>();
+        
+        [JsonPropertyName("ownerInfo")]
         public OwnerInfo OwnerInfo { get; set; } = new();
+        
+        [JsonPropertyName("authorizationType")]
         public string AuthorizationType { get; set; }
+        
+        [JsonPropertyName("documentationWebUrl")]
         public string DocumentationWebUrl { get; set; }
-
-        public void Write(Utf8JsonWriter writer)
-        {
-            writer.WriteStartObject();
-            if (!string.IsNullOrEmpty(AuthorizationType)) writer.WriteString("authorizationType", AuthorizationType);
-            if (!string.IsNullOrEmpty(DocumentationWebUrl)) writer.WriteString("documentationWebUrl", DocumentationWebUrl);
-            if (!string.IsNullOrWhiteSpace(Note)) writer.WriteString("note", Note);
-            if (Implicit) writer.WriteBoolean("implicit", Implicit);
-
-            writer.WritePropertyName("schemes");
-            writer.WriteStartObject();
-            foreach (var scheme in Schemes)
-            {
-                writer.WritePropertyName(scheme.Key.ToString());
-                scheme.Value.Write(writer);
-            }
-            writer.WriteEndObject();
-
-            writer.WritePropertyName("pathSets");
-            writer.WriteStartArray();
-            foreach (var pathSet in PathSets)
-            {
-                pathSet.Write(writer);
-            }
-            writer.WriteEndArray();
-
-            writer.WritePropertyName("ownerInfo");
-            OwnerInfo.Write(writer);
-
-            writer.WriteEndObject();
-        }
-
-        internal static Permission Load(JsonElement value)
-        {
-            var permission = new Permission();
-            ParsingHelpers.ParseMap(value, permission, handlers);
-            return permission;
-        }
-
-        private static FixedFieldMap<Permission> handlers = new()
-        {
-            { "authorizationType", (o,v) => {o.AuthorizationType = v.GetString();  } },
-            { "documentationWebUrl", (o,v) => {o.DocumentationWebUrl = v.GetString();  } },
-            { "note", (o,v) => {o.Note = v.GetString();  } },
-            { "privilegeLevel", (o,v) => {o.PrivilegeLevel= v.GetString();  } },
-            { "implicit", (o,v) => {o.Implicit = v.GetBoolean();  } },
-            { "pathSets", (o,v) => {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
-            { "schemes", (o,v) => {o.Schemes = ParsingHelpers.GetOrderedMap(v, Scheme.Load);  } },
-            { "ownerInfo", (o,v) => {o.OwnerInfo = OwnerInfo.Load(v);  } },
-        };
-    }
-
+    }    
 }

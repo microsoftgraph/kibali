@@ -1,41 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Kibali
 {
     public class PermissionsDeployment
     {
+        [JsonPropertyName("permissionDeployments")]
         public Dictionary<string, List<ProvisioningInfo>> Deployments { get; set; } = new();
 
         public static PermissionsDeployment Load(string document)
         {
-            return Load(JsonDocument.Parse(document));
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<PermissionsDeployment>(document, options);
         }
 
         public static PermissionsDeployment Load(Stream documentStream)
         {
-            return Load(JsonDocument.Parse(documentStream));
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<PermissionsDeployment>(documentStream, options);
         }
+
         public static PermissionsDeployment Load(JsonDocument doc)
         {
-            return Load(doc.RootElement);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<PermissionsDeployment>(doc.RootElement.GetRawText(), options);
         }
 
         public static PermissionsDeployment Load(JsonElement value)
         {
-            var permissionsDeployment = new PermissionsDeployment();
-            ParsingHelpers.ParseMap(value, permissionsDeployment, handlers);
-            return permissionsDeployment;
-        }
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
 
-        private static readonly FixedFieldMap<PermissionsDeployment> handlers = new()
-        {
-            { "permissionDeployments", (d,v) => { d.Deployments = ParsingHelpers.GetMapOfLists(v,ProvisioningInfo.Load);  } },
-        };
+            return JsonSerializer.Deserialize<PermissionsDeployment>(value.GetRawText(), options);
+        }
     }
 }
