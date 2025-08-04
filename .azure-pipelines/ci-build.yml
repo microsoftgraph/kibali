@@ -20,6 +20,7 @@ resources:
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
+
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
@@ -242,8 +243,16 @@ extends:
       dependsOn: build
       jobs:
       - deployment: deploy_kibaliTool
+        displayName: 'Deploy KibaliTool'
         dependsOn: []
         environment: nuget-org
+        templateContext:
+            type: releaseJob
+            isProduction: true
+            inputs:
+              - input: pipelineArtifact
+                artifactName: Nugets
+                targetPath: '$(Pipeline.Workspace)'
         strategy:
           runOnce:
             deploy:
