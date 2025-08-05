@@ -252,22 +252,16 @@ extends:
             inputs:
               - input: pipelineArtifact
                 artifactName: Nugets
-                targetPath: '$(Pipeline.Workspace)'
+                targetPath: $(Build.ArtifactStagingDirectory)/Nugets
+              - input: pipelineArtifact
+                artifactName: Microsoft.Graph.Kibali-v$(kibaliToolversion)
+                targetPath: '$(Build.ArtifactStagingDirectory)/Microsoft.Graph.Kibali-v$(kibaliToolversion)'
         strategy:
           runOnce:
             deploy:
               pool:
                 vmImage: ubuntu-latest
               steps:
-              - task: DownloadPipelineArtifact@2
-                displayName: Download nupkg from artifacts
-                inputs:
-                  artifact: Nugets
-                  source: current
-              - task: DownloadPipelineArtifact@2
-                displayName: Download kibaliTool executable from artifacts
-                inputs:
-                  source: current
               - pwsh: |
                   $artifactName = Get-ChildItem -Path $(Pipeline.Workspace)\Nugets -Filter Microsoft.Graph.*.nupkg -recurse | select -First 1
                   $artifactVersion= $artifactName.Name -replace "Microsoft.Graph.Kibali", "" -replace ".nupkg", ""
