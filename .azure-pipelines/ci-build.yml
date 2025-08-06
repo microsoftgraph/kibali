@@ -242,9 +242,24 @@ extends:
       condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
       dependsOn: build
       jobs:
+      - job: getVersion
+        displayName: 'Get Version'
+        steps:
+        - task: PowerShell@2
+          name: extractVersion
+          displayName: "Extract version from .csproj"
+          inputs:
+            targetType: 'inline'
+            script: |
+              $xml = [Xml] (Get-Content .\src\kibaliTool\KibaliTool.csproj)
+              $version = $xml.Project.PropertyGroup.Version
+              echo "Version: $version"
+              echo "##vso[task.setvariable variable=kibaliToolversion;isOutput=true]$version"
       - deployment: deploy_kibaliTool
         displayName: 'Deploy KibaliTool'
-        dependsOn: []
+        dependsOn: getVersion
+        variables:
+          kibaliToolversion: $[ dependencies.getVersion.outputs['extractVersion.kibaliToolversion'] ]
         environment: nuget-org
         templateContext:
             type: releaseJob
