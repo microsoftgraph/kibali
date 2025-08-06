@@ -240,7 +240,7 @@ extends:
             sourceFolder: $(Build.ArtifactStagingDirectory)
             content: '*.nupkg'
     - stage: deploy
-      # condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+      condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
       dependsOn: build
       jobs:
       - job: getVersion
@@ -287,22 +287,22 @@ extends:
                   echo "$artifactName"
                   echo "$artifactVersion"
                 displayName: 'Fetch Artifact Name'
-              # - task: 1ES.PublishNuget@1
-              #   displayName: 'NuGet push'
-              #   inputs:
-              #     packageParentPath: '$(Pipeline.Workspace)'
-              #     packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
-              #     nuGetFeedType: external
-              #     publishPackageMetadata: true
-              #     publishFeedCredentials: 'microsoftgraph NuGet connection'
-              # - task: GitHubRelease@1
-              #   displayName: 'GitHub release (KibaliTool v$(artifactVersion))'
-              #   condition: succeededOrFailed()
-              #   inputs:
-              #     gitHubConnection: 'GitHub - thewahome'
-              #     action: edit
-              #     tagSource: userSpecifiedTag
-              #     tag: '$(artifactVersion)'
-              #     title: 'KibaliTool v$(artifactVersion)'
-              #     assets: '$(Pipeline.Workspace)\**\*.exe'
-              #     changeLogType: issueBased
+              - task: 1ES.PublishNuget@1
+                displayName: 'NuGet push'
+                inputs:
+                  packageParentPath: '$(Pipeline.Workspace)'
+                  packagesToPush: '$(Pipeline.Workspace)/Nugets/Microsoft.Graph.Kibali.*.nupkg'
+                  nuGetFeedType: external
+                  publishPackageMetadata: true
+                  publishFeedCredentials: 'microsoftgraph NuGet connection'
+              - task: GitHubRelease@1
+                displayName: 'GitHub release (KibaliTool v$(artifactVersion))'
+                condition: succeededOrFailed()
+                inputs:
+                  gitHubConnection: 'GitHub - thewahome'
+                  action: edit
+                  tagSource: userSpecifiedTag
+                  tag: '$(artifactVersion)'
+                  title: 'KibaliTool v$(artifactVersion)'
+                  assets: '$(Pipeline.Workspace)\**\*.exe'
+                  changeLogType: issueBased
