@@ -14,7 +14,6 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   ProductBinPath: '$(Build.SourcesDirectory)\src\kibali\bin\$(BuildConfiguration)'
-  kibaliToolversion: 
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
