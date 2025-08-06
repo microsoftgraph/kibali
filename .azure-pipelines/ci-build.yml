@@ -240,7 +240,7 @@ extends:
             sourceFolder: $(Build.ArtifactStagingDirectory)
             content: '*.nupkg'
     - stage: deploy
-      condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+      # condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
       dependsOn: build
       jobs:
       - job: getVersion
