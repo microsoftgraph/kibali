@@ -10,7 +10,7 @@ Thank you for your interest in contributing to Kibali! This document describes h
 ## Getting Started
 
 ```shell
-git clone https://github.com/chegeapollo11/kibali.git
+git clone https://github.com/microsoftgraph/kibali.git
 cd kibali
 dotnet build
 ```
