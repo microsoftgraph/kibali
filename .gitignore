@@ -453,3 +453,18 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+##
+## Sensitive files -- secrets, keys, certificates
+##
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.cer
+**/secrets/
+appsettings.*.json
+!appsettings.json
