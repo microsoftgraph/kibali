@@ -117,7 +117,7 @@ extends:
             CredScan: false
             PoliCheck: true
         
-        - task: EsrpCodeSigning@5
+        - task: EsrpCodeSigning@6
           displayName: 'ESRP CodeSigning'
           inputs:
             ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
@@ -179,7 +179,7 @@ extends:
         - pwsh: dotnet pack $(Build.SourcesDirectory)/src/kibaliTool/KibaliTool.csproj -o $(Build.ArtifactStagingDirectory) --configuration $(BuildConfiguration) --no-build --include-symbols --include-source /p:SymbolPackageFormat=snupkg
           displayName: 'pack KibaliTool'
         
-        - task: EsrpCodeSigning@5
+        - task: EsrpCodeSigning@6
           displayName: 'ESRP CodeSigning Nuget Packages'
           inputs:
             ConnectedServiceName: 'Federated DevX ESRP Managed Identity Connection'
